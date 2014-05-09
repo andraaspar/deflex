@@ -30,6 +30,6 @@
     "grunt-contrib-clean": "^0.5.0"
   },
   "dependencies": {
-    "andraaspar-illa": "git://github.com/andraaspar/illa#v1.0"
+    "andraaspar-illa": "git://github.com/andraaspar/illa#v1"
   }
 }
