@@ -1,35 +1,11 @@
 {
-  "name": "andraaspar-deflex",
-  "version": "1.0.0",
-  "description": "JavaScript layout framework.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/andraaspar/deflex.git"
-  },
-  "keywords": [
-    "JavaScript",
-    "layout",
-    "framework",
-    "TypeScript",
-    "jQuery",
-    "flexbox"
-  ],
-  "author": "András Parditka",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/andraaspar/deflex/issues"
-  },
-  "homepage": "https://github.com/andraaspar/deflex",
-  "files": [
-    "src", "LICENSE"
-  ],
-  "devDependencies": {
-    "grunt": "^0.4.4",
-    "grunt-typescript": "^0.3.5",
-    "grunt-contrib-less": "^0.11.0",
-    "grunt-contrib-clean": "^0.5.0"
-  },
-  "dependencies": {
-    "andraaspar-illa": "git://github.com/andraaspar/illa#v1"
-  }
+	"private": true,
+	"devDependencies": {
+		"grunt": "^0.4.4",
+		"grunt-typescript": "^0.3.5",
+		"grunt-contrib-less": "^0.11.0",
+		"grunt-contrib-clean": "^0.5.0",
+		"grunt-bower-task": "^0.3.4",
+		"grunt-contrib-copy": "^0.5.0"
+	}
 }

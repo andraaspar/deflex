@@ -1,4 +1,4 @@
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Log.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='../../src/deflex/Factory.ts'/>
 
 module test1 {

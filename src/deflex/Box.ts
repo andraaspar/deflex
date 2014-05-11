@@ -1,9 +1,9 @@
-/// <reference path='../../node_modules/andraaspar-illa/lib/JQuery.d.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Axis2D.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/IventHandler.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Log.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/ScrollbarUtil.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Ticker.ts'/>
+/// <reference path='../../lib/JQuery.d.ts'/>
+/// <reference path='../../lib/illa/Axis2D.ts'/>
+/// <reference path='../../lib/illa/IventHandler.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='../../lib/illa/ScrollbarUtil.ts'/>
+/// <reference path='../../lib/illa/Ticker.ts'/>
 /// <reference path='Alignment.ts'/>
 /// <reference path='BoxModel.ts'/>
 /// <reference path='Context.ts'/>

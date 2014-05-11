@@ -1,9 +1,9 @@
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Axis2D.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Log.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Prop.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Prop2.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Prop4.ts'/>
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Prop8.ts'/>
+/// <reference path='../../lib/illa/Axis2D.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='../../lib/illa/Prop.ts'/>
+/// <reference path='../../lib/illa/Prop2.ts'/>
+/// <reference path='../../lib/illa/Prop4.ts'/>
+/// <reference path='../../lib/illa/Prop8.ts'/>
 /// <reference path='Alignment.ts'/>
 /// <reference path='End.ts'/>
 /// <reference path='IBoxImp.ts'/>

@@ -1,0 +1,30 @@
+{
+	"name": "andraaspar-deflex",
+	"version": "1.0.2",
+	"homepage": "https://github.com/andraaspar/deflex",
+	"authors": [
+		"András Parditka"
+	],
+	"description": "JavaScript layout framework.",
+	"main": "src/deflex",
+	"moduleType": [
+		"globals"
+	],
+	"keywords": [
+		"layout",
+		"framework",
+		"TypeScript",
+		"jQuery",
+		"flexbox"
+	],
+	"license": "MIT",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test"
+	],
+	"dependencies": {
+		"illa": "andraaspar/illa#v1.0.4"
+	}
+}

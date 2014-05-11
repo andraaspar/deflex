@@ -1,4 +1,4 @@
-/// <reference path='../../node_modules/andraaspar-illa/src/illa/Log.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='Box.ts'/>
 /// <reference path='IBoxConstructor.ts'/>
 
