@@ -576,7 +576,7 @@ module deflex {
 			var hasParentJQ = this.parentJQuery != null;
 			if (hasNotDestroyedParentBox || hasParentJQ) {
 				illa.Log.infoIf(this.name, 'is unsetting its parent.');
-				this.setParent(null);
+				this.setParent(null, undefined, undefined, true);
 			}
 		}
 

@@ -1384,7 +1384,7 @@ var deflex;
             var hasParentJQ = this.parentJQuery != null;
             if (hasNotDestroyedParentBox || hasParentJQ) {
                 illa.Log.infoIf(this.name, 'is unsetting its parent.');
-                this.setParent(null);
+                this.setParent(null, undefined, undefined, true);
             }
         };
 
@@ -1976,8 +1976,14 @@ var test1;
 
             deflex.Factory.checkDOM();
 
+            var inner = new deflex.Box();
+            inner.name = 'inner';
+            inner.setParent(outer);
+
             illa.Log.info('Init finished:', new Date().getTime() - startTime, 'ms.');
             illa.Log.info('Item count:', itemCount);
+
+            $('body').empty();
         };
         return Main;
     })();

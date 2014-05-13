@@ -46,9 +46,15 @@ module test1 {
 			outer.getJQuery().html(markup);
 			
 			deflex.Factory.checkDOM();
+			
+			var inner = new deflex.Box();
+			inner.name = 'inner';
+			inner.setParent(outer);
 
 			illa.Log.info('Init finished:', new Date().getTime() - startTime, 'ms.');
 			illa.Log.info('Item count:', itemCount);
+			
+			$('body').empty();
 		}
 	}
 }
