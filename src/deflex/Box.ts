@@ -24,6 +24,8 @@ module deflex {
 		static CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
 		static EVENT_DESTROYED = 'deflex_Box_destroyed';
 
+		private static scrollbarUtil: illa.ScrollbarUtil;
+
 		private jQuery: JQuery;
 		private sizeCacheX = 0;
 		private sizeCacheY = 0;
@@ -68,6 +70,10 @@ module deflex {
 				};
 			}
 			this.jQuery.on(Box.EVENT_DESTROYED, jQuery.proxy(this.onDestroyed, this));
+
+			if (!Box.scrollbarUtil) {
+				Box.scrollbarUtil = new illa.ScrollbarUtil();
+			}
 		}
 
 		getJQuery(): JQuery {
@@ -79,7 +85,7 @@ module deflex {
 			this.onTick();
 
 			if (this.getNeedsLayoutUpdate()) {
-				illa.ScrollbarUtil.clearDefaultSizeCache();
+				this.getScrollbarUtil().clearDefaultSizeCache();
 				this.updateModel();
 				this.model.applyContentWeight();
 
@@ -100,7 +106,7 @@ module deflex {
 				this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
 			}
 		}
-		
+
 		checkNeedsLayoutUpdate(): void {
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				if (this.getSizeIsAuto(axis) || this.getSizeIsFull(axis)) {
@@ -406,7 +412,11 @@ module deflex {
 		}
 
 		getScrollbarSize(axis: illa.Axis2D): number {
-			return illa.ScrollbarUtil.getDefaultSize(axis);
+			return this.getScrollbarUtil().getDefaultSize(axis);
+		}
+
+		getScrollbarUtil(): illa.ScrollbarUtil {
+			return Box.scrollbarUtil;
 		}
 
 		static getFrom(source: JQuery): Box {
@@ -1043,7 +1053,7 @@ module deflex {
 				default:
 					success = false;
 			}
-			
+
 			return success;
 		}
 	}

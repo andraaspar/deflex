@@ -17,12 +17,19 @@ module.exports = function(grunt) {
 		_outCSS: 'build/test1/style/test.css',
 		
 		clean: {
-			collect_libs: ['lib/*'],
+			update: ['lib/*'],
 			test1: ['<%= _outJS %>', '<%= _outCSS %>']
 		},
 		copy: {
-			collect_libs: {
+			update: {
 				files: bowerLibFiles
+			}
+		},
+		less: {
+			test1: {
+				files: {
+					'<%= _outCSS %>': 'test/test1/_style.less'
+				}
 			}
 		},
 		typescript: {
@@ -32,20 +39,24 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		less: {
-			test1: {
-				files: {
-					'<%= _outCSS %>': 'test/test1/_style.less'
-				}
+		shell: {
+			update: {
+				command: [
+					'bower install',
+					'bower prune',
+					'bower update'
+				].join('&&')
 			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
-	grunt.loadNpmTasks('grunt-typescript');
 	grunt.loadNpmTasks('grunt-contrib-less');
+	grunt.loadNpmTasks('grunt-typescript');
+	grunt.loadNpmTasks('grunt-shell');
 
-	grunt.registerTask('collect_libs', ['clean:collect_libs','copy:collect_libs']);
-	grunt.registerTask('default', ['clean:test1','typescript:test1','less:test1']);
+	grunt.registerTask('update', ['shell:update','clean:update','copy:update']);
+	grunt.registerTask('compile', ['clean:test1','typescript:test1','less:test1']);
+	grunt.registerTask('default', ['update', 'compile']);
 };

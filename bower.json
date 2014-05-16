@@ -1,6 +1,6 @@
 {
 	"name": "deflex",
-	"version": "1.0.4-beta",
+	"version": "1.0.4",
 	"homepage": "https://github.com/andraaspar/deflex",
 	"authors": [
 		"András Parditka"
@@ -25,6 +25,6 @@
 		"test"
 	],
 	"dependencies": {
-		"illa": "andraaspar/illa#v1.0.4"
+		"illa": "andraaspar/illa#v1"
 	}
 }
