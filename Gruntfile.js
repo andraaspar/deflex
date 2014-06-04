@@ -58,5 +58,5 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('update', ['shell:update','clean:update','copy:update']);
 	grunt.registerTask('compile', ['clean:test1','typescript:test1','less:test1']);
-	grunt.registerTask('default', ['update', 'compile']);
+	grunt.registerTask('default', ['compile']);
 };

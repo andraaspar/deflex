@@ -1,3 +1,105 @@
+var berek;
+(function (berek) {
+    berek.$ = window['jQuery'];
+})(berek || (berek = {}));
+var illa;
+(function (illa) {
+    illa.GLOBAL = (function () {
+        return this;
+    })();
+
+    illa.classByType = (function () {
+        var classes = 'Boolean Number String Function Array Date RegExp Object Error'.split(' ');
+        var result = {};
+        for (var i = 0, n = classes.length; i < n; i++) {
+            result['[object ' + classes[i] + ']'] = classes[i].toLowerCase();
+        }
+        return result;
+    })();
+
+    function isString(v) {
+        return typeof v == 'string';
+    }
+    illa.isString = isString;
+
+    function isBoolean(v) {
+        return typeof v == 'boolean';
+    }
+    illa.isBoolean = isBoolean;
+
+    function isNumber(v) {
+        return typeof v == 'number';
+    }
+    illa.isNumber = isNumber;
+
+    function isFunction(v) {
+        return typeof v == 'function';
+    }
+    illa.isFunction = isFunction;
+
+    function isArray(v) {
+        return illa.getType(v) == 'array';
+    }
+    illa.isArray = isArray;
+
+    if (Array.isArray)
+        illa.isArray = Array.isArray;
+
+    function isUndefined(v) {
+        return typeof v == 'undefined';
+    }
+    illa.isUndefined = isUndefined;
+
+    function isNull(v) {
+        return v === null;
+    }
+    illa.isNull = isNull;
+
+    function isUndefinedOrNull(v) {
+        return typeof v == 'undefined' || v === null;
+    }
+    illa.isUndefinedOrNull = isUndefinedOrNull;
+
+    function isObjectNotNull(v) {
+        var t = typeof v;
+        return t == 'object' && v !== null || t == 'function';
+    }
+    illa.isObjectNotNull = isObjectNotNull;
+
+    function getType(v) {
+        var result = '';
+        if (v == null) {
+            result = v + '';
+        } else {
+            result = typeof v;
+            if (result == 'object' || result == 'function') {
+                result = illa.classByType[toString.call(v)] || 'object';
+            }
+        }
+        return result;
+    }
+    illa.getType = getType;
+
+    function as(c, v) {
+        return v instanceof c ? v : null;
+    }
+    illa.as = as;
+
+    function bind(fn, obj) {
+        if (!fn)
+            throw 'No function.';
+        return function () {
+            return fn.apply(obj, arguments);
+        };
+    }
+    illa.bind = bind;
+
+    if (Function.prototype.bind) {
+        illa.bind = function (fn, obj) {
+            return fn.call.apply(fn.bind, arguments);
+        };
+    }
+})(illa || (illa = {}));
 var illa;
 (function (illa) {
     var Log = (function () {
@@ -8,7 +110,8 @@ var illa;
             for (var _i = 0; _i < (arguments.length - 0); _i++) {
                 args[_i] = arguments[_i + 0];
             }
-            if (window.console && console.log) {
+            var console = illa.GLOBAL.console;
+            if (console && console.log) {
                 if (console.log.apply) {
                     console.log.apply(console, args);
                 } else {
@@ -21,7 +124,8 @@ var illa;
             for (var _i = 0; _i < (arguments.length - 0); _i++) {
                 args[_i] = arguments[_i + 0];
             }
-            if (window.console && console.info) {
+            var console = illa.GLOBAL.console;
+            if (console && console.info) {
                 if (console.info.apply) {
                     console.info.apply(console, args);
                 } else {
@@ -36,7 +140,8 @@ var illa;
             for (var _i = 0; _i < (arguments.length - 0); _i++) {
                 args[_i] = arguments[_i + 0];
             }
-            if (window.console && console.warn) {
+            var console = illa.GLOBAL.console;
+            if (console && console.warn) {
                 if (console.warn.apply) {
                     console.warn.apply(console, args);
                 } else {
@@ -51,7 +156,8 @@ var illa;
             for (var _i = 0; _i < (arguments.length - 0); _i++) {
                 args[_i] = arguments[_i + 0];
             }
-            if (window.console && console.error) {
+            var console = illa.GLOBAL.console;
+            if (console && console.error) {
                 if (console.error.apply) {
                     console.error.apply(console, args);
                 } else {
@@ -97,7 +203,6 @@ var illa;
                 Log.error.apply(this, [test].concat(args));
             }
         };
-        Log.logSupported = 'console' in window && 'log' in window.console;
         return Log;
     })();
     illa.Log = Log;
@@ -110,66 +215,8 @@ var illa;
     })(illa.Axis2D || (illa.Axis2D = {}));
     var Axis2D = illa.Axis2D;
 })(illa || (illa = {}));
-var illa;
-(function (illa) {
-    var IventCallbackReg = (function () {
-        function IventCallbackReg(callback, thisObj) {
-            this.callback = callback;
-            this.thisObj = thisObj;
-        }
-        return IventCallbackReg;
-    })();
-    illa.IventCallbackReg = IventCallbackReg;
-})(illa || (illa = {}));
-var illa;
-(function (illa) {
-    var IventHandler = (function () {
-        function IventHandler() {
-            this.callbacksByType = {};
-        }
-        IventHandler.prototype.getCallbackRegsByType = function (type) {
-            var result = this.callbacksByType[type];
-            if (!jQuery.isArray(result))
-                result = [];
-            return result;
-        };
-
-        IventHandler.prototype.getEventParent = function () {
-            return null;
-        };
-
-        IventHandler.prototype.addIventCallback = function (type, cb, thisObj) {
-            var reg = new illa.IventCallbackReg(cb, thisObj);
-            if (jQuery.isArray(this.callbacksByType[type])) {
-                this.removeIventCallback(type, cb, thisObj);
-                this.callbacksByType[type].push(reg);
-            } else {
-                this.callbacksByType[type] = [reg];
-            }
-        };
-
-        IventHandler.prototype.removeIventCallback = function (type, cb, thisObj) {
-            var callbacks = this.callbacksByType[type];
-            if (jQuery.isArray(callbacks)) {
-                for (var i = 0, n = callbacks.length; i < n; i++) {
-                    var callback = callbacks[i];
-                    if (callback.callback === cb && callback.thisObj === thisObj) {
-                        callbacks.splice(i, 1);
-                        break;
-                    }
-                }
-            }
-        };
-
-        IventHandler.prototype.removeAllIventCallbacks = function () {
-            this.callbacksByType = {};
-        };
-        return IventHandler;
-    })();
-    illa.IventHandler = IventHandler;
-})(illa || (illa = {}));
-var illa;
-(function (illa) {
+var berek;
+(function (berek) {
     var ScrollbarUtil = (function () {
         function ScrollbarUtil(box) {
             this.defaultWidth = NaN;
@@ -177,7 +224,7 @@ var illa;
             if (box) {
                 this.box = box;
             } else {
-                this.box = jQuery('<div>');
+                this.box = berek.$('<div>');
             }
             this.box.addClass(ScrollbarUtil.CSS_CLASS);
             this.box.appendTo('body');
@@ -234,25 +281,130 @@ var illa;
             }
             return false;
         };
-        ScrollbarUtil.CSS_CLASS = 'illa-ScrollbarUtil-box';
+        ScrollbarUtil.CSS_CLASS = 'berek-ScrollbarUtil-box';
         return ScrollbarUtil;
     })();
-    illa.ScrollbarUtil = ScrollbarUtil;
+    berek.ScrollbarUtil = ScrollbarUtil;
+})(berek || (berek = {}));
+var illa;
+(function (illa) {
+    var ArrayUtil = (function () {
+        function ArrayUtil() {
+        }
+        ArrayUtil.indexOf = function (a, v, fromIndex) {
+            if (Array.prototype.indexOf) {
+                return Array.prototype.indexOf.call(a, v, fromIndex);
+            } else {
+                var length = a.length;
+                if (fromIndex == null) {
+                    fromIndex = 0;
+                } else if (fromIndex < 0) {
+                    fromIndex = Math.max(0, length + fromIndex);
+                }
+                for (var i = fromIndex; i < length; i++) {
+                    if (i in a && a[i] === v) {
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        };
+
+        ArrayUtil.removeFirst = function (a, v) {
+            var i = this.indexOf(a, v);
+            var removed = i >= 0;
+            if (removed) {
+                a.splice(i, 1)[0];
+            }
+            return removed;
+        };
+
+        ArrayUtil.removeAll = function (a, v) {
+            var removed = false;
+            for (var i = a.length - 1; i >= 0; i--) {
+                if (a[i] === v) {
+                    a.splice(i, 1);
+                    removed = true;
+                }
+            }
+            return removed;
+        };
+        return ArrayUtil;
+    })();
+    illa.ArrayUtil = ArrayUtil;
 })(illa || (illa = {}));
 var illa;
 (function (illa) {
-    var Ivent = (function () {
-        function Ivent(type, target) {
+    var EventCallbackReg = (function () {
+        function EventCallbackReg(callback, thisObj) {
+            this.callback = callback;
+            this.thisObj = thisObj;
+        }
+        return EventCallbackReg;
+    })();
+    illa.EventCallbackReg = EventCallbackReg;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
+    var EventHandler = (function () {
+        function EventHandler() {
+            this.callbacksByType = {};
+        }
+        EventHandler.prototype.getCallbackRegsByType = function (type) {
+            var result = this.callbacksByType[type];
+            if (!illa.isArray(result))
+                result = [];
+            return result;
+        };
+
+        EventHandler.prototype.getEventParent = function () {
+            return null;
+        };
+
+        EventHandler.prototype.addEventCallback = function (type, cb, thisObj) {
+            var reg = new illa.EventCallbackReg(cb, thisObj);
+            if (illa.isArray(this.callbacksByType[type])) {
+                this.removeEventCallback(type, cb, thisObj);
+                this.callbacksByType[type].push(reg);
+            } else {
+                this.callbacksByType[type] = [reg];
+            }
+        };
+
+        EventHandler.prototype.removeEventCallback = function (type, cb, thisObj) {
+            var callbacks = this.callbacksByType[type];
+            if (illa.isArray(callbacks)) {
+                for (var i = 0, n = callbacks.length; i < n; i++) {
+                    var callback = callbacks[i];
+                    if (callback.callback === cb && callback.thisObj === thisObj) {
+                        callbacks.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        };
+
+        EventHandler.prototype.removeAllEventCallbacks = function () {
+            this.callbacksByType = {};
+        };
+        return EventHandler;
+    })();
+    illa.EventHandler = EventHandler;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
+    var Event = (function () {
+        function Event(type, target) {
             this.type = type;
             this.target = target;
             this.isPropagationStopped = false;
             this.isImmediatePropagationStopped = false;
         }
-        Ivent.prototype.dispatch = function () {
+        Event.prototype.dispatch = function () {
             this.processHandler(this.target);
         };
 
-        Ivent.prototype.processHandler = function (handler) {
+        Event.prototype.processHandler = function (handler) {
             this.currentTarget = handler;
             var callbackRegs = handler.getCallbackRegsByType(this.type).slice(0);
             for (var i = 0, n = callbackRegs.length; i < n; i++) {
@@ -268,36 +420,36 @@ var illa;
             }
         };
 
-        Ivent.prototype.getType = function () {
+        Event.prototype.getType = function () {
             return this.type;
         };
 
-        Ivent.prototype.getTarget = function () {
+        Event.prototype.getTarget = function () {
             return this.target;
         };
 
-        Ivent.prototype.getCurrentTarget = function () {
+        Event.prototype.getCurrentTarget = function () {
             return this.currentTarget;
         };
 
-        Ivent.prototype.setIsPropagationStopped = function (flag) {
+        Event.prototype.setIsPropagationStopped = function (flag) {
             this.isPropagationStopped = flag;
         };
 
-        Ivent.prototype.getIsPropagationStopped = function () {
+        Event.prototype.getIsPropagationStopped = function () {
             return this.isPropagationStopped;
         };
 
-        Ivent.prototype.setStopImmediatePropagation = function (flag) {
+        Event.prototype.setStopImmediatePropagation = function (flag) {
             this.isImmediatePropagationStopped = flag;
         };
 
-        Ivent.prototype.getIsImmediatePropagationStopped = function () {
+        Event.prototype.getIsImmediatePropagationStopped = function () {
             return this.isImmediatePropagationStopped;
         };
-        return Ivent;
+        return Event;
     })();
-    illa.Ivent = Ivent;
+    illa.Event = Event;
 })(illa || (illa = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -311,14 +463,13 @@ var illa;
         __extends(Ticker, _super);
         function Ticker() {
             _super.call(this);
-            this.supportsAnimationFrame = jQuery.isFunction(window.requestAnimationFrame) && jQuery.isFunction(window.cancelAnimationFrame);
-            this.intervalID = NaN;
-            this.onTickBound = jQuery.proxy(this.onTick, this);
+            this.supportsAnimationFrame = illa.isFunction(illa.GLOBAL.requestAnimationFrame) && illa.isFunction(illa.GLOBAL.cancelAnimationFrame);
+            this.onTickBound = illa.bind(this.onTick, this);
             this.tickCount = 0;
             this.setIsStarted(true);
         }
         Ticker.prototype.getIsStarted = function () {
-            return !isNaN(this.intervalID);
+            return !illa.isUndefined(this.intervalID);
         };
 
         Ticker.prototype.setIsStarted = function (flag) {
@@ -337,7 +488,7 @@ var illa;
                 } else {
                     clearInterval(this.intervalID);
                 }
-                this.intervalID = NaN;
+                this.intervalID = undefined;
             }
         };
 
@@ -350,7 +501,7 @@ var illa;
             if (this.supportsAnimationFrame) {
                 this.intervalID = requestAnimationFrame(this.onTickBound);
             }
-            new illa.Ivent(Ticker.EVENT_TICK, this).dispatch();
+            new illa.Event(Ticker.EVENT_TICK, this).dispatch();
         };
 
         Ticker.prototype.getTickCount = function () {
@@ -358,7 +509,7 @@ var illa;
         };
         Ticker.EVENT_TICK = 'illa_Ticker_EVENT_TICK';
         return Ticker;
-    })(illa.IventHandler);
+    })(illa.EventHandler);
     illa.Ticker = Ticker;
 })(illa || (illa = {}));
 var deflex;
@@ -843,23 +994,23 @@ var deflex;
                     nextBoxJQ = undefined;
                 this.setParent(jq.parent(), nextBoxJQ ? 0 /* MIN */ : 1 /* MAX */, nextBoxJQ, true);
             } else {
-                this.jQuery = jQuery('<div>');
+                this.jQuery = berek.$('<div>');
             }
             this.jQuery.data(Box.JQUERY_DATA_KEY, this);
             this.jQuery.addClass(Box.CSS_CLASS);
-            if (!(Box.EVENT_DESTROYED in jQuery['event'].special)) {
-                jQuery['event'].special[Box.EVENT_DESTROYED] = {
+            if (!(Box.EVENT_DESTROYED in berek.$.event.special)) {
+                berek.$.event.special[Box.EVENT_DESTROYED] = {
                     remove: function (o) {
                         if (o.handler) {
-                            o.handler();
+                            o.handler(null);
                         }
                     }
                 };
             }
-            this.jQuery.on(Box.EVENT_DESTROYED, jQuery.proxy(this.onDestroyed, this));
+            this.jQuery.on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
 
             if (!Box.scrollbarUtil) {
-                Box.scrollbarUtil = new illa.ScrollbarUtil();
+                Box.scrollbarUtil = new berek.ScrollbarUtil();
             }
         }
         Box.prototype.getJQuery = function () {
@@ -1239,13 +1390,13 @@ var deflex;
             if (parent instanceof Box) {
                 parentBox = parent;
                 relatedBox = related;
-            } else if (parent instanceof jQuery || related instanceof jQuery) {
+            } else if (parent instanceof berek.$ || related instanceof berek.$) {
                 parentJQuery = parent;
                 relatedJQuery = related;
                 parentBox = Box.getFrom(parentJQuery);
                 relatedBox = Box.getFrom(relatedJQuery);
             } else if (typeof parent == 'string') {
-                parentJQuery = jQuery(parent);
+                parentJQuery = berek.$(parent);
             }
 
             if (this.parentBox) {
@@ -1378,7 +1529,7 @@ var deflex;
         };
 
         Box.prototype.getChildIndex = function (child) {
-            return jQuery.inArray(child, this.children);
+            return illa.ArrayUtil.indexOf(this.children, child);
         };
 
         Box.prototype.destroy = function () {
@@ -1430,9 +1581,9 @@ var deflex;
             this.model.applySizeToSelf.set(value);
             this.getJQuery().toggleClass(Box.CSS_CLASS_IS_ROOT, value);
             if (value) {
-                Box.ROOT_TICKER.addIventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+                Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
             } else {
-                Box.ROOT_TICKER.removeIventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+                Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
             }
             illa.Log.infoIf(this.name, 'is now ' + (value ? '' : 'NOT ') + 'root.');
         };
@@ -1880,7 +2031,7 @@ var deflex;
         Box.CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
         Box.EVENT_DESTROYED = 'deflex_Box_destroyed';
         return Box;
-    })(illa.IventHandler);
+    })(illa.EventHandler);
     deflex.Box = Box;
 })(deflex || (deflex = {}));
 var deflex;
@@ -1889,7 +2040,7 @@ var deflex;
         function Factory() {
         }
         Factory.checkDOM = function () {
-            var jqs = jQuery('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
+            var jqs = berek.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
             for (var i = 0, n = jqs.length; i < n; i++) {
                 var jq = jqs.eq(i);
                 this.create(jq);
@@ -1946,7 +2097,7 @@ var test1;
 (function (test1) {
     var Main = (function () {
         function Main() {
-            jQuery(jQuery.proxy(this.onDOMLoaded, this));
+            berek.$(illa.bind(this.onDOMLoaded, this));
         }
         Main.prototype.onDOMLoaded = function () {
             var startTime = new Date().getTime();

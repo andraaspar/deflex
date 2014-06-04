@@ -1,3 +1,4 @@
+/// <reference path='../../lib/berek/_module.ts'/>
 /// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='../../src/deflex/Factory.ts'/>
 
@@ -6,7 +7,7 @@ module test1 {
 		outer: deflex.Box;
 
 		constructor() {
-			jQuery(jQuery.proxy(this.onDOMLoaded, this));
+			berek.$(illa.bind(this.onDOMLoaded, this));
 		}
 
 		onDOMLoaded() {

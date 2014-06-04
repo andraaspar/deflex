@@ -9,14 +9,14 @@ module deflex {
 		static boxConstructors: { [s: string]: IBoxConstructor } = { 'default': Box };
 
 		static checkDOM(): void {
-			var jqs = jQuery('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
+			var jqs = berek.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
 			for (var i = 0, n = jqs.length; i < n; i++) {
 				var jq = jqs.eq(i);
 				this.create(jq);
 			}
 		}
 
-		static create(jq: JQuery): Box {
+		static create(jq: berek.jquery.IInstance): Box {
 			var constructorName = jq.attr(this.CLASS_ATTRIBUTE_NAME);
 			jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
 			if (typeof constructorName != 'string') {

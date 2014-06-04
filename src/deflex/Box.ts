@@ -1,8 +1,10 @@
-/// <reference path='../../lib/JQuery.d.ts'/>
+/// <reference path='../../lib/berek/_module.ts'/>
+/// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
+/// <reference path='../../lib/illa/_module.ts'/>
+/// <reference path='../../lib/illa/ArrayUtil.ts'/>
 /// <reference path='../../lib/illa/Axis2D.ts'/>
-/// <reference path='../../lib/illa/IventHandler.ts'/>
+/// <reference path='../../lib/illa/EventHandler.ts'/>
 /// <reference path='../../lib/illa/Log.ts'/>
-/// <reference path='../../lib/illa/ScrollbarUtil.ts'/>
 /// <reference path='../../lib/illa/Ticker.ts'/>
 /// <reference path='Alignment.ts'/>
 /// <reference path='BoxModel.ts'/>
@@ -12,7 +14,7 @@
 /// <reference path='StyleUtil.ts'/>
 
 module deflex {
-	export class Box extends illa.IventHandler implements IBoxImp {
+	export class Box extends illa.EventHandler implements IBoxImp {
 		static ROOT_TICKER = new illa.Ticker();
 
 		static JQUERY_DATA_KEY = 'deflex_Box';
@@ -24,9 +26,9 @@ module deflex {
 		static CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
 		static EVENT_DESTROYED = 'deflex_Box_destroyed';
 
-		private static scrollbarUtil: illa.ScrollbarUtil;
+		private static scrollbarUtil: berek.ScrollbarUtil;
 
-		private jQuery: JQuery;
+		private jQuery: berek.jquery.IInstance;
 		private sizeCacheX = 0;
 		private sizeCacheY = 0;
 		private sizeIsFullX = false;
@@ -36,7 +38,7 @@ module deflex {
 		private offsetCacheX = 0;
 		private offsetCacheY = 0;
 		private parentBox: Box;
-		private parentJQuery: JQuery;
+		private parentJQuery: berek.jquery.IInstance;
 		private children: Array<Box> = [];
 		private zIndex = 0;
 		private isDestroyed = false;
@@ -47,7 +49,7 @@ module deflex {
 
 		public name = '';
 
-		constructor(jq?: JQuery) {
+		constructor(jq?: berek.jquery.IInstance) {
 			super();
 
 			if (jq) {
@@ -56,31 +58,31 @@ module deflex {
 				if (!nextBoxJQ.length) nextBoxJQ = undefined;
 				this.setParent(jq.parent(), nextBoxJQ ? End.MIN : End.MAX, nextBoxJQ, true);
 			} else {
-				this.jQuery = jQuery('<div>');
+				this.jQuery = berek.$('<div>');
 			}
 			this.jQuery.data(Box.JQUERY_DATA_KEY, this);
 			this.jQuery.addClass(Box.CSS_CLASS);
-			if (!(Box.EVENT_DESTROYED in jQuery['event'].special)) {
-				jQuery['event'].special[Box.EVENT_DESTROYED] = {
+			if (!(Box.EVENT_DESTROYED in berek.$.event.special)) {
+				berek.$.event.special[Box.EVENT_DESTROYED] = {
 					remove: function(o) {
 						if (o.handler) {
-							o.handler();
+							o.handler(null);
 						}
 					}
 				};
 			}
-			this.jQuery.on(Box.EVENT_DESTROYED, jQuery.proxy(this.onDestroyed, this));
+			this.jQuery.on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
 
 			if (!Box.scrollbarUtil) {
-				Box.scrollbarUtil = new illa.ScrollbarUtil();
+				Box.scrollbarUtil = new berek.ScrollbarUtil();
 			}
 		}
 
-		getJQuery(): JQuery {
+		getJQuery(): berek.jquery.IInstance {
 			return this.jQuery;
 		}
 
-		onRootTick(e: illa.Ivent): void {
+		onRootTick(e: illa.Event): void {
 			var startTime = new Date().getTime();
 			this.onTick();
 
@@ -301,7 +303,7 @@ module deflex {
 
 		getOffset(axis: illa.Axis2D, alignment = Alignment.START, context = Context.PARENT): number {
 			var result = NaN;
-			var offset: JQueryCoordinates;
+			var offset: berek.jquery.IPositionObject;
 			switch (context) {
 				case Context.INNER:
 					offset = { left: 0, top: 0 };
@@ -415,40 +417,40 @@ module deflex {
 			return this.getScrollbarUtil().getDefaultSize(axis);
 		}
 
-		getScrollbarUtil(): illa.ScrollbarUtil {
+		getScrollbarUtil(): berek.ScrollbarUtil {
 			return Box.scrollbarUtil;
 		}
 
-		static getFrom(source: JQuery): Box {
+		static getFrom(source: berek.jquery.IInstance): Box {
 			var result: Box = null;
 			if (source) {
 				var stored = source.data(Box.JQUERY_DATA_KEY);
 				if (stored instanceof Box) {
-					result = stored;
+					result = <any>stored;
 				}
 			}
 			return result;
 		}
 
 		setParent(parent: Box, end?: End, related?: Box, dontModifyDOM?: boolean): void;
-		setParent(parent: JQuery, end?: End, related?: JQuery, dontModifyDOM?: boolean): void;
+		setParent(parent: berek.jquery.IInstance, end?: End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
 		setParent(parent: string, end?: End, dontModifyDOM?: boolean): void;
 		setParent(parent, end = End.MAX, related = null, dontModifyDOM = false) {
 			var parentBox: Box = null;
-			var parentJQuery: JQuery = null;
+			var parentJQuery: berek.jquery.IInstance = null;
 			var relatedBox: Box = null;
-			var relatedJQuery: JQuery = null;
+			var relatedJQuery: berek.jquery.IInstance = null;
 
 			if (parent instanceof Box) {
 				parentBox = <Box>parent;
 				relatedBox = <Box>related;
-			} else if (parent instanceof jQuery || related instanceof jQuery) {
-				parentJQuery = <JQuery>parent;
-				relatedJQuery = <JQuery>related;
+			} else if (parent instanceof berek.$ || related instanceof berek.$) {
+				parentJQuery = <berek.jquery.IInstance>parent;
+				relatedJQuery = <berek.jquery.IInstance>related;
 				parentBox = Box.getFrom(parentJQuery);
 				relatedBox = Box.getFrom(relatedJQuery);
 			} else if (typeof parent == 'string') {
-				parentJQuery = jQuery(<string>parent);
+				parentJQuery = berek.$(<string>parent);
 			}
 
 			if (this.parentBox) {
@@ -511,11 +513,11 @@ module deflex {
 			return this.parentBox;
 		}
 
-		getParentJQuery(): JQuery {
+		getParentJQuery(): berek.jquery.IInstance {
 			return this.parentJQuery;
 		}
 
-		getEventParent(): illa.IIventHandler {
+		getEventParent(): illa.IEventHandler {
 			if (this.parentBox) {
 				return this.parentBox;
 			} else if (this.parentJQuery) {
@@ -572,14 +574,14 @@ module deflex {
 		}
 
 		getChildIndex(child: Box): number {
-			return jQuery.inArray(child, this.children);
+			return illa.ArrayUtil.indexOf(this.children, child);
 		}
 
 		destroy(): void {
 			this.getJQuery().remove();
 		}
 
-		onDestroyed(event: JQueryEventObject): void {
+		onDestroyed(event: berek.jquery.IEvent): void {
 			illa.Log.infoIf(this.name, 'is being destroyed.');
 			this.isDestroyed = true;
 			var hasNotDestroyedParentBox = this.parentBox && !this.parentBox.getIsDestroyed();
@@ -621,9 +623,9 @@ module deflex {
 			this.model.applySizeToSelf.set(value);
 			this.getJQuery().toggleClass(Box.CSS_CLASS_IS_ROOT, value);
 			if (value) {
-				Box.ROOT_TICKER.addIventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+				Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
 			} else {
-				Box.ROOT_TICKER.removeIventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+				Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
 			}
 			illa.Log.infoIf(this.name, 'is now ' + (value ? '' : 'NOT ') + 'root.');
 		}

@@ -1,15 +1,12 @@
 {
 	"name": "deflex",
-	"version": "1.0.4",
+	"version": "1.1.0",
 	"homepage": "https://github.com/andraaspar/deflex",
 	"authors": [
 		"András Parditka"
 	],
 	"description": "JavaScript layout framework.",
 	"main": "src/deflex",
-	"moduleType": [
-		"globals"
-	],
 	"keywords": [
 		"layout",
 		"framework",
@@ -20,11 +17,15 @@
 	"license": "MIT",
 	"ignore": [
 		"**/.*",
-		"node_modules",
 		"bower_components",
-		"test"
+		"build",
+		"lib",
+		"node_modules",
+		"test",
+		"Gruntfile.js",
+		"package.json"
 	],
 	"dependencies": {
-		"illa": "andraaspar/illa#v1"
+		"berek": "andraaspar/berek#v1.1"
 	}
 }

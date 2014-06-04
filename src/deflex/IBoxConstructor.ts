@@ -1,5 +1,5 @@
 module deflex {
 	export interface IBoxConstructor {
-		new (jq: JQuery): Box;
+		new (jq: berek.jquery.IInstance): Box;
 	}
 }
