@@ -1,13 +1,10 @@
 module.exports = function(grunt) {
 	
-	var bowerDeps = Object.keys(grunt.file.readJSON('./bower.json').dependencies);
-	var folders = ['lib', 'src'];
+	var bowerComponents = grunt.file.expand('bower_components/*');
 	var bowerLibFiles = (function() {
 		var result = [];
-		for (var i = 0; i < bowerDeps.length; i++) {
-			for (var j = 0; j < folders.length; j++) {
-				result.push({expand: true, cwd: 'bower_components/' + bowerDeps[i] + '/' + folders[j], src: ['**/*'], dest: 'lib/'});
-			}
+		for (var i = 0; i < bowerComponents.length; i++) {
+			result.push({expand: true, cwd: bowerComponents[i] + '/src', src: ['**/*'], dest: 'lib/'});
 		}
 		return result;
 	})();
@@ -42,8 +39,8 @@ module.exports = function(grunt) {
 		shell: {
 			update: {
 				command: [
+					'bower prune --force',
 					'bower install',
-					'bower prune',
 					'bower update'
 				].join('&&')
 			}
