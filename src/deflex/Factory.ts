@@ -3,13 +3,15 @@
 /// <reference path='IBoxConstructor.ts'/>
 
 module deflex {
+	import jquery = berek.jquery;
+	
 	export class Factory {
 		static CLASS_ATTRIBUTE_NAME = 'data-deflex-class';
 		static STYLE_ATTRIBUTE_NAME = 'data-deflex-style';
 		static boxConstructors: { [s: string]: IBoxConstructor } = { 'default': Box };
 
 		static checkDOM(): void {
-			var jqs = berek.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
+			var jqs = jquery.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
 			for (var i = 0, n = jqs.length; i < n; i++) {
 				var jq = jqs.eq(i);
 				this.create(jq);

@@ -1,6 +1,9 @@
 var berek;
 (function (berek) {
-    berek.$ = window['jQuery'];
+    (function (jquery) {
+        jquery.$ = window['jQuery'];
+    })(berek.jquery || (berek.jquery = {}));
+    var jquery = berek.jquery;
 })(berek || (berek = {}));
 var illa;
 (function (illa) {
@@ -224,7 +227,7 @@ var berek;
             if (box) {
                 this.box = box;
             } else {
-                this.box = berek.$('<div>');
+                this.box = berek.jquery.$('<div>');
             }
             this.box.addClass(ScrollbarUtil.CSS_CLASS);
             this.box.appendTo('body');
@@ -966,6 +969,8 @@ var deflex;
 })(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
+    var jquery = berek.jquery;
+
     var Box = (function (_super) {
         __extends(Box, _super);
         function Box(jq) {
@@ -994,12 +999,12 @@ var deflex;
                     nextBoxJQ = undefined;
                 this.setParent(jq.parent(), nextBoxJQ ? 0 /* MIN */ : 1 /* MAX */, nextBoxJQ, true);
             } else {
-                this.jQuery = berek.$('<div>');
+                this.jQuery = jquery.$('<div>');
             }
             this.jQuery.data(Box.JQUERY_DATA_KEY, this);
             this.jQuery.addClass(Box.CSS_CLASS);
-            if (!(Box.EVENT_DESTROYED in berek.$.event.special)) {
-                berek.$.event.special[Box.EVENT_DESTROYED] = {
+            if (!(Box.EVENT_DESTROYED in jquery.$.event.special)) {
+                jquery.$.event.special[Box.EVENT_DESTROYED] = {
                     remove: function (o) {
                         if (o.handler) {
                             o.handler(null);
@@ -1390,13 +1395,13 @@ var deflex;
             if (parent instanceof Box) {
                 parentBox = parent;
                 relatedBox = related;
-            } else if (parent instanceof berek.$ || related instanceof berek.$) {
+            } else if (parent instanceof jquery.$ || related instanceof jquery.$) {
                 parentJQuery = parent;
                 relatedJQuery = related;
                 parentBox = Box.getFrom(parentJQuery);
                 relatedBox = Box.getFrom(relatedJQuery);
             } else if (typeof parent == 'string') {
-                parentJQuery = berek.$(parent);
+                parentJQuery = jquery.$(parent);
             }
 
             if (this.parentBox) {
@@ -2036,11 +2041,13 @@ var deflex;
 })(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
+    var jquery = berek.jquery;
+
     var Factory = (function () {
         function Factory() {
         }
         Factory.checkDOM = function () {
-            var jqs = berek.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
+            var jqs = jquery.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
             for (var i = 0, n = jqs.length; i < n; i++) {
                 var jq = jqs.eq(i);
                 this.create(jq);
@@ -2095,9 +2102,11 @@ var deflex;
 })(deflex || (deflex = {}));
 var test1;
 (function (test1) {
+    var jquery = berek.jquery;
+
     var Main = (function () {
         function Main() {
-            berek.$(illa.bind(this.onDOMLoaded, this));
+            jquery.$(illa.bind(this.onDOMLoaded, this));
         }
         Main.prototype.onDOMLoaded = function () {
             var startTime = new Date().getTime();

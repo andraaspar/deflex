@@ -1,4 +1,4 @@
-/// <reference path='../../lib/berek/_module.ts'/>
+/// <reference path='../../lib/berek/jquery/_module.ts'/>
 /// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
 /// <reference path='../../lib/illa/_module.ts'/>
 /// <reference path='../../lib/illa/ArrayUtil.ts'/>
@@ -14,6 +14,8 @@
 /// <reference path='StyleUtil.ts'/>
 
 module deflex {
+	import jquery = berek.jquery;
+	
 	export class Box extends illa.EventHandler implements IBoxImp {
 		static ROOT_TICKER = new illa.Ticker();
 
@@ -58,12 +60,12 @@ module deflex {
 				if (!nextBoxJQ.length) nextBoxJQ = undefined;
 				this.setParent(jq.parent(), nextBoxJQ ? End.MIN : End.MAX, nextBoxJQ, true);
 			} else {
-				this.jQuery = berek.$('<div>');
+				this.jQuery = jquery.$('<div>');
 			}
 			this.jQuery.data(Box.JQUERY_DATA_KEY, this);
 			this.jQuery.addClass(Box.CSS_CLASS);
-			if (!(Box.EVENT_DESTROYED in berek.$.event.special)) {
-				berek.$.event.special[Box.EVENT_DESTROYED] = {
+			if (!(Box.EVENT_DESTROYED in jquery.$.event.special)) {
+				jquery.$.event.special[Box.EVENT_DESTROYED] = {
 					remove: function(o) {
 						if (o.handler) {
 							o.handler(null);
@@ -179,14 +181,14 @@ module deflex {
 			switch (axis) {
 				case illa.Axis2D.X:
 					if (isNaN(this.sizeCacheX)) {
-						result = this.jQuery[0].offsetWidth;
+						result = (<HTMLElement>this.jQuery[0]).offsetWidth;
 					} else {
 						result = this.sizeCacheX;
 					}
 					break;
 				case illa.Axis2D.Y:
 					if (isNaN(this.sizeCacheY)) {
-						result = this.jQuery[0].offsetHeight;
+						result = (<HTMLElement>this.jQuery[0]).offsetHeight;
 					} else {
 						result = this.sizeCacheY;
 					}
@@ -242,13 +244,13 @@ module deflex {
 					case illa.Axis2D.X:
 						if (this.sizeCacheX != value) {
 							this.sizeCacheX = value;
-							this.jQuery[0].style.width = value + 'px';
+							(<HTMLElement>this.jQuery[0]).style.width = value + 'px';
 						}
 						break;
 					case illa.Axis2D.Y:
 						if (this.sizeCacheY != value) {
 							this.sizeCacheY = value;
-							this.jQuery[0].style.height = value + 'px';
+							(<HTMLElement>this.jQuery[0]).style.height = value + 'px';
 						}
 						break;
 				}
@@ -363,13 +365,13 @@ module deflex {
 					case illa.Axis2D.X:
 						if (this.offsetCacheX != value) {
 							this.offsetCacheX = value;
-							this.jQuery[0].style.left = value + 'px';
+							(<HTMLElement>this.jQuery[0]).style.left = value + 'px';
 						}
 						break;
 					case illa.Axis2D.Y:
 						if (this.offsetCacheY != value) {
 							this.offsetCacheY = value;
-							this.jQuery[0].style.top = value + 'px';
+							(<HTMLElement>this.jQuery[0]).style.top = value + 'px';
 						}
 						break;
 				}
@@ -380,10 +382,10 @@ module deflex {
 			var overflow = '';
 			switch (axis) {
 				case illa.Axis2D.X:
-					overflow = this.jQuery[0].style.overflowY;
+					overflow = (<HTMLElement>this.jQuery[0]).style.overflowY;
 					break;
 				case illa.Axis2D.Y:
-					overflow = this.jQuery[0].style.overflowX;
+					overflow = (<HTMLElement>this.jQuery[0]).style.overflowX;
 					break;
 			}
 			return overflow == 'scroll';
@@ -395,12 +397,12 @@ module deflex {
 				default:
 				case illa.Axis2D.X:
 					if (this.getShowScrollbar(illa.Axis2D.X) != flag) {
-						this.jQuery[0].style.overflowY = overflow;
+						(<HTMLElement>this.jQuery[0]).style.overflowY = overflow;
 					}
 					if (axis != null) break;
 				case illa.Axis2D.Y:
 					if (this.getShowScrollbar(illa.Axis2D.Y) != flag) {
-						this.jQuery[0].style.overflowX = overflow;
+						(<HTMLElement>this.jQuery[0]).style.overflowX = overflow;
 					}
 			}
 		}
@@ -444,13 +446,13 @@ module deflex {
 			if (parent instanceof Box) {
 				parentBox = <Box>parent;
 				relatedBox = <Box>related;
-			} else if (parent instanceof berek.$ || related instanceof berek.$) {
+			} else if (parent instanceof jquery.$ || related instanceof jquery.$) {
 				parentJQuery = <berek.jquery.IInstance>parent;
 				relatedJQuery = <berek.jquery.IInstance>related;
 				parentBox = Box.getFrom(parentJQuery);
 				relatedBox = Box.getFrom(relatedJQuery);
 			} else if (typeof parent == 'string') {
-				parentJQuery = berek.$(<string>parent);
+				parentJQuery = jquery.$(<string>parent);
 			}
 
 			if (this.parentBox) {
@@ -600,7 +602,7 @@ module deflex {
 			if (this.zIndex == value) return;
 			illa.Log.infoIf(this.name, 'has a new z-index: ' + value);
 			this.zIndex = value;
-			this.getJQuery()[0].style.zIndex = <any>value;
+			(<HTMLElement>this.getJQuery()[0]).style.zIndex = <any>value;
 		}
 
 		getIsDestroyed(): boolean {
