@@ -392,6 +392,15 @@ var berek;
 })(berek || (berek = {}));
 var illa;
 (function (illa) {
+    (function (Alignment) {
+        Alignment[Alignment["START"] = 0] = "START";
+        Alignment[Alignment["CENTER"] = 1] = "CENTER";
+        Alignment[Alignment["END"] = 2] = "END";
+    })(illa.Alignment || (illa.Alignment = {}));
+    var Alignment = illa.Alignment;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
     var ArrayUtil = (function () {
         function ArrayUtil() {
         }
@@ -436,6 +445,14 @@ var illa;
         return ArrayUtil;
     })();
     illa.ArrayUtil = ArrayUtil;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
+    (function (End) {
+        End[End["MIN"] = 0] = "MIN";
+        End[End["MAX"] = 1] = "MAX";
+    })(illa.End || (illa.End = {}));
+    var End = illa.End;
 })(illa || (illa = {}));
 var illa;
 (function (illa) {
@@ -610,15 +627,6 @@ var illa;
     })(illa.EventHandler);
     illa.Ticker = Ticker;
 })(illa || (illa = {}));
-var deflex;
-(function (deflex) {
-    (function (Alignment) {
-        Alignment[Alignment["START"] = 0] = "START";
-        Alignment[Alignment["CENTER"] = 1] = "CENTER";
-        Alignment[Alignment["END"] = 2] = "END";
-    })(deflex.Alignment || (deflex.Alignment = {}));
-    var Alignment = deflex.Alignment;
-})(deflex || (deflex = {}));
 var illa;
 (function (illa) {
     var Prop = (function () {
@@ -717,14 +725,6 @@ var illa;
     })();
     illa.Prop8 = Prop8;
 })(illa || (illa = {}));
-var deflex;
-(function (deflex) {
-    (function (End) {
-        End[End["MIN"] = 0] = "MIN";
-        End[End["MAX"] = 1] = "MAX";
-    })(deflex.End || (deflex.End = {}));
-    var End = deflex.End;
-})(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
     var BoxModel = (function () {

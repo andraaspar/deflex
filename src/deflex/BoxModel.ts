@@ -4,8 +4,8 @@
 /// <reference path='../../lib/illa/Prop2.ts'/>
 /// <reference path='../../lib/illa/Prop4.ts'/>
 /// <reference path='../../lib/illa/Prop8.ts'/>
-/// <reference path='Alignment.ts'/>
-/// <reference path='End.ts'/>
+/// <reference path='illa.Alignment.ts'/>
+/// <reference path='illa.End.ts'/>
 /// <reference path='IBoxImp.ts'/>
 
 module deflex {
@@ -20,13 +20,13 @@ module deflex {
 		new illa.Prop2<illa.Axis2D, boolean>([false, false], this.onSettingChanged, this);
 
 		inset =
-		new illa.Prop4<illa.Axis2D, End, number>([0, 0, 0, 0], this.onSettingChanged, this);
+		new illa.Prop4<illa.Axis2D, illa.End, number>([0, 0, 0, 0], this.onSettingChanged, this);
 
 		sizeLimit =
-		new illa.Prop4<illa.Axis2D, End, number>([0, Infinity, 0, Infinity], this.onSettingChanged, this);
+		new illa.Prop4<illa.Axis2D, illa.End, number>([0, Infinity, 0, Infinity], this.onSettingChanged, this);
 
 		shrinkWrapSizeLimit =
-		new illa.Prop8<illa.Axis2D, End, End, number>([0, Infinity, 0, Infinity, 0, Infinity, 0, Infinity], this.onSettingChanged, this);
+		new illa.Prop8<illa.Axis2D, illa.End, illa.End, number>([0, Infinity, 0, Infinity, 0, Infinity, 0, Infinity], this.onSettingChanged, this);
 
 		spaceBefore =
 		new illa.Prop2<illa.Axis2D, number>([NaN, NaN], this.onSettingChanged, this);
@@ -44,7 +44,7 @@ module deflex {
 		new illa.Prop2<illa.Axis2D, boolean>([false, false], this.onSettingChanged, this);
 
 		alignment =
-		new illa.Prop2<illa.Axis2D, Alignment>([Alignment.START, Alignment.START], this.onSettingChanged, this);
+		new illa.Prop2<illa.Axis2D, illa.Alignment>([illa.Alignment.START, illa.Alignment.START], this.onSettingChanged, this);
 
 		isSpacer =
 		new illa.Prop(false, this.onSettingChanged, this);
@@ -91,7 +91,7 @@ module deflex {
 
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				if (this.applySizeToSelf.get()) {
-					this.outSize.set(axis, this.sizeLimit.get(axis, End.MIN));
+					this.outSize.set(axis, this.sizeLimit.get(axis, illa.End.MIN));
 				}
 
 				if (this.direction.get() == axis) {
@@ -99,7 +99,7 @@ module deflex {
 					this.stackChildren(axis, remainingSpace);
 				} else {
 					var contentSpace = this.getContentSpace(axis);
-					var largestMinSize = this.getLargestChildSizeLimit(axis, End.MIN);
+					var largestMinSize = this.getLargestChildSizeLimit(axis, illa.End.MIN);
 					var sizeToset = Math.max(contentSpace, largestMinSize);
 					this.setChildSizes(axis, sizeToset);
 					this.alignChildren(axis, sizeToset);
@@ -107,7 +107,7 @@ module deflex {
 				}
 
 				if (this.mayShowScrollbar.get(1 - axis)) {
-					this.outShowScrollbar.set(1 - axis, remainingSpace + this.inset.get(axis, End.MAX) < 0);
+					this.outShowScrollbar.set(1 - axis, remainingSpace + this.inset.get(axis, illa.End.MAX) < 0);
 				}
 			}
 
@@ -130,18 +130,18 @@ module deflex {
 
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var item = this.children[i];
-				item.outSize.set(axis, item.sizeLimit.get(axis, End.MIN));
+				item.outSize.set(axis, item.sizeLimit.get(axis, illa.End.MIN));
 				allWeight += item.weight.get(axis);
 			}
 
 			var growables = this.children.slice(0);
 			growables.sort(function(a, b) {
 				// Largest maxSize comes first
-				var result = b.sizeLimit.get(axis, End.MAX) - a.sizeLimit.get(axis, End.MAX);
+				var result = b.sizeLimit.get(axis, illa.End.MAX) - a.sizeLimit.get(axis, illa.End.MAX);
 				return result || 0; // Avoid NaN
 			});
 
-			var remainingSpace = this.getContentSpace(axis) - this.getChildSizeLimits(axis, End.MIN);
+			var remainingSpace = this.getContentSpace(axis) - this.getChildSizeLimits(axis, illa.End.MIN);
 
 			// Share space
 
@@ -160,8 +160,8 @@ module deflex {
 				for (var i = 0, n = growables.length; i < n; i++) {
 					var growable = growables[i];
 					var prevSize = growable.outSize.get(axis);
-					var newSize = Math.max(growable.sizeLimit.get(axis, End.MIN),
-						Math.min(growable.sizeLimit.get(axis, End.MAX),
+					var newSize = Math.max(growable.sizeLimit.get(axis, illa.End.MIN),
+						Math.min(growable.sizeLimit.get(axis, illa.End.MAX),
 							prevSize + spaceUnit * growable.weight.get(axis)));
 					if (newSize == prevSize) {
 						growables.splice(i, 1);
@@ -179,15 +179,15 @@ module deflex {
 		}
 
 		stackChildren(axis: illa.Axis2D, remainingSpace: number): void {
-			if (this.alignment.get(axis) == Alignment.CENTER) {
+			if (this.alignment.get(axis) == illa.Alignment.CENTER) {
 				var offset = Math.floor(remainingSpace / 2);
-			} else if (this.alignment.get(axis) == Alignment.END) {
+			} else if (this.alignment.get(axis) == illa.Alignment.END) {
 				var offset = remainingSpace;
 			} else {
 				var offset = 0;
 			}
 			offset = Math.max(0, offset);
-			offset += this.inset.get(axis, End.MIN);
+			offset += this.inset.get(axis, illa.End.MIN);
 
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var item = this.children[i];
@@ -204,15 +204,15 @@ module deflex {
 		}
 
 		alignChildren(axis: illa.Axis2D, contentSpace: number) {
-			var insetStart = this.inset.get(axis, End.MIN);
+			var insetStart = this.inset.get(axis, illa.End.MIN);
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var item = this.children[i];
 				var offset = insetStart;
 				switch (this.alignment.get(axis)) {
-					case Alignment.CENTER:
+					case illa.Alignment.CENTER:
 						offset += Math.max(0, (contentSpace - item.outSize.get(axis)) / 2);
 						break;
-					case Alignment.END:
+					case illa.Alignment.END:
 						offset += Math.max(0, contentSpace - item.outSize.get(axis));
 						break;
 				}
@@ -224,8 +224,8 @@ module deflex {
 		setChildSizes(axis: illa.Axis2D, size: number): void {
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var item = this.children[i];
-				var sizeToSet = Math.max(item.sizeLimit.get(axis, End.MIN),
-					Math.min(item.sizeLimit.get(axis, End.MAX), size));
+				var sizeToSet = Math.max(item.sizeLimit.get(axis, illa.End.MIN),
+					Math.min(item.sizeLimit.get(axis, illa.End.MAX), size));
 				item.outSize.set(axis, sizeToSet);
 			}
 		}
@@ -245,18 +245,18 @@ module deflex {
 			}
 		}
 
-		getShrinkWrappedSizeLimit(axis: illa.Axis2D, end: End): number {
+		getShrinkWrappedSizeLimit(axis: illa.Axis2D, end: illa.End): number {
 			if (axis == this.direction.get()) {
 				var result = this.getChildSizeLimits(axis, end);
 			} else {
 				var result = this.getLargestChildSizeLimit(axis, end);
 			}
 
-			result = Math.max(this.shrinkWrapSizeLimit.get(axis, end, End.MIN),
-				Math.min(this.shrinkWrapSizeLimit.get(axis, end, End.MAX), result));
+			result = Math.max(this.shrinkWrapSizeLimit.get(axis, end, illa.End.MIN),
+				Math.min(this.shrinkWrapSizeLimit.get(axis, end, illa.End.MAX), result));
 
-			result += this.inset.get(axis, End.MIN);
-			result += this.inset.get(axis, End.MAX);
+			result += this.inset.get(axis, illa.End.MIN);
+			result += this.inset.get(axis, illa.End.MAX);
 			if (this.outShowScrollbar.get(axis)) {
 				result += this.imp.getScrollbarSize(axis);
 			}
@@ -266,8 +266,8 @@ module deflex {
 		applyShrinkWrap(): void {
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				if (this.shrinkWrap.get(axis)) {
-					for (var end = End.MIN; end <= End.MAX; end++) {
-						for (var end2 = End.MIN; end2 <= End.MAX; end2++) {
+					for (var end = illa.End.MIN; end <= illa.End.MAX; end++) {
+						for (var end2 = illa.End.MIN; end2 <= illa.End.MAX; end2++) {
 							this.sizeLimit.set(axis, end, this.getShrinkWrappedSizeLimit(axis, end));
 						}
 					}
@@ -276,19 +276,19 @@ module deflex {
 		}
 
 		getContentSpace(axis: illa.Axis2D): number {
-			var result = this.outSize.get(axis) - this.inset.get(axis, End.MIN) - this.inset.get(axis, End.MAX);
+			var result = this.outSize.get(axis) - this.inset.get(axis, illa.End.MIN) - this.inset.get(axis, illa.End.MAX);
 			if (this.outShowScrollbar.get(axis)) {
 				result -= this.imp.getScrollbarSize(axis);
 			}
 			return result;
 		}
 
-		getChildSizeLimits(axis: illa.Axis2D, end: End): number {
+		getChildSizeLimits(axis: illa.Axis2D, end: illa.End): number {
 			var result = 0;
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var child = this.children[i];
 				// Spacers must not expand maximum size of shrinkwrapped container
-				var endToGet = child.isSpacer.get() ? End.MIN : end;
+				var endToGet = child.isSpacer.get() ? illa.End.MIN : end;
 
 				result += child.sizeLimit.get(axis, endToGet);
 				if (i > 0) {
@@ -307,12 +307,12 @@ module deflex {
 			return result;
 		}
 
-		getLargestChildSizeLimit(axis: illa.Axis2D, end: End) {
+		getLargestChildSizeLimit(axis: illa.Axis2D, end: illa.End) {
 			var result = 0;
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var child = this.children[i];
 				// Spacers must not expand maximum size of shrinkwrapped container
-				var endToGet = child.isSpacer.get() ? End.MIN : end;
+				var endToGet = child.isSpacer.get() ? illa.End.MIN : end;
 
 				result = Math.max(result, child.sizeLimit.get(axis, endToGet));
 				if (!isFinite(result)) {

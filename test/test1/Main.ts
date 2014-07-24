@@ -22,7 +22,7 @@ module test1 {
 			outer.setParent('body');
 			outer.getJQuery().css({ 'background-color': '#aaa' });
 			outer.setSizeIsFull(true);
-			outer.setAlignment(deflex.Alignment.CENTER);
+			outer.setAlignment(illa.Alignment.CENTER);
 			outer.setDirection(illa.Axis2D.Y);
 			itemCount++;
 

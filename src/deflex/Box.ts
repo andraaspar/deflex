@@ -1,15 +1,15 @@
 /// <reference path='../../lib/berek/jquery/_module.ts'/>
 /// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
 /// <reference path='../../lib/illa/_module.ts'/>
+/// <reference path='../../lib/illa/Alignment.ts'/>
 /// <reference path='../../lib/illa/ArrayUtil.ts'/>
 /// <reference path='../../lib/illa/Axis2D.ts'/>
+/// <reference path='../../lib/illa/End.ts'/>
 /// <reference path='../../lib/illa/EventHandler.ts'/>
 /// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='../../lib/illa/Ticker.ts'/>
-/// <reference path='Alignment.ts'/>
 /// <reference path='BoxModel.ts'/>
 /// <reference path='Context.ts'/>
-/// <reference path='End.ts'/>
 /// <reference path='IBoxImp.ts'/>
 /// <reference path='StyleUtil.ts'/>
 
@@ -58,7 +58,7 @@ module deflex {
 				this.jQuery = jq;
 				var nextBoxJQ = this.jQuery.next('.' + Box.CSS_CLASS);
 				if (!nextBoxJQ.length) nextBoxJQ = undefined;
-				this.setParent(jq.parent(), nextBoxJQ ? End.MIN : End.MAX, nextBoxJQ, true);
+				this.setParent(jq.parent(), nextBoxJQ ? illa.End.MIN : illa.End.MAX, nextBoxJQ, true);
 			} else {
 				this.jQuery = jquery.$('<div>');
 			}
@@ -110,8 +110,8 @@ module deflex {
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				if (this.getSizeIsAuto(axis) || this.getSizeIsFull(axis)) {
 					var size = this.getSize(axis);
-					this.model.sizeLimit.set(axis, End.MIN, size);
-					this.model.sizeLimit.set(axis, End.MAX, size);
+					this.model.sizeLimit.set(axis, illa.End.MIN, size);
+					this.model.sizeLimit.set(axis, illa.End.MAX, size);
 				}
 			}
 		}
@@ -307,7 +307,7 @@ module deflex {
 			}
 		}
 
-		getOffset(axis: illa.Axis2D, alignment = Alignment.START, context = Context.PARENT): number {
+		getOffset(axis: illa.Axis2D, alignment = illa.Alignment.START, context = Context.PARENT): number {
 			var result = NaN;
 			var offset: berek.jquery.IPositionObject;
 			switch (context) {
@@ -333,9 +333,9 @@ module deflex {
 					result = offset.top;
 					break;
 			}
-			if (alignment != Alignment.START) {
+			if (alignment != illa.Alignment.START) {
 				var size = this.getSize(axis, context);
-				if (alignment == Alignment.CENTER) {
+				if (alignment == illa.Alignment.CENTER) {
 					size = size / 2;
 				}
 				result += size;
@@ -343,19 +343,19 @@ module deflex {
 			return result;
 		}
 
-		setOffset(v: number, a?: illa.Axis2D, alignment = Alignment.START, context = Context.PARENT): void {
+		setOffset(v: number, a?: illa.Axis2D, alignment = illa.Alignment.START, context = Context.PARENT): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				var value = v;
 				if (context == Context.PAGE) {
-					var pageOffset = this.getOffset(axis, Alignment.START, Context.PAGE);
+					var pageOffset = this.getOffset(axis, illa.Alignment.START, Context.PAGE);
 					var currentOffset = this.getOffset(axis);
 					value -= pageOffset - currentOffset; // Page offset of parent
 				} else if (context == Context.INNER) {
 					value += this.getOffset(axis); // Parent offset
 				}
-				if (alignment != Alignment.START) {
+				if (alignment != illa.Alignment.START) {
 					var size = this.getSize(axis, context);
-					if (alignment == Alignment.CENTER) {
+					if (alignment == illa.Alignment.CENTER) {
 						size = size / 2;
 					}
 					value -= size;
@@ -438,10 +438,10 @@ module deflex {
 			return result;
 		}
 
-		setParent(parent: Box, end?: End, related?: Box, dontModifyDOM?: boolean): void;
-		setParent(parent: berek.jquery.IInstance, end?: End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
-		setParent(parent: string, end?: End, dontModifyDOM?: boolean): void;
-		setParent(parent, end = End.MAX, related = null, dontModifyDOM = false) {
+		setParent(parent: Box, end?: illa.End, related?: Box, dontModifyDOM?: boolean): void;
+		setParent(parent: berek.jquery.IInstance, end?: illa.End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
+		setParent(parent: string, end?: illa.End, dontModifyDOM?: boolean): void;
+		setParent(parent, end = illa.End.MAX, related = null, dontModifyDOM = false) {
 			var parentBox: Box = null;
 			var parentJQuery: berek.jquery.IInstance = null;
 			var relatedBox: Box = null;
@@ -479,10 +479,10 @@ module deflex {
 
 				if (!dontModifyDOM) {
 					switch (end) {
-						case End.MIN:
+						case illa.End.MIN:
 							relatedJQuery.insertBefore(this.getJQuery());
 							break;
-						case End.MAX:
+						case illa.End.MAX:
 							relatedJQuery.insertAfter(this.getJQuery());
 							break;
 					}
@@ -494,10 +494,10 @@ module deflex {
 
 				if (!dontModifyDOM) {
 					switch (end) {
-						case End.MIN:
+						case illa.End.MIN:
 							parentJQuery.append(this.getJQuery());
 							break;
-						case End.MAX:
+						case illa.End.MAX:
 							parentJQuery.prepend(this.getJQuery());
 							break;
 					}
@@ -533,26 +533,26 @@ module deflex {
 			}
 		}
 
-		insertChild(child: Box, end = End.MAX, related: Box = null): void {
+		insertChild(child: Box, end = illa.End.MAX, related: Box = null): void {
 			var newIndex = 0;
 			if (related) {
 				var relatedIndex = this.getChildIndex(related);
 				if (relatedIndex == -1) throw 'Related not a child.';
 				switch (end) {
-					case End.MIN:
+					case illa.End.MIN:
 						newIndex = relatedIndex;
 						break;
-					case End.MAX:
+					case illa.End.MAX:
 						newIndex = relatedIndex + 1;
 						break;
 				}
 				this.children.splice(newIndex, 0, child);
 			} else {
 				switch (end) {
-					case End.MIN:
+					case illa.End.MIN:
 						this.children.unshift(child);
 						break;
-					case End.MAX:
+					case illa.End.MAX:
 						newIndex = this.children.push(child) - 1;
 						break;
 				}
@@ -562,7 +562,7 @@ module deflex {
 			this.setNeedsLayoutUpdate(true);
 		}
 
-		moveChild(child: Box, end = End.MAX, related: Box = null): void {
+		moveChild(child: Box, end = illa.End.MAX, related: Box = null): void {
 			this.removeChild(child, true);
 			this.insertChild(child, end, related);
 		}
@@ -702,28 +702,28 @@ module deflex {
 			this.model.needsLayoutUpdate = value;
 		}
 
-		getAlignment(axis: illa.Axis2D): Alignment {
+		getAlignment(axis: illa.Axis2D): illa.Alignment {
 			return this.model.alignment.get(axis);
 		}
 
-		setAlignment(value: Alignment, a?: illa.Axis2D): void {
+		setAlignment(value: illa.Alignment, a?: illa.Axis2D): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				this.model.alignment.set(axis, value);
 			}
 			this.setNeedsLayoutUpdate(true);
 		}
 
-		getInset(axis: illa.Axis2D, e?: End): number {
+		getInset(axis: illa.Axis2D, e?: illa.End): number {
 			var result = 0;
-			for (var end = e || End.MIN, lastEnd = (e != null ? e : End.MAX); end <= lastEnd; end++) {
+			for (var end = e || illa.End.MIN, lastEnd = (e != null ? e : illa.End.MAX); end <= lastEnd; end++) {
 				result += this.model.inset.get(axis, end);
 			}
 			return result;
 		}
 
-		setInset(value: number, a?: illa.Axis2D, e?: End): void {
+		setInset(value: number, a?: illa.Axis2D, e?: illa.End): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
-				for (var end = e || End.MIN, lastEnd = (e != null ? e : End.MAX); end <= lastEnd; end++) {
+				for (var end = e || illa.End.MIN, lastEnd = (e != null ? e : illa.End.MAX); end <= lastEnd; end++) {
 					this.model.inset.set(axis, end, value);
 				}
 			}
@@ -737,7 +737,7 @@ module deflex {
 			this.model.direction.set(value);
 		}
 
-		getSizeLimit(axis: illa.Axis2D, end: End): number {
+		getSizeLimit(axis: illa.Axis2D, end: illa.End): number {
 			return this.model.sizeLimit.get(axis, end);
 		}
 
@@ -745,22 +745,22 @@ module deflex {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				if (!isNaN(min)) {
 					min = Math.max(0, min);
-					this.model.sizeLimit.set(axis, End.MIN, min);
+					this.model.sizeLimit.set(axis, illa.End.MIN, min);
 				}
 				if (!isNaN(max)) {
-					this.model.sizeLimit.set(axis, End.MAX, max);
+					this.model.sizeLimit.set(axis, illa.End.MAX, max);
 				}
 			}
 		}
 
-		getShrinkWrapSizeLimit(axis: illa.Axis2D, end: End, end2: End): number {
+		getShrinkWrapSizeLimit(axis: illa.Axis2D, end: illa.End, end2: illa.End): number {
 			return this.model.shrinkWrapSizeLimit.get(axis, end, end2);
 		}
 
-		setShrinkWrapSizeLimit(value: number, a?: illa.Axis2D, e?: End, e2?: End): void {
+		setShrinkWrapSizeLimit(value: number, a?: illa.Axis2D, e?: illa.End, e2?: illa.End): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
-				for (var end = e || End.MIN, lastEnd = (e != null ? e : End.MAX); end <= lastEnd; end++) {
-					for (var end2 = e2 || End.MIN, lastEnd2 = (e2 != null ? e2 : End.MAX); end2 <= lastEnd2; end2++) {
+				for (var end = e || illa.End.MIN, lastEnd = (e != null ? e : illa.End.MAX); end <= lastEnd; end++) {
+					for (var end2 = e2 || illa.End.MIN, lastEnd2 = (e2 != null ? e2 : illa.End.MAX); end2 <= lastEnd2; end2++) {
 						this.model.shrinkWrapSizeLimit.set(axis, end, end2, value);
 					}
 				}
@@ -880,16 +880,16 @@ module deflex {
 					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.Y);
 					break;
 				case 'inset-left':
-					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.X, End.MIN);
+					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MIN);
 					break;
 				case 'inset-right':
-					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.X, End.MAX);
+					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MAX);
 					break;
 				case 'inset-top':
-					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MIN);
+					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MIN);
 					break;
 				case 'inset-bottom':
-					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MAX);
+					this.setInset(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MAX);
 					break;
 
 				case 'size-limit':
@@ -930,58 +930,58 @@ module deflex {
 					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y);
 					break;
 				case 'shrink-wrap-size-limit-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-x-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-x-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-y-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-y-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-min-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, End.MIN, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, illa.End.MIN, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-min-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, End.MIN, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, illa.End.MIN, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-max-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, End.MAX, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, illa.End.MAX, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-max-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, End.MAX, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), undefined, illa.End.MAX, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-x-min-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, End.MIN, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MIN, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-x-min-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, End.MIN, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MIN, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-x-max-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, End.MAX, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MAX, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-x-max-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, End.MAX, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.X, illa.End.MAX, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-y-min-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MIN, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MIN, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-y-min-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MIN, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MIN, illa.End.MAX);
 					break;
 				case 'shrink-wrap-size-limit-y-max-min':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MAX, End.MIN);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MAX, illa.End.MIN);
 					break;
 				case 'shrink-wrap-size-limit-y-max-max':
-					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, End.MAX, End.MAX);
+					this.setShrinkWrapSizeLimit(StyleUtil.readNumber(value), illa.Axis2D.Y, illa.End.MAX, illa.End.MAX);
 					break;
 
 				case 'space-before':

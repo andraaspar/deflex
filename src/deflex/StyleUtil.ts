@@ -28,11 +28,11 @@ module deflex {
 			}
 		}
 		
-		static readAlignment(value: string): Alignment {
+		static readAlignment(value: string): illa.Alignment {
 			switch (value.toLowerCase()) {
-				case 'start': return Alignment.START;
-				case 'center': return Alignment.CENTER;
-				case 'end': return Alignment.END;
+				case 'start': return illa.Alignment.START;
+				case 'center': return illa.Alignment.CENTER;
+				case 'end': return illa.Alignment.END;
 				default: throw 'Invalid value. Expected alignment, got: ' + value;
 			}
 		}
