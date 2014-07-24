@@ -1124,12 +1124,7 @@ var deflex;
             if (this.getNeedsLayoutUpdate()) {
                 this.getScrollbarUtil().clearDefaultSizeCache();
                 this.updateModel();
-                this.model.applyContentWeight();
-
-                while (this.getNeedsLayoutUpdate()) {
-                    this.model.solveLayout();
-                    this.applyModel();
-                }
+                this.solveLayout();
                 illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms.');
             }
         };
@@ -1168,6 +1163,15 @@ var deflex;
                 }
             }
             model.children = childModels;
+        };
+
+        Box.prototype.solveLayout = function () {
+            this.model.applyContentWeight();
+
+            while (this.getNeedsLayoutUpdate()) {
+                this.model.solveLayout();
+                this.applyModel();
+            }
         };
 
         Box.prototype.applyModel = function () {

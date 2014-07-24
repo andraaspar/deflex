@@ -91,12 +91,7 @@ module deflex {
 			if (this.getNeedsLayoutUpdate()) {
 				this.getScrollbarUtil().clearDefaultSizeCache();
 				this.updateModel();
-				this.model.applyContentWeight();
-
-				while (this.getNeedsLayoutUpdate()) {
-					this.model.solveLayout();
-					this.applyModel();
-				}
+				this.solveLayout();
 				illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms.');
 			}
 		}
@@ -135,6 +130,15 @@ module deflex {
 				}
 			}
 			model.children = childModels;
+		}
+		
+		solveLayout(): void {
+			this.model.applyContentWeight();
+
+			while (this.getNeedsLayoutUpdate()) {
+				this.model.solveLayout();
+				this.applyModel();
+			}
 		}
 
 		applyModel(): void {
