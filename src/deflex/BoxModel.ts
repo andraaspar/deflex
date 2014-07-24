@@ -237,7 +237,7 @@ module deflex {
 				child.applyContentWeight();
 
 				for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
-					childrenWeight = child.weight.get(axis);
+					childrenWeight += child.weight.get(axis);
 				}
 			}
 			if (this.useContentWeight.get(axis)) {

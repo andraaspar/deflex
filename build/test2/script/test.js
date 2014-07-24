@@ -908,7 +908,7 @@ var deflex;
                 child.applyContentWeight();
 
                 for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
-                    childrenWeight = child.weight.get(axis);
+                    childrenWeight += child.weight.get(axis);
                 }
             }
             if (this.useContentWeight.get(axis)) {
