@@ -902,17 +902,17 @@ var deflex;
         };
 
         BoxModel.prototype.applyContentWeight = function () {
-            var childrenWeight = 0;
             for (var i = 0, n = this.children.length; i < n; i++) {
-                var child = this.children[i];
-                child.applyContentWeight();
-
-                for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
-                    childrenWeight += child.weight.get(axis);
-                }
+                this.children[i].applyContentWeight();
             }
-            if (this.useContentWeight.get(axis)) {
-                this.weight.set(axis, childrenWeight);
+            for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
+                var childrenWeight = 0;
+                for (var j = 0, o = this.children.length; j < o; j++) {
+                    childrenWeight += this.children[j].weight.get(axis);
+                }
+                if (this.useContentWeight.get(axis)) {
+                    this.weight.set(axis, childrenWeight);
+                }
             }
         };
 

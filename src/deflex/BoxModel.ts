@@ -150,7 +150,7 @@ module deflex {
 					var maxedOut = growables.pop();
 					allWeight -= maxedOut.weight.get(axis);
 				}
-				
+
 				if (growables.length == 0 || allWeight == 0) {
 					break;
 				}
@@ -231,17 +231,17 @@ module deflex {
 		}
 
 		applyContentWeight(): void {
-			var childrenWeight = 0;
 			for (var i = 0, n = this.children.length; i < n; i++) {
-				var child = this.children[i];
-				child.applyContentWeight();
-
-				for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
-					childrenWeight += child.weight.get(axis);
-				}
+				this.children[i].applyContentWeight();
 			}
-			if (this.useContentWeight.get(axis)) {
-				this.weight.set(axis, childrenWeight);
+			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
+				var childrenWeight = 0;
+				for (var j = 0, o = this.children.length; j < o; j++) {
+					childrenWeight += this.children[j].weight.get(axis);
+				}
+				if (this.useContentWeight.get(axis)) {
+					this.weight.set(axis, childrenWeight);
+				}
 			}
 		}
 
