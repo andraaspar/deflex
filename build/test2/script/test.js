@@ -1,10 +1,3 @@
-var berek;
-(function (berek) {
-    (function (jquery) {
-        jquery.$ = window['jQuery'];
-    })(berek.jquery || (berek.jquery = {}));
-    var jquery = berek.jquery;
-})(berek || (berek = {}));
 var illa;
 (function (illa) {
     illa.GLOBAL = (function () {
@@ -210,6 +203,114 @@ var illa;
     })();
     illa.Log = Log;
 })(illa || (illa = {}));
+var berek;
+(function (berek) {
+    (function (jquery) {
+        jquery.$ = window['jQuery'];
+    })(berek.jquery || (berek.jquery = {}));
+    var jquery = berek.jquery;
+})(berek || (berek = {}));
+var illa;
+(function (illa) {
+    var UnitTest = (function () {
+        function UnitTest() {
+            this.testCount = 0;
+            this.successCount = 0;
+            this.failCount = 0;
+        }
+        UnitTest.prototype.assert = function (test, desc) {
+            if (typeof desc === "undefined") { desc = ''; }
+            this.testCount++;
+            if (test === true) {
+                this.successCount++;
+            } else {
+                this.failCount++;
+                if (desc) {
+                    this.warn('Test failed: ' + desc);
+                } else {
+                    throw 'Test failed.';
+                }
+            }
+            return test;
+        };
+
+        UnitTest.prototype.assertThrowsError = function (fn, desc) {
+            if (typeof desc === "undefined") { desc = ''; }
+            var errorThrown = false;
+            try  {
+                fn();
+            } catch (e) {
+                errorThrown = true;
+            }
+            return this.assert(errorThrown, desc);
+        };
+
+        UnitTest.prototype.printStats = function () {
+            this.info(this.testCount + ' tests completed: ' + this.successCount + ' succeeded, ' + this.failCount + ' failed.');
+        };
+
+        UnitTest.prototype.info = function () {
+            var r = [];
+            for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                r[_i] = arguments[_i + 0];
+            }
+            illa.Log.info.apply(illa.Log, r);
+        };
+
+        UnitTest.prototype.warn = function () {
+            var r = [];
+            for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                r[_i] = arguments[_i + 0];
+            }
+            illa.Log.warn.apply(illa.Log, r);
+        };
+        return UnitTest;
+    })();
+    illa.UnitTest = UnitTest;
+})(illa || (illa = {}));
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var berek;
+(function (berek) {
+    var UnitTest = (function (_super) {
+        __extends(UnitTest, _super);
+        function UnitTest(printTarget) {
+            _super.call(this);
+            this.printTarget = printTarget;
+        }
+        UnitTest.prototype.info = function () {
+            var r = [];
+            for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                r[_i] = arguments[_i + 0];
+            }
+            if (this.printTarget) {
+                var out = berek.jquery.$('<p>').text(r.join(' '));
+                this.printTarget.append(out);
+            } else {
+                _super.prototype.info.apply(this, r);
+            }
+        };
+
+        UnitTest.prototype.warn = function () {
+            var r = [];
+            for (var _i = 0; _i < (arguments.length - 0); _i++) {
+                r[_i] = arguments[_i + 0];
+            }
+            if (this.printTarget) {
+                var out = berek.jquery.$('<p>').text(r.join(' ')).prepend('<b>WARNING: </b>');
+                this.printTarget.append(out);
+            } else {
+                _super.prototype.warn.apply(this, r);
+            }
+        };
+        return UnitTest;
+    })(illa.UnitTest);
+    berek.UnitTest = UnitTest;
+})(berek || (berek = {}));
 var illa;
 (function (illa) {
     (function (Axis2D) {
@@ -454,12 +555,6 @@ var illa;
     })();
     illa.Event = Event;
 })(illa || (illa = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var illa;
 (function (illa) {
     var Ticker = (function (_super) {
@@ -2043,69 +2138,8 @@ var deflex;
     })(illa.EventHandler);
     deflex.Box = Box;
 })(deflex || (deflex = {}));
-var deflex;
-(function (deflex) {
-    var jquery = berek.jquery;
-
-    var Factory = (function () {
-        function Factory() {
-        }
-        Factory.checkDOM = function () {
-            var jqs = jquery.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
-            for (var i = 0, n = jqs.length; i < n; i++) {
-                var jq = jqs.eq(i);
-                this.create(jq);
-            }
-        };
-
-        Factory.create = function (jq) {
-            var constructorName = jq.attr(this.CLASS_ATTRIBUTE_NAME);
-            jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
-            if (typeof constructorName != 'string') {
-                constructorName = 'default';
-            }
-
-            var boxConstructor = this.boxConstructors[constructorName];
-            var box = new boxConstructor(jq);
-
-            var styleString = jq.attr(this.STYLE_ATTRIBUTE_NAME);
-            jq.removeAttr(this.STYLE_ATTRIBUTE_NAME);
-            if (styleString) {
-                this.applyStyle(box, styleString);
-            }
-
-            return box;
-        };
-
-        Factory.applyStyle = function (box, styleString) {
-            styleString = styleString.replace(/^\s+/, '').replace(/\s+$/, '');
-
-            var style = styleString.split(/\s*;\s*/g);
-            for (var i = 0, n = style.length; i < n; i++) {
-                var styleSplit = style[i].split(/\s*:\s*/g);
-                var key = styleSplit[0];
-                var value = styleSplit[1];
-
-                if (key) {
-                    try  {
-                        if (!box.applyStyle(key, value)) {
-                            illa.Log.warn('Style key not recognized: ' + key);
-                        }
-                    } catch (e) {
-                        illa.Log.warn(key + ': ' + e);
-                    }
-                }
-            }
-        };
-        Factory.CLASS_ATTRIBUTE_NAME = 'data-deflex-class';
-        Factory.STYLE_ATTRIBUTE_NAME = 'data-deflex-style';
-        Factory.boxConstructors = { 'default': deflex.Box };
-        return Factory;
-    })();
-    deflex.Factory = Factory;
-})(deflex || (deflex = {}));
-var test1;
-(function (test1) {
+var test2;
+(function (test2) {
     var jquery = berek.jquery;
 
     var Main = (function () {
@@ -2113,47 +2147,47 @@ var test1;
             jquery.$(illa.bind(this.onDOMLoaded, this));
         }
         Main.prototype.onDOMLoaded = function () {
-            var startTime = new Date().getTime();
+            var u = new berek.UnitTest(jquery.$('body'));
+            u.info('Testing...');
 
-            var itemCount = 0;
+            var box = new deflex.Box();
+            box.setInset(10, 0 /* X */, 0 /* MIN */);
+            box.setInset(20, 0 /* X */, 1 /* MAX */);
+            box.setInset(30, 1 /* Y */, 0 /* MIN */);
+            box.setInset(40, 1 /* Y */, 1 /* MAX */);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 10, 'getInset 1');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 20, 'getInset 2');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 30, 'getInset 3');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 40, 'getInset 4');
+            u.assert(box.getInset(0 /* X */) === 30, 'getInset 5');
+            u.assert(box.getInset(1 /* Y */) === 70, 'getInset 6');
+            box.setInset(5);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 5, 'getInset 7');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 5, 'getInset 8');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 5, 'getInset 9');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 5, 'getInset 10');
+            u.assert(box.getInset(0 /* X */) === 10, 'getInset 11');
+            u.assert(box.getInset(1 /* Y */) === 10, 'getInset 12');
+            box.setInset(25, 0 /* X */);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 25, 'getInset 13');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 25, 'getInset 14');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 5, 'getInset 15');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 5, 'getInset 16');
+            u.assert(box.getInset(0 /* X */) === 50, 'getInset 17');
+            u.assert(box.getInset(1 /* Y */) === 10, 'getInset 18');
+            box.setInset(15, 1 /* Y */);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 25, 'getInset 19');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 25, 'getInset 20');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 15, 'getInset 21');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 15, 'getInset 22');
+            u.assert(box.getInset(0 /* X */) === 50, 'getInset 23');
+            u.assert(box.getInset(1 /* Y */) === 30, 'getInset 24');
 
-            var outer = this.outer = new deflex.Box();
-            outer.name = 'outer';
-            outer.setParent('body');
-            outer.getJQuery().css({ 'background-color': '#aaa' });
-            outer.setSizeIsFull(true);
-            outer.setAlignment(1 /* CENTER */);
-            outer.setDirection(1 /* Y */);
-            itemCount++;
-
-            var markup = '';
-            for (var i = 0, n = 20; i < n; i++) {
-                markup += '<div data-deflex-style="shrink-wrap: true">';
-                itemCount++;
-
-                for (var j = 0, o = 20; j < o; j++) {
-                    markup += '<div style="background-color: #ededed" ' + 'data-deflex-style="alignment: center; may-show-scrollbar: false; shrink-wrap: true; ' + 'shrink-wrap-size-limit: infinity; shrink-wrap-size-limit-x-min-min: 44px; shrink-wrap-size-limit-y-min-min: 0px">';
-                    itemCount++;
-
-                    markup += '<div data-deflex-style="size-is-auto: true">Cell ' + (i * n + j) + '</div>';
-                    itemCount++;
-
-                    markup += '</div>';
-                }
-
-                markup += '</div>';
-            }
-
-            outer.getJQuery().html(markup);
-
-            deflex.Factory.checkDOM();
-
-            illa.Log.info('Init finished:', new Date().getTime() - startTime, 'ms.');
-            illa.Log.info('Item count:', itemCount);
+            u.printStats();
         };
         return Main;
     })();
-    test1.Main = Main;
-})(test1 || (test1 = {}));
+    test2.Main = Main;
+})(test2 || (test2 = {}));
 
-var test1Main = new test1.Main();
+var test2Main = new test2.Main();

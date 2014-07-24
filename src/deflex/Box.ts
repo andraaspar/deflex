@@ -709,8 +709,12 @@ module deflex {
 			this.setNeedsLayoutUpdate(true);
 		}
 
-		getInset(axis: illa.Axis2D, end: End): number {
-			return this.model.inset.get(axis, end);
+		getInset(axis: illa.Axis2D, e?: End): number {
+			var result = 0;
+			for (var end = e || End.MIN, lastEnd = (e != null ? e : End.MAX); end <= lastEnd; end++) {
+				result += this.model.inset.get(axis, end);
+			}
+			return result;
 		}
 
 		setInset(value: number, a?: illa.Axis2D, e?: End): void {
