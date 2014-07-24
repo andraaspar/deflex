@@ -1,5 +1,3 @@
-/// <reference path='../../lib/berek/jquery/_module.ts'/>
-/// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
 /// <reference path='../../lib/illa/_module.ts'/>
 /// <reference path='../../lib/illa/Alignment.ts'/>
 /// <reference path='../../lib/illa/ArrayUtil.ts'/>
@@ -8,8 +6,12 @@
 /// <reference path='../../lib/illa/EventHandler.ts'/>
 /// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='../../lib/illa/Ticker.ts'/>
+
+/// <reference path='../../lib/berek/jquery/_module.ts'/>
+/// <reference path='../../lib/berek/Context.ts'/>
+/// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
+
 /// <reference path='BoxModel.ts'/>
-/// <reference path='Context.ts'/>
 /// <reference path='IBoxImp.ts'/>
 /// <reference path='StyleUtil.ts'/>
 
@@ -180,7 +182,7 @@ module deflex {
 			}
 		}
 
-		getSize(axis: illa.Axis2D, context = Context.PARENT): number {
+		getSize(axis: illa.Axis2D, context = berek.Context.PARENT): number {
 			var result = NaN;
 			switch (axis) {
 				case illa.Axis2D.X:
@@ -198,7 +200,7 @@ module deflex {
 					}
 					break;
 			}
-			if (context == Context.INNER) {
+			if (context == berek.Context.INNER) {
 				result -= this.getVisibleScrollbarSize(axis);
 				result = Math.max(0, result);
 			}
@@ -231,12 +233,12 @@ module deflex {
 			return result;
 		}
 
-		setSize(v: number, a?: illa.Axis2D, context = Context.PARENT): void {
+		setSize(v: number, a?: illa.Axis2D, context = berek.Context.PARENT): void {
 			this.setSizeIsFull(false, a);
 			this.setSizeIsAuto(false, a);
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				var value = v;
-				if (context == Context.INNER) {
+				if (context == berek.Context.INNER) {
 					value += this.getVisibleScrollbarSize(axis);
 				}
 				if (isNaN(value) || !isFinite(value)) {
@@ -307,21 +309,21 @@ module deflex {
 			}
 		}
 
-		getOffset(axis: illa.Axis2D, alignment = illa.Alignment.START, context = Context.PARENT): number {
+		getOffset(axis: illa.Axis2D, alignment = illa.Alignment.START, context = berek.Context.PARENT): number {
 			var result = NaN;
 			var offset: berek.jquery.IPositionObject;
 			switch (context) {
-				case Context.INNER:
+				case berek.Context.INNER:
 					offset = { left: 0, top: 0 };
 					break;
-				case Context.PARENT:
+				case berek.Context.PARENT:
 					if (isNaN(this.offsetCacheX) || isNaN(this.offsetCacheY)) {
 						offset = this.jQuery.position();
 					} else {
 						offset = { left: this.offsetCacheX, top: this.offsetCacheY };
 					}
 					break;
-				case Context.PAGE:
+				case berek.Context.PAGE:
 					offset = this.jQuery.offset();
 					break;
 			}
@@ -343,14 +345,14 @@ module deflex {
 			return result;
 		}
 
-		setOffset(v: number, a?: illa.Axis2D, alignment = illa.Alignment.START, context = Context.PARENT): void {
+		setOffset(v: number, a?: illa.Axis2D, alignment = illa.Alignment.START, context = berek.Context.PARENT): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				var value = v;
-				if (context == Context.PAGE) {
-					var pageOffset = this.getOffset(axis, illa.Alignment.START, Context.PAGE);
+				if (context == berek.Context.PAGE) {
+					var pageOffset = this.getOffset(axis, illa.Alignment.START, berek.Context.PAGE);
 					var currentOffset = this.getOffset(axis);
 					value -= pageOffset - currentOffset; // Page offset of parent
-				} else if (context == Context.INNER) {
+				} else if (context == berek.Context.INNER) {
 					value += this.getOffset(axis); // Parent offset
 				}
 				if (alignment != illa.Alignment.START) {
@@ -667,27 +669,11 @@ module deflex {
 		}
 
 		getScroll(axis: illa.Axis2D): number {
-			var result = NaN;
-			switch (axis) {
-				case illa.Axis2D.X:
-					result = this.getJQuery().scrollLeft();
-					break;
-				case illa.Axis2D.Y:
-					result = this.getJQuery().scrollTop();
-					break;
-			}
-			return result;
+			return berek.ScrollbarUtil.getScroll(this.getJQuery(), axis);
 		}
 
 		setScroll(value: number, axis?: illa.Axis2D): void {
-			switch (axis) {
-				default:
-				case illa.Axis2D.X:
-					this.getJQuery().scrollLeft(value);
-					if (axis != null) break;
-				case illa.Axis2D.Y:
-					this.getJQuery().scrollTop(value);
-			}
+			berek.ScrollbarUtil.setScroll(this.getJQuery(), value, axis);
 		}
 
 		getModel(): BoxModel {

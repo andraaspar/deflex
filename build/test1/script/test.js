@@ -212,85 +212,6 @@ var illa;
 })(illa || (illa = {}));
 var illa;
 (function (illa) {
-    (function (Axis2D) {
-        Axis2D[Axis2D["X"] = 0] = "X";
-        Axis2D[Axis2D["Y"] = 1] = "Y";
-    })(illa.Axis2D || (illa.Axis2D = {}));
-    var Axis2D = illa.Axis2D;
-})(illa || (illa = {}));
-var berek;
-(function (berek) {
-    var ScrollbarUtil = (function () {
-        function ScrollbarUtil(box) {
-            this.defaultWidth = NaN;
-            this.defaultHeight = NaN;
-            if (box) {
-                this.box = box;
-            } else {
-                this.box = berek.jquery.$('<div>');
-            }
-            this.box.addClass(ScrollbarUtil.CSS_CLASS);
-            this.box.appendTo('body');
-        }
-        ScrollbarUtil.prototype.getDefaultSize = function (axis) {
-            var result = NaN;
-
-            if (isNaN(this.defaultWidth)) {
-                var boxElement = this.box[0];
-                this.defaultWidth = boxElement.offsetWidth - boxElement.clientWidth;
-                this.defaultHeight = boxElement.offsetHeight - boxElement.clientHeight;
-            }
-
-            switch (axis) {
-                case 0 /* X */:
-                    result = this.defaultWidth;
-                    break;
-                case 1 /* Y */:
-                    result = this.defaultHeight;
-                    break;
-            }
-
-            return result;
-        };
-
-        ScrollbarUtil.prototype.clearDefaultSizeCache = function () {
-            this.defaultWidth = NaN;
-        };
-
-        ScrollbarUtil.isVisibleOn = function (jq, axis) {
-            var elem = jq[0];
-            if (!elem)
-                return false;
-            var overflow = '';
-            switch (axis) {
-                case 0 /* X */:
-                    overflow = jq.css('overflow-x');
-                    break;
-                case 1 /* Y */:
-                    overflow = jq.css('overflow-y');
-                    break;
-            }
-            switch (overflow) {
-                case 'scroll':
-                    return true;
-                case 'auto':
-                    switch (axis) {
-                        case 0 /* X */:
-                            return elem.scrollWidth > jq.innerWidth();
-                        case 1 /* Y */:
-                            return elem.scrollHeight > jq.innerHeight();
-                    }
-                    break;
-            }
-            return false;
-        };
-        ScrollbarUtil.CSS_CLASS = 'berek-ScrollbarUtil-box';
-        return ScrollbarUtil;
-    })();
-    berek.ScrollbarUtil = ScrollbarUtil;
-})(berek || (berek = {}));
-var illa;
-(function (illa) {
     (function (Alignment) {
         Alignment[Alignment["START"] = 0] = "START";
         Alignment[Alignment["CENTER"] = 1] = "CENTER";
@@ -344,6 +265,14 @@ var illa;
         return ArrayUtil;
     })();
     illa.ArrayUtil = ArrayUtil;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
+    (function (Axis2D) {
+        Axis2D[Axis2D["X"] = 0] = "X";
+        Axis2D[Axis2D["Y"] = 1] = "Y";
+    })(illa.Axis2D || (illa.Axis2D = {}));
+    var Axis2D = illa.Axis2D;
 })(illa || (illa = {}));
 var illa;
 (function (illa) {
@@ -532,6 +461,111 @@ var illa;
     })(illa.EventHandler);
     illa.Ticker = Ticker;
 })(illa || (illa = {}));
+var berek;
+(function (berek) {
+    (function (Context) {
+        Context[Context["INNER"] = 0] = "INNER";
+        Context[Context["PARENT"] = 1] = "PARENT";
+        Context[Context["PAGE"] = 2] = "PAGE";
+    })(berek.Context || (berek.Context = {}));
+    var Context = berek.Context;
+})(berek || (berek = {}));
+var berek;
+(function (berek) {
+    var ScrollbarUtil = (function () {
+        function ScrollbarUtil(box) {
+            this.defaultWidth = NaN;
+            this.defaultHeight = NaN;
+            if (box) {
+                this.box = box;
+            } else {
+                this.box = berek.jquery.$('<div>');
+            }
+            this.box.addClass(ScrollbarUtil.CSS_CLASS);
+            this.box.appendTo('body');
+        }
+        ScrollbarUtil.prototype.getDefaultSize = function (axis) {
+            var result = NaN;
+
+            if (isNaN(this.defaultWidth)) {
+                var boxElement = this.box[0];
+                this.defaultWidth = boxElement.offsetWidth - boxElement.clientWidth;
+                this.defaultHeight = boxElement.offsetHeight - boxElement.clientHeight;
+            }
+
+            switch (axis) {
+                case 0 /* X */:
+                    result = this.defaultWidth;
+                    break;
+                case 1 /* Y */:
+                    result = this.defaultHeight;
+                    break;
+            }
+
+            return result;
+        };
+
+        ScrollbarUtil.prototype.clearDefaultSizeCache = function () {
+            this.defaultWidth = NaN;
+        };
+
+        ScrollbarUtil.isVisibleOn = function (jq, axis) {
+            var elem = jq[0];
+            if (!elem)
+                return false;
+            var overflow = '';
+            switch (axis) {
+                case 0 /* X */:
+                    overflow = jq.css('overflow-x');
+                    break;
+                case 1 /* Y */:
+                    overflow = jq.css('overflow-y');
+                    break;
+            }
+            switch (overflow) {
+                case 'scroll':
+                    return true;
+                case 'auto':
+                    switch (axis) {
+                        case 0 /* X */:
+                            return elem.scrollWidth > jq.innerWidth();
+                        case 1 /* Y */:
+                            return elem.scrollHeight > jq.innerHeight();
+                    }
+                    break;
+            }
+            return false;
+        };
+
+        ScrollbarUtil.getScroll = function (jq, axis) {
+            var result = NaN;
+            switch (axis) {
+                case 0 /* X */:
+                    result = jq.scrollLeft();
+                    break;
+                case 1 /* Y */:
+                    result = jq.scrollTop();
+                    break;
+            }
+            return result;
+        };
+
+        ScrollbarUtil.setScroll = function (jq, value, axis) {
+            switch (axis) {
+                default:
+                case 0 /* X */:
+                    jq.scrollLeft(value);
+                    if (axis != null)
+                        break;
+                case 1 /* Y */:
+                    jq.scrollTop(value);
+            }
+        };
+        ScrollbarUtil.CSS_CLASS = 'berek-ScrollbarUtil-box';
+        return ScrollbarUtil;
+    })();
+    berek.ScrollbarUtil = ScrollbarUtil;
+})(berek || (berek = {}));
 var illa;
 (function (illa) {
     var Prop = (function () {
@@ -898,15 +932,6 @@ var deflex;
         return BoxModel;
     })();
     deflex.BoxModel = BoxModel;
-})(deflex || (deflex = {}));
-var deflex;
-(function (deflex) {
-    (function (Context) {
-        Context[Context["INNER"] = 0] = "INNER";
-        Context[Context["PARENT"] = 1] = "PARENT";
-        Context[Context["PAGE"] = 2] = "PAGE";
-    })(deflex.Context || (deflex.Context = {}));
-    var Context = deflex.Context;
 })(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
@@ -1631,28 +1656,11 @@ var deflex;
         };
 
         Box.prototype.getScroll = function (axis) {
-            var result = NaN;
-            switch (axis) {
-                case 0 /* X */:
-                    result = this.getJQuery().scrollLeft();
-                    break;
-                case 1 /* Y */:
-                    result = this.getJQuery().scrollTop();
-                    break;
-            }
-            return result;
+            return berek.ScrollbarUtil.getScroll(this.getJQuery(), axis);
         };
 
         Box.prototype.setScroll = function (value, axis) {
-            switch (axis) {
-                default:
-                case 0 /* X */:
-                    this.getJQuery().scrollLeft(value);
-                    if (axis != null)
-                        break;
-                case 1 /* Y */:
-                    this.getJQuery().scrollTop(value);
-            }
+            berek.ScrollbarUtil.setScroll(this.getJQuery(), value, axis);
         };
 
         Box.prototype.getModel = function () {
