@@ -497,10 +497,10 @@ module deflex {
 				if (!dontModifyDOM) {
 					switch (end) {
 						case illa.End.MIN:
-							parentJQuery.append(this.getJQuery());
+							parentJQuery.prepend(this.getJQuery());
 							break;
 						case illa.End.MAX:
-							parentJQuery.prepend(this.getJQuery());
+							parentJQuery.append(this.getJQuery());
 							break;
 					}
 				}
