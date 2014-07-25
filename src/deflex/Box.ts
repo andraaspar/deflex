@@ -345,7 +345,7 @@ module deflex {
 			return result;
 		}
 
-		setOffset(v: number, a?: illa.Axis2D, alignment = illa.Alignment.START, context = berek.Context.PARENT): void {
+		setOffset(v: number, a?: illa.Axis2D, alignment = illa.Alignment.START, context = berek.Context.PARENT, preventNegative = false): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				var value = v;
 				if (context == berek.Context.PAGE) {
@@ -366,6 +366,7 @@ module deflex {
 					value = 0;
 				} else {
 					value = Math.round(value);
+					if (preventNegative) value = Math.max(0, value);
 				}
 				switch (axis) {
 					case illa.Axis2D.X:

@@ -1314,9 +1314,10 @@ var deflex;
             return result;
         };
 
-        Box.prototype.setOffset = function (v, a, alignment, context) {
+        Box.prototype.setOffset = function (v, a, alignment, context, preventNegative) {
             if (typeof alignment === "undefined") { alignment = 0 /* START */; }
             if (typeof context === "undefined") { context = 1 /* PARENT */; }
+            if (typeof preventNegative === "undefined") { preventNegative = false; }
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 var value = v;
                 if (context == 2 /* PAGE */) {
@@ -1337,6 +1338,8 @@ var deflex;
                     value = 0;
                 } else {
                     value = Math.round(value);
+                    if (preventNegative)
+                        value = Math.max(0, value);
                 }
                 switch (axis) {
                     case 0 /* X */:
@@ -1469,10 +1472,10 @@ var deflex;
                 if (!dontModifyDOM) {
                     switch (end) {
                         case 0 /* MIN */:
-                            parentJQuery.append(this.getJQuery());
+                            parentJQuery.prepend(this.getJQuery());
                             break;
                         case 1 /* MAX */:
-                            parentJQuery.prepend(this.getJQuery());
+                            parentJQuery.append(this.getJQuery());
                             break;
                     }
                 }
