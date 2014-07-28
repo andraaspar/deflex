@@ -28,6 +28,7 @@ module deflex {
 		static CSS_CLASS_SIZE_FULL_X = 'deflex-Box-size-full-x';
 		static CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
 		static CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
+		static CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
 		static EVENT_DESTROYED = 'deflex_Box_destroyed';
 
 		private static scrollbarUtil: berek.ScrollbarUtil;
@@ -49,6 +50,7 @@ module deflex {
 		private isRoot = false;
 		private allowsVisibility = true;
 		private allowsLayoutActive = true;
+		private overflowIsVisible = false;
 		private model = new BoxModel(this);
 
 		public name = '';
@@ -833,6 +835,17 @@ module deflex {
 		getChildren(): Box[] {
 			return this.children;
 		}
+		
+		getOverflowIsVisible(): boolean {
+			return this.overflowIsVisible;
+		}
+		
+		setOverflowIsVisible(flag: boolean): void {
+			if (this.overflowIsVisible != flag) {
+				this.overflowIsVisible = flag;
+				this.jQuery.toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
+			}
+		}
 
 		applyStyle(key: string, value: string): boolean {
 			var success = true;
@@ -1047,6 +1060,10 @@ module deflex {
 					break;
 				case 'may-show-scrollbar-y':
 					this.setMayShowScrollbar(StyleUtil.readBoolean(value), illa.Axis2D.Y);
+					break;
+				
+				case 'overflow-is-visible':
+					this.setOverflowIsVisible(StyleUtil.readBoolean(value));
 					break;
 
 				default:

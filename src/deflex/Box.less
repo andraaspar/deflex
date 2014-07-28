@@ -37,3 +37,18 @@
 {
 	position: relative !important;
 }
+
+.deflex-Box-overflow-visible
+{
+	overflow: visible;
+	
+	&:before,
+	&:after
+	{
+		// Uncollapse margins
+		content: '\a0'; // No-break space
+		display: block;
+		overflow: hidden;
+		height: 0;
+	}
+}
