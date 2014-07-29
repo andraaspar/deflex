@@ -51,6 +51,7 @@ module deflex {
 		private allowsVisibility = true;
 		private allowsLayoutActive = true;
 		private overflowIsVisible = false;
+		private doubleCheckLayout = false;
 		private model = new BoxModel(this);
 
 		public name = '';
@@ -90,29 +91,43 @@ module deflex {
 
 		onRootTick(e: illa.Event): void {
 			var startTime = new Date().getTime();
-			this.onTick();
+			var solutionCount = 0;
+			this.checkNeedsLayoutUpdate();
 
-			if (this.getNeedsLayoutUpdate()) {
+			while (this.getNeedsLayoutUpdate()) {
+				solutionCount++;
 				this.getScrollbarUtil().clearDefaultSizeCache();
 				this.updateModel();
 				this.solveLayout();
-				illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms.');
-			}
-		}
-
-		onTick(): void {
-			this.checkNeedsLayoutUpdate();
-
-			for (var i = 0, n = this.children.length; i < n; i++) {
-				var child = this.children[i];
-				child.onTick();
-				if (child.getIsLayoutActive()) {
-					this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+				
+				if (this.doubleCheckLayout) {
+					this.checkNeedsLayoutUpdate();
+					
+					if (this.getNeedsLayoutUpdate() &&
+						new Date().getTime() > startTime + 3000) {
+						illa.Log.warn(this.name, 'Layout double checks take too long - breaking.');
+						break;
+					}
 				}
+			}
+			
+			if (solutionCount) {
+				illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms, solution count:', solutionCount);
 			}
 		}
 
 		checkNeedsLayoutUpdate(): void {
+			for (var i = 0, n = this.children.length; i < n; i++) {
+				var child = this.children[i];
+				if (child.getIsLayoutActive()) {
+					child.checkNeedsLayoutUpdate();
+					
+					if (child.getNeedsLayoutUpdate()) {
+						this.setNeedsLayoutUpdate(true);
+					}
+				}
+			}
+			
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				if (this.getSizeIsAuto(axis) || this.getSizeIsFull(axis)) {
 					var size = this.getSize(axis);
@@ -872,6 +887,14 @@ module deflex {
 				this.jQuery.toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
 			}
 		}
+		
+		getDoubleCheckLayout(): boolean {
+			return this.doubleCheckLayout;
+		}
+		
+		setDoubleCheckLayout(flag: boolean): void {
+			this.doubleCheckLayout = flag;
+		}
 
 		applyStyle(key: string, value: string): boolean {
 			var success = true;
@@ -1090,6 +1113,10 @@ module deflex {
 				
 				case 'overflow-is-visible':
 					this.setOverflowIsVisible(StyleUtil.readBoolean(value));
+					break;
+				
+				case 'double-check-layout':
+					this.setDoubleCheckLayout(StyleUtil.readBoolean(value));
 					break;
 
 				default:

@@ -1015,6 +1015,7 @@ var deflex;
             this.allowsVisibility = true;
             this.allowsLayoutActive = true;
             this.overflowIsVisible = false;
+            this.doubleCheckLayout = false;
             this.model = new deflex.BoxModel(this);
             this.name = '';
 
@@ -1050,27 +1051,42 @@ var deflex;
 
         Box.prototype.onRootTick = function (e) {
             var startTime = new Date().getTime();
-            this.onTick();
+            var solutionCount = 0;
+            this.checkNeedsLayoutUpdate();
 
-            if (this.getNeedsLayoutUpdate()) {
+            while (this.getNeedsLayoutUpdate()) {
+                solutionCount++;
                 this.getScrollbarUtil().clearDefaultSizeCache();
                 this.updateModel();
                 this.solveLayout();
-                illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms.');
+
+                if (this.doubleCheckLayout) {
+                    this.checkNeedsLayoutUpdate();
+
+                    if (this.getNeedsLayoutUpdate() && new Date().getTime() > startTime + 3000) {
+                        illa.Log.warn(this.name, 'Layout double checks take too long - breaking.');
+                        break;
+                    }
+                }
             }
-        };
 
-        Box.prototype.onTick = function () {
-            this.checkNeedsLayoutUpdate();
-
-            for (var i = 0, n = this.children.length; i < n; i++) {
-                var child = this.children[i];
-                child.onTick();
-                this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+            if (solutionCount) {
+                illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms, solution count:', solutionCount);
             }
         };
 
         Box.prototype.checkNeedsLayoutUpdate = function () {
+            for (var i = 0, n = this.children.length; i < n; i++) {
+                var child = this.children[i];
+                if (child.getIsLayoutActive()) {
+                    child.checkNeedsLayoutUpdate();
+
+                    if (child.getNeedsLayoutUpdate()) {
+                        this.setNeedsLayoutUpdate(true);
+                    }
+                }
+            }
+
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 if (this.getSizeIsAuto(axis) || this.getSizeIsFull(axis)) {
                     var size = this.getSize(axis);
@@ -1099,9 +1115,16 @@ var deflex;
         Box.prototype.solveLayout = function () {
             this.model.applyContentWeight();
 
+            var startTime = new Date().getTime();
+
             while (this.getNeedsLayoutUpdate()) {
                 this.model.solveLayout();
                 this.applyModel();
+
+                if (new Date().getTime() > startTime + 3000) {
+                    illa.Log.warn(this.name, 'Layout solving takes too long - breaking.');
+                    break;
+                }
             }
         };
 
@@ -1117,8 +1140,10 @@ var deflex;
 
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var child = this.children[i];
-                child.applyModel();
-                this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+                if (child.getIsLayoutActive()) {
+                    child.applyModel();
+                    this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+                }
             }
         };
 
@@ -1454,7 +1479,7 @@ var deflex;
             if (parentBox) {
                 if (this.parentBox != parentBox) {
                     if (!dontModifyDOM) {
-                        parentBox.getJQuery().append(this.getJQuery());
+                        this.getJQuery().appendTo(parentBox.getJQuery());
                     }
                     this.parentBox = parentBox;
                     this.parentJQuery = null;
@@ -1468,10 +1493,10 @@ var deflex;
                 if (!dontModifyDOM) {
                     switch (end) {
                         case 0 /* MIN */:
-                            relatedJQuery.insertBefore(this.getJQuery());
+                            this.getJQuery().insertBefore(relatedJQuery);
                             break;
                         case 1 /* MAX */:
-                            relatedJQuery.insertAfter(this.getJQuery());
+                            this.getJQuery().insertAfter(relatedJQuery);
                             break;
                     }
                 }
@@ -1483,10 +1508,10 @@ var deflex;
                 if (!dontModifyDOM) {
                     switch (end) {
                         case 0 /* MIN */:
-                            parentJQuery.prepend(this.getJQuery());
+                            this.getJQuery().prependTo(parentJQuery);
                             break;
                         case 1 /* MAX */:
-                            parentJQuery.append(this.getJQuery());
+                            this.getJQuery().appendTo(parentJQuery);
                             break;
                     }
                 }
@@ -1845,6 +1870,14 @@ var deflex;
             }
         };
 
+        Box.prototype.getDoubleCheckLayout = function () {
+            return this.doubleCheckLayout;
+        };
+
+        Box.prototype.setDoubleCheckLayout = function (flag) {
+            this.doubleCheckLayout = flag;
+        };
+
         Box.prototype.applyStyle = function (key, value) {
             var success = true;
             switch (key) {
@@ -2062,6 +2095,10 @@ var deflex;
 
                 case 'overflow-is-visible':
                     this.setOverflowIsVisible(deflex.StyleUtil.readBoolean(value));
+                    break;
+
+                case 'double-check-layout':
+                    this.setDoubleCheckLayout(deflex.StyleUtil.readBoolean(value));
                     break;
 
                 default:
