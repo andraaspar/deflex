@@ -486,7 +486,7 @@ module deflex {
 			if (parentBox) {
 				if (this.parentBox != parentBox) {
 					if (!dontModifyDOM) {
-						parentBox.getJQuery().append(this.getJQuery());
+						this.getJQuery().appendTo(parentBox.getJQuery());
 					}
 					this.parentBox = parentBox;
 					this.parentJQuery = null;
@@ -500,10 +500,10 @@ module deflex {
 				if (!dontModifyDOM) {
 					switch (end) {
 						case illa.End.MIN:
-							relatedJQuery.insertBefore(this.getJQuery());
+							this.getJQuery().insertBefore(relatedJQuery);
 							break;
 						case illa.End.MAX:
-							relatedJQuery.insertAfter(this.getJQuery());
+							this.getJQuery().insertAfter(relatedJQuery);
 							break;
 					}
 				}
@@ -515,10 +515,10 @@ module deflex {
 				if (!dontModifyDOM) {
 					switch (end) {
 						case illa.End.MIN:
-							parentJQuery.prepend(this.getJQuery());
+							this.getJQuery().prependTo(parentJQuery);
 							break;
 						case illa.End.MAX:
-							parentJQuery.append(this.getJQuery());
+							this.getJQuery().appendTo(parentJQuery);
 							break;
 					}
 				}
