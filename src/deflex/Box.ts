@@ -106,7 +106,9 @@ module deflex {
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var child = this.children[i];
 				child.onTick();
-				this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+				if (child.getIsLayoutActive()) {
+					this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+				}
 			}
 		}
 
@@ -138,10 +140,17 @@ module deflex {
 		
 		solveLayout(): void {
 			this.model.applyContentWeight();
+			
+			var startTime = new Date().getTime();
 
 			while (this.getNeedsLayoutUpdate()) {
 				this.model.solveLayout();
 				this.applyModel();
+				
+				if (new Date().getTime() > startTime + 3000) {
+					illa.Log.warn(this.name, 'Layout solving takes too long - breaking.');
+					break;
+				}
 			}
 		}
 
@@ -157,8 +166,10 @@ module deflex {
 
 			for (var i = 0, n = this.children.length; i < n; i++) {
 				var child = this.children[i];
-				child.applyModel();
-				this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+				if (child.getIsLayoutActive()) {
+					child.applyModel();
+					this.setNeedsLayoutUpdate(this.getNeedsLayoutUpdate() || child.getNeedsLayoutUpdate());
+				}
 			}
 		}
 
