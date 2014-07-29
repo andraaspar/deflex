@@ -34,3 +34,13 @@
 .deflex-Box-is-root {
   position: relative !important;
 }
+.deflex-Box-overflow-visible {
+  overflow: visible;
+}
+.deflex-Box-overflow-visible:before,
+.deflex-Box-overflow-visible:after {
+  content: '\a0';
+  display: block;
+  overflow: hidden;
+  height: 0;
+}

@@ -1014,6 +1014,7 @@ var deflex;
             this.isRoot = false;
             this.allowsVisibility = true;
             this.allowsLayoutActive = true;
+            this.overflowIsVisible = false;
             this.model = new deflex.BoxModel(this);
             this.name = '';
 
@@ -1426,14 +1427,24 @@ var deflex;
 
             if (parent instanceof Box) {
                 parentBox = parent;
-                relatedBox = related;
-            } else if (parent instanceof jquery.$ || related instanceof jquery.$) {
+            } else if (parent instanceof jquery.$) {
                 parentJQuery = parent;
-                relatedJQuery = related;
                 parentBox = Box.getFrom(parentJQuery);
-                relatedBox = Box.getFrom(relatedJQuery);
             } else if (typeof parent == 'string') {
                 parentJQuery = jquery.$(parent);
+            }
+
+            if (related instanceof Box) {
+                relatedBox = related;
+
+                if (!parentBox)
+                    relatedJQuery = relatedBox.getJQuery();
+            } else if (related instanceof jquery.$) {
+                relatedJQuery = related;
+                relatedBox = Box.getFrom(relatedJQuery);
+
+                if (!relatedBox)
+                    parentBox = null;
             }
 
             if (this.parentBox) {
@@ -1823,6 +1834,17 @@ var deflex;
             return this.children;
         };
 
+        Box.prototype.getOverflowIsVisible = function () {
+            return this.overflowIsVisible;
+        };
+
+        Box.prototype.setOverflowIsVisible = function (flag) {
+            if (this.overflowIsVisible != flag) {
+                this.overflowIsVisible = flag;
+                this.jQuery.toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
+            }
+        };
+
         Box.prototype.applyStyle = function (key, value) {
             var success = true;
             switch (key) {
@@ -2038,6 +2060,10 @@ var deflex;
                     this.setMayShowScrollbar(deflex.StyleUtil.readBoolean(value), 1 /* Y */);
                     break;
 
+                case 'overflow-is-visible':
+                    this.setOverflowIsVisible(deflex.StyleUtil.readBoolean(value));
+                    break;
+
                 default:
                     success = false;
             }
@@ -2053,6 +2079,7 @@ var deflex;
         Box.CSS_CLASS_SIZE_FULL_X = 'deflex-Box-size-full-x';
         Box.CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
         Box.CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
+        Box.CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
         Box.EVENT_DESTROYED = 'deflex_Box_destroyed';
         return Box;
     })(illa.EventHandler);

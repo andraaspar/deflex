@@ -444,6 +444,8 @@ module deflex {
 		}
 
 		setParent(parent: Box, end?: illa.End, related?: Box, dontModifyDOM?: boolean): void;
+		setParent(parent: Box, end?: illa.End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
+		setParent(parent: berek.jquery.IInstance, end?: illa.End, related?: Box, dontModifyDOM?: boolean): void;
 		setParent(parent: berek.jquery.IInstance, end?: illa.End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
 		setParent(parent: string, end?: illa.End, dontModifyDOM?: boolean): void;
 		setParent(parent, end = illa.End.MAX, related = null, dontModifyDOM = false) {
@@ -454,14 +456,27 @@ module deflex {
 
 			if (parent instanceof Box) {
 				parentBox = <Box>parent;
-				relatedBox = <Box>related;
-			} else if (parent instanceof jquery.$ || related instanceof jquery.$) {
+			} else if (parent instanceof jquery.$) {
 				parentJQuery = <berek.jquery.IInstance>parent;
-				relatedJQuery = <berek.jquery.IInstance>related;
 				parentBox = Box.getFrom(parentJQuery);
-				relatedBox = Box.getFrom(relatedJQuery);
 			} else if (typeof parent == 'string') {
 				parentJQuery = jquery.$(<string>parent);
+			}
+			
+			if (related instanceof Box) {
+				relatedBox = <Box>related;
+				
+				// If a parent jQuery and a related Box were specified, get the related jQuery
+				// because the related Box is only used when the parent is a Box.
+				if (!parentBox) relatedJQuery = relatedBox.getJQuery();
+				
+			} else if (related instanceof jquery.$) {
+				relatedJQuery = <berek.jquery.IInstance>related;
+				relatedBox = Box.getFrom(relatedJQuery);
+				
+				// If a parent Box and a related jQuery were specified, ignore the parent Box and
+				// insert next to the related jQuery.
+				if (!relatedBox) parentBox = null;
 			}
 
 			if (this.parentBox) {
