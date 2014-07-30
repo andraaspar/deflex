@@ -58,10 +58,11 @@ module deflex {
 		mayShowScrollbar =
 		new illa.Prop2<illa.Axis2D, boolean>([true, true], this.onSettingChanged, this);
 
-		parent: BoxModel;
 		children: BoxModel[] = [];
 
 		needsLayoutUpdate = false;
+		
+		name = '';
 
 		constructor(private imp: IBoxImp) {
 

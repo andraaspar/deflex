@@ -687,6 +687,7 @@ var deflex;
             this.mayShowScrollbar = new illa.Prop2([true, true], this.onSettingChanged, this);
             this.children = [];
             this.needsLayoutUpdate = false;
+            this.name = '';
         }
         BoxModel.prototype.onSettingChanged = function () {
             this.needsLayoutUpdate = true;
@@ -1097,10 +1098,6 @@ var deflex;
         };
 
         Box.prototype.updateModel = function () {
-            var model = this.model;
-            var parentBox = this.getParentBox();
-            model.parent = parentBox ? parentBox.getModel() : null;
-
             var childModels = [];
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var childBox = this.children[i];
@@ -1109,7 +1106,12 @@ var deflex;
                     childBox.updateModel();
                 }
             }
-            model.children = childModels;
+            this.model.children = childModels;
+
+            if (this.name)
+                this.model.name = this.name + 'Model';
+            else
+                this.model.name = '';
         };
 
         Box.prototype.solveLayout = function () {
