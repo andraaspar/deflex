@@ -722,6 +722,10 @@ module deflex {
 		getModel(): BoxModel {
 			return this.model;
 		}
+		
+		setModel(value: BoxModel): void {
+			this.model = value;
+		}
 
 		getNeedsLayoutUpdate(): boolean {
 			return this.model.needsLayoutUpdate;

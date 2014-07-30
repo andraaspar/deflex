@@ -1807,6 +1807,10 @@ var deflex;
             return this.model;
         };
 
+        Box.prototype.setModel = function (value) {
+            this.model = value;
+        };
+
         Box.prototype.getNeedsLayoutUpdate = function () {
             return this.model.needsLayoutUpdate;
         };
