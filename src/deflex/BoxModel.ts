@@ -323,5 +323,9 @@ module deflex {
 			}
 			return result;
 		}
+		
+		getImp(): IBoxImp {
+			return this.imp;
+		}
 	}
 }

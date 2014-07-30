@@ -930,6 +930,10 @@ var deflex;
             }
             return result;
         };
+
+        BoxModel.prototype.getImp = function () {
+            return this.imp;
+        };
         return BoxModel;
     })();
     deflex.BoxModel = BoxModel;
