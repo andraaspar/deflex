@@ -21,7 +21,7 @@ module deflex {
 		static create(jq: berek.jquery.IInstance): Box {
 			var constructorName = jq.attr(this.CLASS_ATTRIBUTE_NAME);
 			jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
-			if (typeof constructorName != 'string') {
+			if (!illa.isString(constructorName) || constructorName == '') {
 				constructorName = 'default';
 			}
 

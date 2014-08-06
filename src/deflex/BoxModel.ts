@@ -101,9 +101,9 @@ module deflex {
 				} else {
 					var contentSpace = this.getContentSpace(axis);
 					var largestMinSize = this.getLargestChildSizeLimit(axis, illa.End.MIN);
-					var sizeToset = Math.max(contentSpace, largestMinSize);
-					this.setChildSizes(axis, sizeToset);
-					this.alignChildren(axis, sizeToset);
+					var sizeToSet = Math.max(contentSpace, largestMinSize);
+					this.setChildSizes(axis, sizeToSet);
+					this.alignChildren(axis, sizeToSet);
 					var remainingSpace = contentSpace - largestMinSize;
 				}
 
@@ -236,11 +236,11 @@ module deflex {
 				this.children[i].applyContentWeight();
 			}
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
-				var childrenWeight = 0;
-				for (var j = 0, o = this.children.length; j < o; j++) {
-					childrenWeight += this.children[j].weight.get(axis);
-				}
 				if (this.useContentWeight.get(axis)) {
+					var childrenWeight = 0;
+					for (var j = 0, o = this.children.length; j < o; j++) {
+						childrenWeight += this.children[j].weight.get(axis);
+					}
 					this.weight.set(axis, childrenWeight);
 				}
 			}

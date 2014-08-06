@@ -721,9 +721,9 @@ var deflex;
                 } else {
                     var contentSpace = this.getContentSpace(axis);
                     var largestMinSize = this.getLargestChildSizeLimit(axis, 0 /* MIN */);
-                    var sizeToset = Math.max(contentSpace, largestMinSize);
-                    this.setChildSizes(axis, sizeToset);
-                    this.alignChildren(axis, sizeToset);
+                    var sizeToSet = Math.max(contentSpace, largestMinSize);
+                    this.setChildSizes(axis, sizeToSet);
+                    this.alignChildren(axis, sizeToSet);
                     var remainingSpace = contentSpace - largestMinSize;
                 }
 
@@ -846,11 +846,11 @@ var deflex;
                 this.children[i].applyContentWeight();
             }
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
-                var childrenWeight = 0;
-                for (var j = 0, o = this.children.length; j < o; j++) {
-                    childrenWeight += this.children[j].weight.get(axis);
-                }
                 if (this.useContentWeight.get(axis)) {
+                    var childrenWeight = 0;
+                    for (var j = 0, o = this.children.length; j < o; j++) {
+                        childrenWeight += this.children[j].weight.get(axis);
+                    }
                     this.weight.set(axis, childrenWeight);
                 }
             }
@@ -2150,7 +2150,7 @@ var deflex;
         Factory.create = function (jq) {
             var constructorName = jq.attr(this.CLASS_ATTRIBUTE_NAME);
             jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
-            if (typeof constructorName != 'string') {
+            if (!illa.isString(constructorName) || constructorName == '') {
                 constructorName = 'default';
             }
 
