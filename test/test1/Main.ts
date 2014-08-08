@@ -21,6 +21,7 @@ module test1 {
 			outer.name = 'outer';
 			outer.setParent('body');
 			outer.getJQuery().css({ 'background-color': '#aaa' });
+			outer.setDoubleCheckLayout(false);
 			outer.setSizeIsFull(true);
 			outer.setAlignment(illa.Alignment.CENTER);
 			outer.setDirection(illa.Axis2D.Y);

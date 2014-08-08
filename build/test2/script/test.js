@@ -1115,7 +1115,8 @@ var deflex;
             this.allowsVisibility = true;
             this.allowsLayoutActive = true;
             this.overflowIsVisible = false;
-            this.doubleCheckLayout = false;
+            this.doubleCheckLayout = true;
+            this.isSolvingLayout = false;
             this.model = new deflex.BoxModel(this);
             this.name = '';
 
@@ -1151,6 +1152,7 @@ var deflex;
 
         Box.prototype.onRootTick = function (e) {
             var startTime = new Date().getTime();
+            this.isSolvingLayout = true;
             var solutionCount = 0;
             this.checkNeedsLayoutUpdate();
 
@@ -1172,6 +1174,14 @@ var deflex;
 
             if (solutionCount) {
                 illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms, solution count:', solutionCount);
+            }
+
+            this.isSolvingLayout = false;
+        };
+
+        Box.prototype.onSolveLayoutNowRequested = function (e) {
+            if (!this.isSolvingLayout) {
+                this.onRootTick(null);
             }
         };
 
@@ -1756,8 +1766,10 @@ var deflex;
             this.getJQuery().toggleClass(Box.CSS_CLASS_IS_ROOT, value);
             if (value) {
                 Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+                this.addEventCallback(Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED, this.onSolveLayoutNowRequested, this);
             } else {
                 Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+                this.removeEventCallback(Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED, this.onSolveLayoutNowRequested, this);
             }
             illa.Log.infoIf(this.name, 'is now ' + (value ? '' : 'NOT ') + 'root.');
         };
@@ -1981,6 +1993,14 @@ var deflex;
 
         Box.prototype.setDoubleCheckLayout = function (flag) {
             this.doubleCheckLayout = flag;
+        };
+
+        Box.prototype.getIsSolvingLayout = function () {
+            return this.isSolvingLayout;
+        };
+
+        Box.prototype.setIsSolvingLayout = function (flag) {
+            this.isSolvingLayout = flag;
         };
 
         Box.prototype.applyStyle = function (key, value) {
@@ -2222,7 +2242,8 @@ var deflex;
         Box.CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
         Box.CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
         Box.CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
-        Box.EVENT_DESTROYED = 'deflex_Box_destroyed';
+        Box.EVENT_DESTROYED = 'deflex_Box_EVENT_DESTROYED';
+        Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED = 'deflex_Box_EVENT_SOLVE_LAYOUT_NOW_REQUESTED';
         return Box;
     })(illa.EventHandler);
     deflex.Box = Box;

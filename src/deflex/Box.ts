@@ -29,7 +29,8 @@ module deflex {
 		static CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
 		static CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
 		static CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
-		static EVENT_DESTROYED = 'deflex_Box_destroyed';
+		static EVENT_DESTROYED = 'deflex_Box_EVENT_DESTROYED';
+		static EVENT_SOLVE_LAYOUT_NOW_REQUESTED = 'deflex_Box_EVENT_SOLVE_LAYOUT_NOW_REQUESTED';
 
 		private static scrollbarUtil: berek.ScrollbarUtil;
 
@@ -51,7 +52,8 @@ module deflex {
 		private allowsVisibility = true;
 		private allowsLayoutActive = true;
 		private overflowIsVisible = false;
-		private doubleCheckLayout = false;
+		private doubleCheckLayout = true;
+		private isSolvingLayout = false;
 		private model = new BoxModel(this);
 
 		public name = '';
@@ -91,6 +93,7 @@ module deflex {
 
 		onRootTick(e: illa.Event): void {
 			var startTime = new Date().getTime();
+			this.isSolvingLayout = true;
 			var solutionCount = 0;
 			this.checkNeedsLayoutUpdate();
 
@@ -113,6 +116,14 @@ module deflex {
 			
 			if (solutionCount) {
 				illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms, solution count:', solutionCount);
+			}
+			
+			this.isSolvingLayout = false;
+		}
+		
+		onSolveLayoutNowRequested(e: illa.Event): void {
+			if (!this.isSolvingLayout) {
+				this.onRootTick(null);
 			}
 		}
 
@@ -675,8 +686,10 @@ module deflex {
 			this.getJQuery().toggleClass(Box.CSS_CLASS_IS_ROOT, value);
 			if (value) {
 				Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+				this.addEventCallback(Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED, this.onSolveLayoutNowRequested, this);
 			} else {
 				Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
+				this.removeEventCallback(Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED, this.onSolveLayoutNowRequested, this);
 			}
 			illa.Log.infoIf(this.name, 'is now ' + (value ? '' : 'NOT ') + 'root.');
 		}
@@ -897,6 +910,14 @@ module deflex {
 		
 		setDoubleCheckLayout(flag: boolean): void {
 			this.doubleCheckLayout = flag;
+		}
+		
+		getIsSolvingLayout(): boolean {
+			return this.isSolvingLayout;
+		}
+		
+		setIsSolvingLayout(flag: boolean): void {
+			this.isSolvingLayout = flag;
 		}
 
 		applyStyle(key: string, value: string): boolean {
