@@ -1027,10 +1027,10 @@ var deflex;
 
             if (jq) {
                 this.jQuery = jq;
-                var nextBoxJQ = this.jQuery.next('.' + Box.CSS_CLASS);
-                if (!nextBoxJQ.length)
-                    nextBoxJQ = undefined;
-                this.setParent(jq.parent(), nextBoxJQ ? 0 /* MIN */ : 1 /* MAX */, nextBoxJQ, true);
+                var relatedBoxJQ = this.jQuery.prev('.' + Box.CSS_CLASS);
+                if (!relatedBoxJQ.length)
+                    relatedBoxJQ = undefined;
+                this.setParent(jq.parent(), relatedBoxJQ ? 1 /* MAX */ : 0 /* MIN */, relatedBoxJQ, true);
             } else {
                 this.jQuery = jquery.$('<div>');
             }

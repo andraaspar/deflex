@@ -63,9 +63,9 @@ module deflex {
 
 			if (jq) {
 				this.jQuery = jq;
-				var nextBoxJQ = this.jQuery.next('.' + Box.CSS_CLASS);
-				if (!nextBoxJQ.length) nextBoxJQ = undefined;
-				this.setParent(jq.parent(), nextBoxJQ ? illa.End.MIN : illa.End.MAX, nextBoxJQ, true);
+				var relatedBoxJQ = this.jQuery.prev('.' + Box.CSS_CLASS);
+				if (!relatedBoxJQ.length) relatedBoxJQ = undefined;
+				this.setParent(jq.parent(), relatedBoxJQ ? illa.End.MAX : illa.End.MIN, relatedBoxJQ, true);
 			} else {
 				this.jQuery = jquery.$('<div>');
 			}
