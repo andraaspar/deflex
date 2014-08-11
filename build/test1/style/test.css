@@ -25,6 +25,7 @@ body {
   margin: 0 !important;
   border: 0 !important;
   padding: 0 !important;
+  white-space: normal;
 }
 .deflex-Box-size-auto-x {
   width: auto !important;
