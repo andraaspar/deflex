@@ -1,18 +1,20 @@
 /// <reference path='../../lib/illa/Log.ts'/>
-/// <reference path='../../lib/berek/jquery/_module.ts'/>
+
+/// <reference path='../../lib/jQuery.d.ts'/>
+
 /// <reference path='../../lib/berek/UnitTest.ts'/>
+
 /// <reference path='../../src/deflex/Box.ts'/>
 
 module test2 {
-	import jquery = berek.jquery;
 	
 	export class Main {
 		constructor() {
-			jquery.$(illa.bind(this.onDOMLoaded, this));
+			jQuery(illa.bind(this.onDOMLoaded, this));
 		}
 
 		onDOMLoaded() {
-			var u = new berek.UnitTest(jquery.$('body'));
+			var u = new berek.UnitTest(jQuery('body'));
 			u.info('Testing...');
 			
 			

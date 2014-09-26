@@ -7,6 +7,7 @@
   overflow: scroll !important;
 }
 .deflex-Box {
+  box-sizing: content-box;
   position: absolute !important;
   top: 0;
   left: 0;

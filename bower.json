@@ -1,6 +1,6 @@
 {
 	"name": "deflex",
-	"version": "1.6.7",
+	"version": "1.7.0",
 	"homepage": "https://github.com/andraaspar/deflex",
 	"authors": [
 		"András Parditka"
@@ -26,6 +26,6 @@
 		"package.json"
 	],
 	"dependencies": {
-		"berek": "andraaspar/berek#v1.2"
+		"berek": "andraaspar/berek#v1.3"
 	}
 }

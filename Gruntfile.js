@@ -1,60 +1,76 @@
 module.exports = function(grunt) {
 	
-	grunt.initConfig({
-		_outJS: 'build/test1/script/test.js',
-		_outCSS: 'build/test1/style/test.css',
-		_outJS2: 'build/test2/script/test.js',
-		_outCSS2: 'build/test2/style/test.css',
+grunt.initConfig((function() {
 		
-		clean: {
-			test1: ['<%= _outJS %>', '<%= _outCSS %>'],
-			test2: ['<%= _outJS2 %>', '<%= _outCSS2 %>']
-		},
-		less: {
-			test1: {
-				files: {
-					'<%= _outCSS %>': 'test/test1/_style.less'
+		var TEST_COUNT = 2;
+		
+		var config = {
+			clean: {
+				tests: ['tmp', 'build']
+			},
+			kapocs: {
+				tests: {
+					assetTemplates: [{
+						expand: true,
+						cwd: 'tmp/asset_templates',
+						dot: true,
+						src: ['**'],
+						dest: 'build'
+					}],
+					templates: [{
+						expand: true,
+						cwd: 'test/templates',
+						dot: true,
+						src: ['**'],
+						dest: 'build'
+					}]
 				}
 			},
-			test2: {
-				files: {
-					'<%= _outCSS2 %>': 'test/test2/_style.less'
-				}
-			}
-		},
-		typescript: {
-			test1: {
-				files: {
-					'<%= _outJS %>': 'test/test1/Main.ts'
+			less: {
+				tests: {
+					files: {}
 				}
 			},
-			test2: {
-				files: {
-					'<%= _outJS2 %>': 'test/test2/Main.ts'
+			typescript: {
+				tests: {
+					files: {}
+				}
+			},
+			sas: {
+				update: {}
+			},
+			shell: {
+				update: {
+					command: [
+						'bower prune',
+						'bower update',
+						'bower install'
+					].join('&&')
 				}
 			}
-		},
-		sas: {
-			update: {}
-		},
-		shell: {
-			update: {
-				command: [
-					'bower prune',
-					'bower install',
-					'bower update'
-				].join('&&')
-			}
+		};
+		
+		for (var i = 1; i <= TEST_COUNT; i++) {
+			var folderPath = 'tmp/asset_templates/test' + i;
+			var jsPath = folderPath + '/script/test.js';
+			var cssPath = folderPath + '/style/test.css';
+			
+			config.less.tests.files[cssPath] = 'test/test' + i + '/_style.less';
+			
+			config.typescript.tests.files[jsPath] = 'test/test' + i + '/Main.ts';
 		}
-	});
+		
+		return config;
+	})());
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-less');
-	grunt.loadNpmTasks('grunt-typescript');
-	grunt.loadNpmTasks('grunt-shell');
+	grunt.loadNpmTasks('grunt-kapocs');
 	grunt.loadNpmTasks('grunt-sas');
+	grunt.loadNpmTasks('grunt-shell');
+	grunt.loadNpmTasks('grunt-typescript');
 
 	grunt.registerTask('update', ['shell:update','sas:update']);
-	grunt.registerTask('compile', ['clean:test1','typescript:test1','less:test1','clean:test2','typescript:test2','less:test2']);
+	grunt.registerTask('compile', ['clean:tests','typescript:tests','less:tests', 'kapocs:tests']);
 	grunt.registerTask('default', ['compile']);
 };

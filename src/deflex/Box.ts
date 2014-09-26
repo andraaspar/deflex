@@ -7,7 +7,8 @@
 /// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='../../lib/illa/Ticker.ts'/>
 
-/// <reference path='../../lib/berek/jquery/_module.ts'/>
+/// <reference path='../../lib/jQuery.d.ts'/>
+
 /// <reference path='../../lib/berek/Context.ts'/>
 /// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
 
@@ -16,7 +17,6 @@
 /// <reference path='StyleUtil.ts'/>
 
 module deflex {
-	import jquery = berek.jquery;
 	
 	export class Box extends illa.EventHandler implements IBoxImp {
 		static ROOT_TICKER = new illa.Ticker();
@@ -34,7 +34,7 @@ module deflex {
 
 		private static scrollbarUtil: berek.ScrollbarUtil;
 
-		private jQuery: berek.jquery.IInstance;
+		private jQuery: jQuery.IInstance;
 		private sizeCacheX = 0;
 		private sizeCacheY = 0;
 		private sizeIsFullX = false;
@@ -44,7 +44,7 @@ module deflex {
 		private offsetCacheX = 0;
 		private offsetCacheY = 0;
 		private parentBox: Box;
-		private parentJQuery: berek.jquery.IInstance;
+		private parentJQuery: jQuery.IInstance;
 		private children: Array<Box> = [];
 		private zIndex = 0;
 		private isDestroyed = false;
@@ -58,7 +58,7 @@ module deflex {
 
 		public name = '';
 
-		constructor(jq?: berek.jquery.IInstance) {
+		constructor(jq?: jQuery.IInstance) {
 			super();
 
 			if (jq) {
@@ -67,12 +67,12 @@ module deflex {
 				if (!relatedBoxJQ.length) relatedBoxJQ = undefined;
 				this.setParent(jq.parent(), relatedBoxJQ ? illa.End.MAX : illa.End.MIN, relatedBoxJQ, true);
 			} else {
-				this.jQuery = jquery.$('<div>');
+				this.jQuery = jQuery('<div>');
 			}
 			this.jQuery.data(Box.JQUERY_DATA_KEY, this);
 			this.jQuery.addClass(Box.CSS_CLASS);
-			if (!(Box.EVENT_DESTROYED in jquery.$.event.special)) {
-				jquery.$.event.special[Box.EVENT_DESTROYED] = {
+			if (!(Box.EVENT_DESTROYED in jQuery.event.special)) {
+				jQuery.event.special[Box.EVENT_DESTROYED] = {
 					remove: function(o) {
 						if (o.handler) {
 							o.handler(null);
@@ -87,7 +87,7 @@ module deflex {
 			}
 		}
 
-		getJQuery(): berek.jquery.IInstance {
+		getJQuery(): jQuery.IInstance {
 			return this.jQuery;
 		}
 
@@ -349,7 +349,7 @@ module deflex {
 
 		getOffset(axis: illa.Axis2D, alignment = illa.Alignment.START, context = berek.Context.PARENT): number {
 			var result = NaN;
-			var offset: berek.jquery.IPositionObject;
+			var offset: jQuery.IPositionObject;
 			switch (context) {
 				case berek.Context.INNER:
 					offset = { left: 0, top: 0 };
@@ -468,7 +468,7 @@ module deflex {
 			return Box.scrollbarUtil;
 		}
 
-		static getFrom(source: berek.jquery.IInstance): Box {
+		static getFrom(source: jQuery.IInstance): Box {
 			var result: Box = null;
 			if (source) {
 				var stored = source.data(Box.JQUERY_DATA_KEY);
@@ -480,23 +480,23 @@ module deflex {
 		}
 
 		setParent(parent: Box, end?: illa.End, related?: Box, dontModifyDOM?: boolean): void;
-		setParent(parent: Box, end?: illa.End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
-		setParent(parent: berek.jquery.IInstance, end?: illa.End, related?: Box, dontModifyDOM?: boolean): void;
-		setParent(parent: berek.jquery.IInstance, end?: illa.End, related?: berek.jquery.IInstance, dontModifyDOM?: boolean): void;
+		setParent(parent: Box, end?: illa.End, related?: jQuery.IInstance, dontModifyDOM?: boolean): void;
+		setParent(parent: jQuery.IInstance, end?: illa.End, related?: Box, dontModifyDOM?: boolean): void;
+		setParent(parent: jQuery.IInstance, end?: illa.End, related?: jQuery.IInstance, dontModifyDOM?: boolean): void;
 		setParent(parent: string, end?: illa.End, dontModifyDOM?: boolean): void;
 		setParent(parent, end = illa.End.MAX, related = null, dontModifyDOM = false) {
 			var parentBox: Box = null;
-			var parentJQuery: berek.jquery.IInstance = null;
+			var parentJQuery: jQuery.IInstance = null;
 			var relatedBox: Box = null;
-			var relatedJQuery: berek.jquery.IInstance = null;
+			var relatedJQuery: jQuery.IInstance = null;
 
 			if (parent instanceof Box) {
 				parentBox = <Box>parent;
-			} else if (parent instanceof jquery.$) {
-				parentJQuery = <berek.jquery.IInstance>parent;
+			} else if (parent instanceof jQuery) {
+				parentJQuery = <jQuery.IInstance>parent;
 				parentBox = Box.getFrom(parentJQuery);
 			} else if (typeof parent == 'string') {
-				parentJQuery = jquery.$(<string>parent);
+				parentJQuery = jQuery(<string>parent);
 			}
 			
 			if (related instanceof Box) {
@@ -506,8 +506,8 @@ module deflex {
 				// because the related Box is only used when the parent is a Box.
 				if (!parentBox) relatedJQuery = relatedBox.getJQuery();
 				
-			} else if (related instanceof jquery.$) {
-				relatedJQuery = <berek.jquery.IInstance>related;
+			} else if (related instanceof jQuery) {
+				relatedJQuery = <jQuery.IInstance>related;
 				relatedBox = Box.getFrom(relatedJQuery);
 				
 				// If a parent Box and a related jQuery were specified, ignore the parent Box and
@@ -575,7 +575,7 @@ module deflex {
 			return this.parentBox;
 		}
 
-		getParentJQuery(): berek.jquery.IInstance {
+		getParentJQuery(): jQuery.IInstance {
 			return this.parentJQuery;
 		}
 
@@ -643,7 +643,7 @@ module deflex {
 			this.getJQuery().remove();
 		}
 
-		onDestroyed(event: berek.jquery.IEvent): void {
+		onDestroyed(event: jQuery.IEvent): void {
 			illa.Log.infoIf(this.name, 'is being destroyed.');
 			this.isDestroyed = true;
 			var hasNotDestroyedParentBox = this.parentBox && !this.parentBox.getIsDestroyed();

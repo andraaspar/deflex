@@ -3,7 +3,6 @@
 /// <reference path='IBoxConstructor.ts'/>
 
 module deflex {
-	import jquery = berek.jquery;
 	
 	export class Factory {
 		static CLASS_ATTRIBUTE_NAME = 'data-deflex-class';
@@ -11,14 +10,14 @@ module deflex {
 		static boxConstructors: { [s: string]: IBoxConstructor } = { 'default': Box };
 
 		static checkDOM(): void {
-			var jqs = jquery.$('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
+			var jqs = jQuery('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
 			for (var i = 0, n = jqs.length; i < n; i++) {
 				var jq = jqs.eq(i);
 				this.create(jq);
 			}
 		}
 
-		static create(jq: berek.jquery.IInstance): Box {
+		static create(jq: jQuery.IInstance): Box {
 			var constructorName = jq.attr(this.CLASS_ATTRIBUTE_NAME);
 			jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
 			if (!illa.isString(constructorName) || constructorName == '') {
