@@ -813,8 +813,8 @@ var berek;
 
             if (isNaN(this.defaultWidth)) {
                 var boxElement = this.box[0];
-                this.defaultWidth = boxElement.offsetWidth - boxElement.clientWidth;
-                this.defaultHeight = boxElement.offsetHeight - boxElement.clientHeight;
+                this.defaultWidth = Math.ceil(boxElement.offsetWidth - boxElement.clientWidth);
+                this.defaultHeight = Math.ceil(boxElement.offsetHeight - boxElement.clientHeight);
             }
 
             switch (axis) {
