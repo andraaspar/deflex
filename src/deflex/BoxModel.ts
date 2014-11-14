@@ -32,13 +32,13 @@ module deflex {
 		new illa.Prop2<illa.Axis2D, number>([NaN, NaN], this.onSettingChanged, this);
 
 		defaultSpaceBefore =
-		new illa.Prop2<illa.Axis2D, number>([1, 1], this.onSettingChanged, this);
+		new illa.Prop2<illa.Axis2D, number>([0, 0], this.onSettingChanged, this);
 
 		weight =
 		new illa.Prop2<illa.Axis2D, number>([1, 1], this.onSettingChanged, this);
 
 		shrinkWrap =
-		new illa.Prop2<illa.Axis2D, boolean>([false, false], this.onSettingChanged, this);
+		new illa.Prop2<illa.Axis2D, boolean>([true, true], this.onSettingChanged, this);
 
 		useContentWeight =
 		new illa.Prop2<illa.Axis2D, boolean>([false, false], this.onSettingChanged, this);

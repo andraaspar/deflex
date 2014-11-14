@@ -87,7 +87,7 @@ module test1 {
 			this.u.assertEquals(this.root1.getApplySizeToSelf(), true,													'Test1 48');
 			this.u.assertEquals(this.root1.getIsSolvingLayout(), false,													'Test1 49');
 			
-			this.root1.setSizeIsFull(true);
+			this.root1.setSizeSource(deflex.BoxSizeSource.JQUERY_FULL);
 			
 			deflex.Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);
 			deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest2, this);

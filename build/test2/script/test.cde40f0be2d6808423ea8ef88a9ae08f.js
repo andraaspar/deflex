@@ -459,6 +459,39 @@ var illa;
 })(illa || (illa = {}));
 var illa;
 (function (illa) {
+    var StringUtil = (function () {
+        function StringUtil() {
+        }
+        StringUtil.escapeHTML = function (str) {
+            return str.replace(/[&<>"']/g, function (s) {
+                return StringUtil.CHAR_TO_HTML[s];
+            });
+        };
+
+        StringUtil.castNicely = function (str) {
+            return str == null ? '' : String(str);
+        };
+
+        StringUtil.trim = function (str) {
+            return str.replace(/^\s+|\s+$/g, '');
+        };
+
+        StringUtil.escapeRegExp = function (str) {
+            return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        };
+        StringUtil.CHAR_TO_HTML = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        return StringUtil;
+    })();
+    illa.StringUtil = StringUtil;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
     var Event = (function () {
         function Event(type, target) {
             this.type = type;
@@ -681,6 +714,46 @@ var berek;
     })();
     berek.ScrollbarUtil = ScrollbarUtil;
 })(berek || (berek = {}));
+var berek;
+(function (berek) {
+    var Widget = (function (_super) {
+        __extends(Widget, _super);
+        function Widget(jq) {
+            _super.call(this);
+
+            this.jQuery = jq;
+
+            this.jQuery.data(Widget.JQUERY_DATA_KEY, this);
+            if (!(Widget.EVENT_DESTROYED in jQuery.event.special)) {
+                jQuery.event.special[Widget.EVENT_DESTROYED] = {
+                    remove: function (o) {
+                        if (o.handler) {
+                            o.handler(null);
+                        }
+                    }
+                };
+            }
+        }
+        Widget.prototype.getJQuery = function () {
+            return this.jQuery;
+        };
+
+        Widget.getFrom = function (source) {
+            var result = null;
+            if (source) {
+                var stored = source.data(Widget.JQUERY_DATA_KEY);
+                if (stored instanceof Widget) {
+                    result = stored;
+                }
+            }
+            return result;
+        };
+        Widget.JQUERY_DATA_KEY = 'berek_Widget';
+        Widget.EVENT_DESTROYED = 'berek_Widget_EVENT_DESTROYED';
+        return Widget;
+    })(illa.EventHandler);
+    berek.Widget = Widget;
+})(berek || (berek = {}));
 var illa;
 (function (illa) {
     var Prop = (function () {
@@ -700,6 +773,10 @@ var illa;
             this.value = value;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, oldValue, value);
+        };
+
+        Prop.prototype.toString = function () {
+            return '[Prop ' + this.value + ']';
         };
         return Prop;
     })();
@@ -724,6 +801,10 @@ var illa;
             this.values[index] = value;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, index, oldValue, value);
+        };
+
+        Prop2.prototype.toString = function () {
+            return '[Prop2 ' + this.values.join(', ') + ']';
         };
         return Prop2;
     })();
@@ -750,6 +831,10 @@ var illa;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, index, index2, oldValue, value);
         };
+
+        Prop4.prototype.toString = function () {
+            return '[Prop4 ' + this.values.join(', ') + ']';
+        };
         return Prop4;
     })();
     illa.Prop4 = Prop4;
@@ -775,6 +860,10 @@ var illa;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, index, index2, index3, oldValue, value);
         };
+
+        Prop8.prototype.toString = function () {
+            return '[Prop8 ' + this.values.join(', ') + ']';
+        };
         return Prop8;
     })();
     illa.Prop8 = Prop8;
@@ -791,9 +880,9 @@ var deflex;
             this.sizeLimit = new illa.Prop4([0, Infinity, 0, Infinity], this.onSettingChanged, this);
             this.shrinkWrapSizeLimit = new illa.Prop8([0, Infinity, 0, Infinity, 0, Infinity, 0, Infinity], this.onSettingChanged, this);
             this.spaceBefore = new illa.Prop2([NaN, NaN], this.onSettingChanged, this);
-            this.defaultSpaceBefore = new illa.Prop2([1, 1], this.onSettingChanged, this);
+            this.defaultSpaceBefore = new illa.Prop2([0, 0], this.onSettingChanged, this);
             this.weight = new illa.Prop2([1, 1], this.onSettingChanged, this);
-            this.shrinkWrap = new illa.Prop2([false, false], this.onSettingChanged, this);
+            this.shrinkWrap = new illa.Prop2([true, true], this.onSettingChanged, this);
             this.useContentWeight = new illa.Prop2([false, false], this.onSettingChanged, this);
             this.alignment = new illa.Prop2([0 /* START */, 0 /* START */], this.onSettingChanged, this);
             this.isSpacer = new illa.Prop(false, this.onSettingChanged, this);
@@ -1055,6 +1144,16 @@ var deflex;
 })(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
+    (function (BoxSizeSource) {
+        BoxSizeSource[BoxSizeSource["PARENT_BOX"] = 0] = "PARENT_BOX";
+        BoxSizeSource[BoxSizeSource["CHILD_BOXES"] = 1] = "CHILD_BOXES";
+        BoxSizeSource[BoxSizeSource["JQUERY_AUTO"] = 2] = "JQUERY_AUTO";
+        BoxSizeSource[BoxSizeSource["JQUERY_FULL"] = 3] = "JQUERY_FULL";
+    })(deflex.BoxSizeSource || (deflex.BoxSizeSource = {}));
+    var BoxSizeSource = deflex.BoxSizeSource;
+})(deflex || (deflex = {}));
+var deflex;
+(function (deflex) {
     var StyleUtil = (function () {
         function StyleUtil() {
         }
@@ -1108,6 +1207,21 @@ var deflex;
                     throw 'Invalid value. Expected alignment, got: ' + value;
             }
         };
+
+        StyleUtil.readBoxSizeSource = function (value) {
+            switch (value.toLowerCase()) {
+                case 'parent-box':
+                    return 0 /* PARENT_BOX */;
+                case 'child-boxes':
+                    return 1 /* CHILD_BOXES */;
+                case 'jquery-auto':
+                    return 2 /* JQUERY_AUTO */;
+                case 'jquery-full':
+                    return 3 /* JQUERY_FULL */;
+                default:
+                    throw 'Invalid value. Expected box size source, got: ' + value;
+            }
+        };
         return StyleUtil;
     })();
     deflex.StyleUtil = StyleUtil;
@@ -1117,13 +1231,11 @@ var deflex;
     var Box = (function (_super) {
         __extends(Box, _super);
         function Box(jq) {
-            _super.call(this);
+            _super.call(this, jq || jQuery('<div>'));
             this.sizeCacheX = 0;
             this.sizeCacheY = 0;
-            this.sizeIsFullX = false;
-            this.sizeIsFullY = false;
-            this.sizeIsAutoX = false;
-            this.sizeIsAutoY = false;
+            this.sizeSourceX = 1 /* CHILD_BOXES */;
+            this.sizeSourceY = 1 /* CHILD_BOXES */;
             this.offsetCacheX = 0;
             this.offsetCacheY = 0;
             this.children = [];
@@ -1136,38 +1248,20 @@ var deflex;
             this.doubleCheckLayout = true;
             this.isSolvingLayout = false;
             this.model = new deflex.BoxModel(this);
-            this.name = '';
 
             if (jq) {
-                this.jQuery = jq;
-                var relatedBoxJQ = this.jQuery.prev('.' + Box.CSS_CLASS);
+                var relatedBoxJQ = jq.prev('.' + Box.CSS_CLASS);
                 if (!relatedBoxJQ.length)
                     relatedBoxJQ = undefined;
                 this.setParent(jq.parent(), relatedBoxJQ ? 1 /* MAX */ : 0 /* MIN */, relatedBoxJQ, true);
-            } else {
-                this.jQuery = jQuery('<div>');
             }
-            this.jQuery.data(Box.JQUERY_DATA_KEY, this);
-            this.jQuery.addClass(Box.CSS_CLASS);
-            if (!(Box.EVENT_DESTROYED in jQuery.event.special)) {
-                jQuery.event.special[Box.EVENT_DESTROYED] = {
-                    remove: function (o) {
-                        if (o.handler) {
-                            o.handler(null);
-                        }
-                    }
-                };
-            }
-            this.jQuery.on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
+
+            this.getJQuery().addClass(Box.CSS_CLASS).on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
 
             if (!Box.scrollbarUtil) {
                 Box.scrollbarUtil = new berek.ScrollbarUtil();
             }
         }
-        Box.prototype.getJQuery = function () {
-            return this.jQuery;
-        };
-
         Box.prototype.onRootTick = function (e) {
             var startTime = new Date().getTime();
             this.isSolvingLayout = true;
@@ -1183,8 +1277,9 @@ var deflex;
                 if (this.doubleCheckLayout) {
                     this.checkNeedsLayoutUpdate();
 
-                    if (this.getNeedsLayoutUpdate() && new Date().getTime() > startTime + 3000) {
-                        illa.Log.warn(this.name, 'Layout double checks take too long - breaking.');
+                    if (this.getNeedsLayoutUpdate() && solutionCount + 1 > Box.solutionCountLimit) {
+                        illa.Log.warn(this.name || '', 'Solution count limit reached - disabling layout double checks.');
+                        this.setDoubleCheckLayout(false);
                         break;
                     }
                 }
@@ -1215,12 +1310,17 @@ var deflex;
                 }
             }
 
+            var neededLayoutUpdate = this.getNeedsLayoutUpdate();
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
-                if (this.getSizeIsAuto(axis) || this.getSizeIsFull(axis)) {
+                var sizeSource = this.getSizeSource(axis);
+                if (sizeSource == 2 /* JQUERY_AUTO */ || sizeSource == 3 /* JQUERY_FULL */) {
                     var size = this.getSize(axis);
                     this.model.sizeLimit.set(axis, 0 /* MIN */, size);
                     this.model.sizeLimit.set(axis, 1 /* MAX */, size);
                 }
+            }
+            if (!neededLayoutUpdate && this.getNeedsLayoutUpdate()) {
+                illa.Log.infoIf(this.name, 'initiates layout update. Size limit set to:', this.model.sizeLimit.toString());
             }
         };
 
@@ -1251,7 +1351,7 @@ var deflex;
                 this.applyModel();
 
                 if (new Date().getTime() > startTime + 3000) {
-                    illa.Log.warn(this.name, 'Layout solving takes too long - breaking.');
+                    illa.Log.warn(this.name || '', 'Layout solving takes too long - breaking.');
                     break;
                 }
             }
@@ -1262,7 +1362,8 @@ var deflex;
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 this.setOffset(model.outOffset.get(axis), axis);
                 this.setShowScrollbar(model.outShowScrollbar.get(axis), axis);
-                if (!this.getSizeIsFull(axis) && !this.getSizeIsAuto(axis)) {
+                var sizeSource = this.getSizeSource(axis);
+                if (sizeSource == 0 /* PARENT_BOX */ || sizeSource == 1 /* CHILD_BOXES */) {
                     this.setSize(model.outSize.get(axis), axis);
                 }
             }
@@ -1306,14 +1407,14 @@ var deflex;
             switch (axis) {
                 case 0 /* X */:
                     if (isNaN(this.sizeCacheX)) {
-                        result = this.jQuery[0].offsetWidth;
+                        result = this.getJQuery()[0].offsetWidth;
                     } else {
                         result = this.sizeCacheX;
                     }
                     break;
                 case 1 /* Y */:
                     if (isNaN(this.sizeCacheY)) {
-                        result = this.jQuery[0].offsetHeight;
+                        result = this.getJQuery()[0].offsetHeight;
                     } else {
                         result = this.sizeCacheY;
                     }
@@ -1326,36 +1427,8 @@ var deflex;
             return result;
         };
 
-        Box.prototype.getSizeIsAuto = function (axis) {
-            var result = false;
-            switch (axis) {
-                case 0 /* X */:
-                    result = this.sizeIsAutoX;
-                    break;
-                case 1 /* Y */:
-                    result = this.sizeIsAutoY;
-                    break;
-            }
-            return result;
-        };
-
-        Box.prototype.getSizeIsFull = function (axis) {
-            var result = false;
-            switch (axis) {
-                case 0 /* X */:
-                    result = this.sizeIsFullX;
-                    break;
-                case 1 /* Y */:
-                    result = this.sizeIsFullY;
-                    break;
-            }
-            return result;
-        };
-
         Box.prototype.setSize = function (v, a, context) {
             if (typeof context === "undefined") { context = 1 /* PARENT */; }
-            this.setSizeIsFull(false, a);
-            this.setSizeIsAuto(false, a);
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 var value = v;
                 if (context == 0 /* INNER */) {
@@ -1370,64 +1443,76 @@ var deflex;
                     case 0 /* X */:
                         if (this.sizeCacheX != value) {
                             this.sizeCacheX = value;
-                            this.jQuery[0].style.width = value + 'px';
+                            this.getJQuery()[0].style.width = value + 'px';
                         }
                         break;
                     case 1 /* Y */:
                         if (this.sizeCacheY != value) {
                             this.sizeCacheY = value;
-                            this.jQuery[0].style.height = value + 'px';
+                            this.getJQuery()[0].style.height = value + 'px';
                         }
                         break;
                 }
             }
         };
 
-        Box.prototype.setSizeIsFull = function (flag, axis) {
-            if (flag) {
-                this.clearSizeCache(axis);
-                this.setSizeIsAuto(false, axis);
-            }
+        Box.prototype.getSizeSource = function (axis) {
+            var result = 0 /* PARENT_BOX */;
             switch (axis) {
-                default:
                 case 0 /* X */:
-                    if (this.sizeIsFullX != flag) {
-                        this.sizeIsFullX = flag;
-                        this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_FULL_X, flag);
-                        this.setNeedsLayoutUpdate(true);
-                    }
-                    if (axis != null)
-                        break;
+                    result = this.sizeSourceX;
+                    break;
                 case 1 /* Y */:
-                    if (this.sizeIsFullY != flag) {
-                        this.sizeIsFullY = flag;
-                        this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_FULL_Y, flag);
-                        this.setNeedsLayoutUpdate(true);
-                    }
+                    result = this.sizeSourceY;
+                    break;
             }
+            return result;
         };
 
-        Box.prototype.setSizeIsAuto = function (flag, axis) {
-            if (flag) {
-                this.clearSizeCache(axis);
-                this.setSizeIsFull(false, axis);
+        Box.prototype.setSizeSource = function (value, a) {
+            switch (value) {
+                case 2 /* JQUERY_AUTO */:
+                case 3 /* JQUERY_FULL */:
+                    this.clearSizeCache(axis);
             }
-            switch (axis) {
-                default:
-                case 0 /* X */:
-                    if (this.sizeIsAutoX != flag) {
-                        this.sizeIsAutoX = flag;
-                        this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_AUTO_X, flag);
-                        this.setNeedsLayoutUpdate(true);
-                    }
-                    if (axis != null)
+            for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
+                var prevSizeSource = this.getSizeSource(axis);
+                if (prevSizeSource === value)
+                    continue;
+
+                switch (axis) {
+                    case 0 /* X */:
+                        this.sizeSourceX = value;
                         break;
-                case 1 /* Y */:
-                    if (this.sizeIsAutoY != flag) {
-                        this.sizeIsAutoY = flag;
-                        this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_AUTO_Y, flag);
-                        this.setNeedsLayoutUpdate(true);
-                    }
+                    case 1 /* Y */:
+                        this.sizeSourceY = value;
+                        break;
+                }
+
+                this.setNeedsLayoutUpdate(true);
+
+                switch (prevSizeSource) {
+                    case 2 /* JQUERY_AUTO */:
+                        this.getJQuery().removeClass(axis == 0 /* X */ ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
+                        break;
+                    case 3 /* JQUERY_FULL */:
+                        this.getJQuery().removeClass(axis == 0 /* X */ ? Box.CSS_CLASS_SIZE_FULL_X : Box.CSS_CLASS_SIZE_FULL_Y);
+                        break;
+                    case 1 /* CHILD_BOXES */:
+                        this.model.shrinkWrap.set(axis, false);
+                        break;
+                }
+                switch (value) {
+                    case 2 /* JQUERY_AUTO */:
+                        this.getJQuery().addClass(axis == 0 /* X */ ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
+                        break;
+                    case 3 /* JQUERY_FULL */:
+                        this.getJQuery().addClass(axis == 0 /* X */ ? Box.CSS_CLASS_SIZE_FULL_X : Box.CSS_CLASS_SIZE_FULL_Y);
+                        break;
+                    case 1 /* CHILD_BOXES */:
+                        this.model.shrinkWrap.set(axis, true);
+                        break;
+                }
             }
         };
 
@@ -1442,13 +1527,13 @@ var deflex;
                     break;
                 case 1 /* PARENT */:
                     if (isNaN(this.offsetCacheX) || isNaN(this.offsetCacheY)) {
-                        offset = this.jQuery.position();
+                        offset = this.getJQuery().position();
                     } else {
                         offset = { left: this.offsetCacheX, top: this.offsetCacheY };
                     }
                     break;
                 case 2 /* PAGE */:
-                    offset = this.jQuery.offset();
+                    offset = this.getJQuery().offset();
                     break;
             }
             switch (axis) {
@@ -1500,13 +1585,13 @@ var deflex;
                     case 0 /* X */:
                         if (this.offsetCacheX != value) {
                             this.offsetCacheX = value;
-                            this.jQuery[0].style.left = value + 'px';
+                            this.getJQuery()[0].style.left = value + 'px';
                         }
                         break;
                     case 1 /* Y */:
                         if (this.offsetCacheY != value) {
                             this.offsetCacheY = value;
-                            this.jQuery[0].style.top = value + 'px';
+                            this.getJQuery()[0].style.top = value + 'px';
                         }
                         break;
                 }
@@ -1517,10 +1602,10 @@ var deflex;
             var overflow = '';
             switch (axis) {
                 case 0 /* X */:
-                    overflow = this.jQuery[0].style.overflowY;
+                    overflow = this.getJQuery()[0].style.overflowY;
                     break;
                 case 1 /* Y */:
-                    overflow = this.jQuery[0].style.overflowX;
+                    overflow = this.getJQuery()[0].style.overflowX;
                     break;
             }
             return overflow == 'scroll';
@@ -1532,13 +1617,13 @@ var deflex;
                 default:
                 case 0 /* X */:
                     if (this.getShowScrollbar(0 /* X */) != flag) {
-                        this.jQuery[0].style.overflowY = overflow;
+                        this.getJQuery()[0].style.overflowY = overflow;
                     }
                     if (axis != null)
                         break;
                 case 1 /* Y */:
                     if (this.getShowScrollbar(1 /* Y */) != flag) {
-                        this.jQuery[0].style.overflowX = overflow;
+                        this.getJQuery()[0].style.overflowX = overflow;
                     }
             }
         };
@@ -1560,12 +1645,9 @@ var deflex;
         };
 
         Box.getFrom = function (source) {
-            var result = null;
-            if (source) {
-                var stored = source.data(Box.JQUERY_DATA_KEY);
-                if (stored instanceof Box) {
-                    result = stored;
-                }
+            var result = berek.Widget.getFrom(source);
+            if (!(result instanceof Box)) {
+                result = null;
             }
             return result;
         };
@@ -1954,16 +2036,6 @@ var deflex;
             }
         };
 
-        Box.prototype.getShrinkWrap = function (axis) {
-            return this.model.shrinkWrap.get(axis);
-        };
-
-        Box.prototype.setShrinkWrap = function (value, a) {
-            for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
-                this.model.shrinkWrap.set(axis, value);
-            }
-        };
-
         Box.prototype.getIsSpacer = function () {
             return this.model.isSpacer.get();
         };
@@ -2001,7 +2073,7 @@ var deflex;
         Box.prototype.setOverflowIsVisible = function (flag) {
             if (this.overflowIsVisible != flag) {
                 this.overflowIsVisible = flag;
-                this.jQuery.toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
+                this.getJQuery().toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
             }
         };
 
@@ -2021,27 +2093,38 @@ var deflex;
             this.isSolvingLayout = flag;
         };
 
-        Box.prototype.applyStyle = function (key, value) {
+        Box.prototype.applyStyle = function (styles) {
+            styles = illa.StringUtil.trim(styles);
+
+            var style = styles.split(/\s*;\s*/g);
+            for (var i = 0, n = style.length; i < n; i++) {
+                var styleSplit = style[i].split(/\s*:\s*/g);
+                var key = styleSplit[0];
+                var value = styleSplit[1];
+
+                if (key) {
+                    try  {
+                        if (!this.applySingleStyle(key, value)) {
+                            illa.Log.warn(this.name || '', 'Style key not recognized: ' + key);
+                        }
+                    } catch (e) {
+                        illa.Log.warn(key + ': ' + e);
+                    }
+                }
+            }
+        };
+
+        Box.prototype.applySingleStyle = function (key, value) {
             var success = true;
             switch (key) {
-                case 'size-is-full':
-                    this.setSizeIsFull(deflex.StyleUtil.readBoolean(value));
+                case 'size-source':
+                    this.setSizeSource(deflex.StyleUtil.readBoxSizeSource(value));
                     break;
-                case 'size-is-full-x':
-                    this.setSizeIsFull(deflex.StyleUtil.readBoolean(value), 0 /* X */);
+                case 'size-source-x':
+                    this.setSizeSource(deflex.StyleUtil.readBoxSizeSource(value), 0 /* X */);
                     break;
-                case 'size-is-full-y':
-                    this.setSizeIsFull(deflex.StyleUtil.readBoolean(value), 1 /* Y */);
-                    break;
-
-                case 'size-is-auto':
-                    this.setSizeIsAuto(deflex.StyleUtil.readBoolean(value));
-                    break;
-                case 'size-is-auto-x':
-                    this.setSizeIsAuto(deflex.StyleUtil.readBoolean(value), 0 /* X */);
-                    break;
-                case 'size-is-auto-y':
-                    this.setSizeIsAuto(deflex.StyleUtil.readBoolean(value), 1 /* Y */);
+                case 'size-source-y':
+                    this.setSizeSource(deflex.StyleUtil.readBoxSizeSource(value), 1 /* Y */);
                     break;
 
                 case 'inset':
@@ -2188,16 +2271,6 @@ var deflex;
                     this.setWeight(deflex.StyleUtil.readNumber(value), 1 /* Y */);
                     break;
 
-                case 'shrink-wrap':
-                    this.setShrinkWrap(deflex.StyleUtil.readBoolean(value));
-                    break;
-                case 'shrink-wrap-x':
-                    this.setShrinkWrap(deflex.StyleUtil.readBoolean(value), 0 /* X */);
-                    break;
-                case 'shrink-wrap-y':
-                    this.setShrinkWrap(deflex.StyleUtil.readBoolean(value), 1 /* Y */);
-                    break;
-
                 case 'use-content-weight':
                     this.setUseContentWeight(deflex.StyleUtil.readBoolean(value));
                     break;
@@ -2244,15 +2317,45 @@ var deflex;
                     this.setDoubleCheckLayout(deflex.StyleUtil.readBoolean(value));
                     break;
 
+                case 'name':
+                    this.name = value;
+                    break;
+
                 default:
                     success = false;
             }
 
             return success;
         };
+
+        Box.getBoxesFromRootsJQueryByName = function (name, rootsJq) {
+            if (typeof rootsJq === "undefined") { rootsJq = jQuery('.' + Box.CSS_CLASS_IS_ROOT); }
+            var result = [];
+
+            for (var i = 0, n = rootsJq.length; i < n; i++) {
+                var root = Box.getFrom(rootsJq.eq(i));
+                result = result.concat(this.getBoxesFromRootByName(name, root));
+            }
+
+            return result;
+        };
+
+        Box.getBoxesFromRootByName = function (name, root) {
+            var result = [];
+
+            if (root.name === name) {
+                result.push(root);
+            }
+
+            var children = root.getChildren();
+            for (var i = 0, n = children.length; i < n; i++) {
+                result = result.concat(this.getBoxesFromRootByName(name, children[i]));
+            }
+
+            return result;
+        };
         Box.ROOT_TICKER = new illa.Ticker();
 
-        Box.JQUERY_DATA_KEY = 'deflex_Box';
         Box.CSS_CLASS = 'deflex-Box';
         Box.CSS_CLASS_SIZE_AUTO_X = 'deflex-Box-size-auto-x';
         Box.CSS_CLASS_SIZE_AUTO_Y = 'deflex-Box-size-auto-y';
@@ -2260,10 +2363,11 @@ var deflex;
         Box.CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
         Box.CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
         Box.CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
-        Box.EVENT_DESTROYED = 'deflex_Box_EVENT_DESTROYED';
         Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED = 'deflex_Box_EVENT_SOLVE_LAYOUT_NOW_REQUESTED';
+
+        Box.solutionCountLimit = 100;
         return Box;
-    })(illa.EventHandler);
+    })(berek.Widget);
     deflex.Box = Box;
 })(deflex || (deflex = {}));
 var test2;

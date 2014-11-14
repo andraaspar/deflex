@@ -5,23 +5,25 @@
 /// <reference path='../../lib/illa/End.ts'/>
 /// <reference path='../../lib/illa/EventHandler.ts'/>
 /// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='../../lib/illa/StringUtil.ts'/>
 /// <reference path='../../lib/illa/Ticker.ts'/>
 
 /// <reference path='../../lib/jQuery.d.ts'/>
 
 /// <reference path='../../lib/berek/Context.ts'/>
 /// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
+/// <reference path='../../lib/berek/Widget.ts'/>
 
 /// <reference path='BoxModel.ts'/>
+/// <reference path='BoxSizeSource.ts'/>
 /// <reference path='IBoxImp.ts'/>
 /// <reference path='StyleUtil.ts'/>
 
 module deflex {
 	
-	export class Box extends illa.EventHandler implements IBoxImp {
+	export class Box extends berek.Widget implements IBoxImp {
 		static ROOT_TICKER = new illa.Ticker();
 
-		static JQUERY_DATA_KEY = 'deflex_Box';
 		static CSS_CLASS = 'deflex-Box';
 		static CSS_CLASS_SIZE_AUTO_X = 'deflex-Box-size-auto-x';
 		static CSS_CLASS_SIZE_AUTO_Y = 'deflex-Box-size-auto-y';
@@ -29,18 +31,17 @@ module deflex {
 		static CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
 		static CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
 		static CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
-		static EVENT_DESTROYED = 'deflex_Box_EVENT_DESTROYED';
 		static EVENT_SOLVE_LAYOUT_NOW_REQUESTED = 'deflex_Box_EVENT_SOLVE_LAYOUT_NOW_REQUESTED';
+		
+		static solutionCountLimit = 100;
+//		static nextId = 0;
 
 		private static scrollbarUtil: berek.ScrollbarUtil;
 
-		private jQuery: jQuery.IInstance;
 		private sizeCacheX = 0;
 		private sizeCacheY = 0;
-		private sizeIsFullX = false;
-		private sizeIsFullY = false;
-		private sizeIsAutoX = false;
-		private sizeIsAutoY = false;
+		private sizeSourceX = BoxSizeSource.CHILD_BOXES;
+		private sizeSourceY = BoxSizeSource.CHILD_BOXES;
 		private offsetCacheX = 0;
 		private offsetCacheY = 0;
 		private parentBox: Box;
@@ -55,40 +56,26 @@ module deflex {
 		private doubleCheckLayout = true;
 		private isSolvingLayout = false;
 		private model = new BoxModel(this);
-
-		public name = '';
+		
+		public name: string;
 
 		constructor(jq?: jQuery.IInstance) {
-			super();
-
+			super(jq || jQuery('<div>'));
+			
+//			this.name = 'Box-' + Box.nextId++;
+			
 			if (jq) {
-				this.jQuery = jq;
-				var relatedBoxJQ = this.jQuery.prev('.' + Box.CSS_CLASS);
+				var relatedBoxJQ = jq.prev('.' + Box.CSS_CLASS);
 				if (!relatedBoxJQ.length) relatedBoxJQ = undefined;
 				this.setParent(jq.parent(), relatedBoxJQ ? illa.End.MAX : illa.End.MIN, relatedBoxJQ, true);
-			} else {
-				this.jQuery = jQuery('<div>');
 			}
-			this.jQuery.data(Box.JQUERY_DATA_KEY, this);
-			this.jQuery.addClass(Box.CSS_CLASS);
-			if (!(Box.EVENT_DESTROYED in jQuery.event.special)) {
-				jQuery.event.special[Box.EVENT_DESTROYED] = {
-					remove: function(o) {
-						if (o.handler) {
-							o.handler(null);
-						}
-					}
-				};
-			}
-			this.jQuery.on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
 
+			this.getJQuery().addClass(Box.CSS_CLASS)
+				.on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
+			
 			if (!Box.scrollbarUtil) {
 				Box.scrollbarUtil = new berek.ScrollbarUtil();
 			}
-		}
-
-		getJQuery(): jQuery.IInstance {
-			return this.jQuery;
 		}
 
 		onRootTick(e: illa.Event): void {
@@ -107,8 +94,9 @@ module deflex {
 					this.checkNeedsLayoutUpdate();
 					
 					if (this.getNeedsLayoutUpdate() &&
-						new Date().getTime() > startTime + 3000) {
-						illa.Log.warn(this.name, 'Layout double checks take too long - breaking.');
+						solutionCount + 1 > Box.solutionCountLimit) {
+						illa.Log.warn(this.name || '', 'Solution count limit reached - disabling layout double checks.');
+						this.setDoubleCheckLayout(false);
 						break;
 					}
 				}
@@ -139,12 +127,17 @@ module deflex {
 				}
 			}
 			
+			var neededLayoutUpdate = this.getNeedsLayoutUpdate();
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
-				if (this.getSizeIsAuto(axis) || this.getSizeIsFull(axis)) {
+				var sizeSource = this.getSizeSource(axis);
+				if (sizeSource == BoxSizeSource.JQUERY_AUTO || sizeSource == BoxSizeSource.JQUERY_FULL) {
 					var size = this.getSize(axis);
 					this.model.sizeLimit.set(axis, illa.End.MIN, size);
 					this.model.sizeLimit.set(axis, illa.End.MAX, size);
 				}
+			}
+			if (!neededLayoutUpdate && this.getNeedsLayoutUpdate()) {
+				illa.Log.infoIf(this.name, 'initiates layout update. Size limit set to:', this.model.sizeLimit.toString());
 			}
 		}
 
@@ -173,7 +166,7 @@ module deflex {
 				this.applyModel();
 				
 				if (new Date().getTime() > startTime + 3000) {
-					illa.Log.warn(this.name, 'Layout solving takes too long - breaking.');
+					illa.Log.warn(this.name || '', 'Layout solving takes too long - breaking.');
 					break;
 				}
 			}
@@ -184,7 +177,8 @@ module deflex {
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				this.setOffset(model.outOffset.get(axis), axis);
 				this.setShowScrollbar(model.outShowScrollbar.get(axis), axis);
-				if (!this.getSizeIsFull(axis) && !this.getSizeIsAuto(axis)) {
+				var sizeSource = this.getSizeSource(axis);
+				if (sizeSource == BoxSizeSource.PARENT_BOX || sizeSource == BoxSizeSource.CHILD_BOXES) {
 					this.setSize(model.outSize.get(axis), axis);
 				}
 			}
@@ -225,14 +219,14 @@ module deflex {
 			switch (axis) {
 				case illa.Axis2D.X:
 					if (isNaN(this.sizeCacheX)) {
-						result = (<HTMLElement>this.jQuery[0]).offsetWidth;
+						result = (<HTMLElement>this.getJQuery()[0]).offsetWidth;
 					} else {
 						result = this.sizeCacheX;
 					}
 					break;
 				case illa.Axis2D.Y:
 					if (isNaN(this.sizeCacheY)) {
-						result = (<HTMLElement>this.jQuery[0]).offsetHeight;
+						result = (<HTMLElement>this.getJQuery()[0]).offsetHeight;
 					} else {
 						result = this.sizeCacheY;
 					}
@@ -245,35 +239,7 @@ module deflex {
 			return result;
 		}
 
-		getSizeIsAuto(axis: illa.Axis2D): boolean {
-			var result = false;
-			switch (axis) {
-				case illa.Axis2D.X:
-					result = this.sizeIsAutoX;
-					break;
-				case illa.Axis2D.Y:
-					result = this.sizeIsAutoY;
-					break;
-			}
-			return result;
-		}
-
-		getSizeIsFull(axis: illa.Axis2D): boolean {
-			var result = false;
-			switch (axis) {
-				case illa.Axis2D.X:
-					result = this.sizeIsFullX;
-					break;
-				case illa.Axis2D.Y:
-					result = this.sizeIsFullY;
-					break;
-			}
-			return result;
-		}
-
 		setSize(v: number, a?: illa.Axis2D, context = berek.Context.PARENT): void {
-			this.setSizeIsFull(false, a);
-			this.setSizeIsAuto(false, a);
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
 				var value = v;
 				if (context == berek.Context.INNER) {
@@ -288,62 +254,75 @@ module deflex {
 					case illa.Axis2D.X:
 						if (this.sizeCacheX != value) {
 							this.sizeCacheX = value;
-							(<HTMLElement>this.jQuery[0]).style.width = value + 'px';
+							(<HTMLElement>this.getJQuery()[0]).style.width = value + 'px';
 						}
 						break;
 					case illa.Axis2D.Y:
 						if (this.sizeCacheY != value) {
 							this.sizeCacheY = value;
-							(<HTMLElement>this.jQuery[0]).style.height = value + 'px';
+							(<HTMLElement>this.getJQuery()[0]).style.height = value + 'px';
 						}
 						break;
 				}
 			}
 		}
-
-		setSizeIsFull(flag: boolean, axis?: illa.Axis2D): void {
-			if (flag) {
-				this.clearSizeCache(axis);
-				this.setSizeIsAuto(false, axis);
-			}
+		
+		getSizeSource(axis: illa.Axis2D): BoxSizeSource {
+			var result = BoxSizeSource.PARENT_BOX;
 			switch (axis) {
-				default:
 				case illa.Axis2D.X:
-					if (this.sizeIsFullX != flag) {
-						this.sizeIsFullX = flag;
-						this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_FULL_X, flag);
-						this.setNeedsLayoutUpdate(true);
-					}
-					if (axis != null) break;
+					result = this.sizeSourceX;
+					break;
 				case illa.Axis2D.Y:
-					if (this.sizeIsFullY != flag) {
-						this.sizeIsFullY = flag;
-						this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_FULL_Y, flag);
-						this.setNeedsLayoutUpdate(true);
-					}
+					result = this.sizeSourceY;
+					break;
 			}
+			return result;
 		}
-
-		setSizeIsAuto(flag: boolean, axis?: illa.Axis2D): void {
-			if (flag) {
-				this.clearSizeCache(axis);
-				this.setSizeIsFull(false, axis);
+		
+		setSizeSource(value: BoxSizeSource, a?: illa.Axis2D): void {
+			switch (value) {
+				case BoxSizeSource.JQUERY_AUTO:
+				case BoxSizeSource.JQUERY_FULL:
+					this.clearSizeCache(axis);
 			}
-			switch (axis) {
-				default:
-				case illa.Axis2D.X:
-					if (this.sizeIsAutoX != flag) {
-						this.sizeIsAutoX = flag;
-						this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_AUTO_X, flag);
-						this.setNeedsLayoutUpdate(true);
-					}
-					if (axis != null) break;
-				case illa.Axis2D.Y:
-					if (this.sizeIsAutoY != flag) {
-						this.sizeIsAutoY = flag;
-						this.jQuery.toggleClass(Box.CSS_CLASS_SIZE_AUTO_Y, flag);
-						this.setNeedsLayoutUpdate(true);
-					}
+			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
+				var prevSizeSource = this.getSizeSource(axis);
+				if (prevSizeSource === value) continue;
+					
+				switch (axis) {
+					case illa.Axis2D.X:
+						this.sizeSourceX = value;
+						break;
+					case illa.Axis2D.Y:
+						this.sizeSourceY = value;
+						break;
+				}
+
+				this.setNeedsLayoutUpdate(true);
+
+				switch (prevSizeSource) {
+					case BoxSizeSource.JQUERY_AUTO:
+						this.getJQuery().removeClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
+						break;
+					case BoxSizeSource.JQUERY_FULL:
+						this.getJQuery().removeClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_FULL_X : Box.CSS_CLASS_SIZE_FULL_Y);
+						break;
+					case BoxSizeSource.CHILD_BOXES:
+						this.model.shrinkWrap.set(axis, false);
+						break;
+				}
+				switch (value) {
+					case BoxSizeSource.JQUERY_AUTO:
+						this.getJQuery().addClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
+						break;
+					case BoxSizeSource.JQUERY_FULL:
+						this.getJQuery().addClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_FULL_X : Box.CSS_CLASS_SIZE_FULL_Y);
+						break;
+					case BoxSizeSource.CHILD_BOXES:
+						this.model.shrinkWrap.set(axis, true);
+						break;
+				}
 			}
 		}
 
@@ -356,13 +335,13 @@ module deflex {
 					break;
 				case berek.Context.PARENT:
 					if (isNaN(this.offsetCacheX) || isNaN(this.offsetCacheY)) {
-						offset = this.jQuery.position();
+						offset = this.getJQuery().position();
 					} else {
 						offset = { left: this.offsetCacheX, top: this.offsetCacheY };
 					}
 					break;
 				case berek.Context.PAGE:
-					offset = this.jQuery.offset();
+					offset = this.getJQuery().offset();
 					break;
 			}
 			switch (axis) {
@@ -410,13 +389,13 @@ module deflex {
 					case illa.Axis2D.X:
 						if (this.offsetCacheX != value) {
 							this.offsetCacheX = value;
-							(<HTMLElement>this.jQuery[0]).style.left = value + 'px';
+							(<HTMLElement>this.getJQuery()[0]).style.left = value + 'px';
 						}
 						break;
 					case illa.Axis2D.Y:
 						if (this.offsetCacheY != value) {
 							this.offsetCacheY = value;
-							(<HTMLElement>this.jQuery[0]).style.top = value + 'px';
+							(<HTMLElement>this.getJQuery()[0]).style.top = value + 'px';
 						}
 						break;
 				}
@@ -427,10 +406,10 @@ module deflex {
 			var overflow = '';
 			switch (axis) {
 				case illa.Axis2D.X:
-					overflow = (<HTMLElement>this.jQuery[0]).style.overflowY;
+					overflow = (<HTMLElement>this.getJQuery()[0]).style.overflowY;
 					break;
 				case illa.Axis2D.Y:
-					overflow = (<HTMLElement>this.jQuery[0]).style.overflowX;
+					overflow = (<HTMLElement>this.getJQuery()[0]).style.overflowX;
 					break;
 			}
 			return overflow == 'scroll';
@@ -442,12 +421,12 @@ module deflex {
 				default:
 				case illa.Axis2D.X:
 					if (this.getShowScrollbar(illa.Axis2D.X) != flag) {
-						(<HTMLElement>this.jQuery[0]).style.overflowY = overflow;
+						(<HTMLElement>this.getJQuery()[0]).style.overflowY = overflow;
 					}
 					if (axis != null) break;
 				case illa.Axis2D.Y:
 					if (this.getShowScrollbar(illa.Axis2D.Y) != flag) {
-						(<HTMLElement>this.jQuery[0]).style.overflowX = overflow;
+						(<HTMLElement>this.getJQuery()[0]).style.overflowX = overflow;
 					}
 			}
 		}
@@ -469,12 +448,9 @@ module deflex {
 		}
 
 		static getFrom(source: jQuery.IInstance): Box {
-			var result: Box = null;
-			if (source) {
-				var stored = source.data(Box.JQUERY_DATA_KEY);
-				if (stored instanceof Box) {
-					result = <any>stored;
-				}
+			var result: Box = <Box>berek.Widget.getFrom(source);
+			if (!(result instanceof Box)) {
+				result = null;
 			}
 			return result;
 		}
@@ -853,16 +829,6 @@ module deflex {
 			}
 		}
 
-		getShrinkWrap(axis: illa.Axis2D): boolean {
-			return this.model.shrinkWrap.get(axis);
-		}
-
-		setShrinkWrap(value: boolean, a?: illa.Axis2D): void {
-			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
-				this.model.shrinkWrap.set(axis, value);
-			}
-		}
-
 		getIsSpacer(): boolean {
 			return this.model.isSpacer.get();
 		}
@@ -900,7 +866,7 @@ module deflex {
 		setOverflowIsVisible(flag: boolean): void {
 			if (this.overflowIsVisible != flag) {
 				this.overflowIsVisible = flag;
-				this.jQuery.toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
+				this.getJQuery().toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
 			}
 		}
 		
@@ -920,27 +886,38 @@ module deflex {
 			this.isSolvingLayout = flag;
 		}
 
-		applyStyle(key: string, value: string): boolean {
+		applyStyle(styles: string): void {
+			styles = illa.StringUtil.trim(styles);
+
+			var style = styles.split(/\s*;\s*/g);
+			for (var i = 0, n = style.length; i < n; i++) {
+				var styleSplit = style[i].split(/\s*:\s*/g);
+				var key = styleSplit[0];
+				var value = styleSplit[1];
+				
+				if (key) {
+					try {
+						if (!this.applySingleStyle(key, value)) {
+							illa.Log.warn(this.name || '', 'Style key not recognized: ' + key);
+						}
+					} catch (e) {
+						illa.Log.warn(key + ': ' + e);
+					}
+				}
+			}
+		}
+
+		applySingleStyle(key: string, value: string): boolean {
 			var success = true;
 			switch (key) {
-				case 'size-is-full':
-					this.setSizeIsFull(StyleUtil.readBoolean(value));
+				case 'size-source':
+					this.setSizeSource(StyleUtil.readBoxSizeSource(value));
 					break;
-				case 'size-is-full-x':
-					this.setSizeIsFull(StyleUtil.readBoolean(value), illa.Axis2D.X);
+				case 'size-source-x':
+					this.setSizeSource(StyleUtil.readBoxSizeSource(value), illa.Axis2D.X);
 					break;
-				case 'size-is-full-y':
-					this.setSizeIsFull(StyleUtil.readBoolean(value), illa.Axis2D.Y);
-					break;
-
-				case 'size-is-auto':
-					this.setSizeIsAuto(StyleUtil.readBoolean(value));
-					break;
-				case 'size-is-auto-x':
-					this.setSizeIsAuto(StyleUtil.readBoolean(value), illa.Axis2D.X);
-					break;
-				case 'size-is-auto-y':
-					this.setSizeIsAuto(StyleUtil.readBoolean(value), illa.Axis2D.Y);
+				case 'size-source-y':
+					this.setSizeSource(StyleUtil.readBoxSizeSource(value), illa.Axis2D.Y);
 					break;
 
 				case 'inset':
@@ -1087,16 +1064,6 @@ module deflex {
 					this.setWeight(StyleUtil.readNumber(value), illa.Axis2D.Y);
 					break;
 
-				case 'shrink-wrap':
-					this.setShrinkWrap(StyleUtil.readBoolean(value));
-					break;
-				case 'shrink-wrap-x':
-					this.setShrinkWrap(StyleUtil.readBoolean(value), illa.Axis2D.X);
-					break;
-				case 'shrink-wrap-y':
-					this.setShrinkWrap(StyleUtil.readBoolean(value), illa.Axis2D.Y);
-					break;
-
 				case 'use-content-weight':
 					this.setUseContentWeight(StyleUtil.readBoolean(value));
 					break;
@@ -1142,12 +1109,42 @@ module deflex {
 				case 'double-check-layout':
 					this.setDoubleCheckLayout(StyleUtil.readBoolean(value));
 					break;
+					
+				case 'name':
+					this.name = value;
+					break;
 
 				default:
 					success = false;
 			}
 
 			return success;
+		}
+		
+		static getBoxesFromRootsJQueryByName(name: string, rootsJq = jQuery('.' + Box.CSS_CLASS_IS_ROOT)): Box[] {
+			var result: Box[] = [];
+			
+			for (var i = 0, n = rootsJq.length; i < n; i++) {
+				var root = Box.getFrom(rootsJq.eq(i));
+				result = result.concat(this.getBoxesFromRootByName(name, root));
+			}
+			
+			return result;
+		}
+		
+		static getBoxesFromRootByName(name: string, root: Box): Box[] {
+			var result: Box[] = [];
+			
+			if (root.name === name) {
+				result.push(root);
+			}
+			
+			var children = root.getChildren();
+			for (var i = 0, n = children.length; i < n; i++) {
+				result = result.concat(this.getBoxesFromRootByName(name, children[i]));
+			}
+			
+			return result;
 		}
 	}
 }

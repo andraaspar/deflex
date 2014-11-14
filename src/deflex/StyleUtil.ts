@@ -36,5 +36,15 @@ module deflex {
 				default: throw 'Invalid value. Expected alignment, got: ' + value;
 			}
 		}
+		
+		static readBoxSizeSource(value: string): BoxSizeSource {
+			switch (value.toLowerCase()) {
+				case 'parent-box': return BoxSizeSource.PARENT_BOX;
+				case 'child-boxes': return BoxSizeSource.CHILD_BOXES;
+				case 'jquery-auto': return BoxSizeSource.JQUERY_AUTO;
+				case 'jquery-full': return BoxSizeSource.JQUERY_FULL;
+				default: throw 'Invalid value. Expected box size source, got: ' + value;
+			}
+		}
 	}
 }
