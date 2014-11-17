@@ -1062,7 +1062,7 @@ var deflex;
             this.useContentWeight = new illa.Prop2([false, false], this.onSettingChanged, this);
             this.alignment = new illa.Prop2([0 /* START */, 0 /* START */], this.onSettingChanged, this);
             this.isSpacer = new illa.Prop(false, this.onSettingChanged, this);
-            this.direction = new illa.Prop(0 /* X */, this.onSettingChanged, this);
+            this.direction = new illa.Prop(1 /* Y */, this.onSettingChanged, this);
             this.applySizeToSelf = new illa.Prop(false, this.onSettingChanged, this);
             this.mayShowScrollbar = new illa.Prop2([true, true], this.onSettingChanged, this);
             this.children = [];
@@ -1320,13 +1320,13 @@ var deflex;
 })(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
-    (function (BoxSizeSource) {
-        BoxSizeSource[BoxSizeSource["PARENT_BOX"] = 0] = "PARENT_BOX";
-        BoxSizeSource[BoxSizeSource["CHILD_BOXES"] = 1] = "CHILD_BOXES";
-        BoxSizeSource[BoxSizeSource["JQUERY_AUTO"] = 2] = "JQUERY_AUTO";
-        BoxSizeSource[BoxSizeSource["JQUERY_FULL"] = 3] = "JQUERY_FULL";
-    })(deflex.BoxSizeSource || (deflex.BoxSizeSource = {}));
-    var BoxSizeSource = deflex.BoxSizeSource;
+    (function (SizeLimitSource) {
+        SizeLimitSource[SizeLimitSource["SELF"] = 0] = "SELF";
+        SizeLimitSource[SizeLimitSource["CHILD_BOXES"] = 1] = "CHILD_BOXES";
+        SizeLimitSource[SizeLimitSource["JQUERY_AUTO"] = 2] = "JQUERY_AUTO";
+        SizeLimitSource[SizeLimitSource["JQUERY_FULL"] = 3] = "JQUERY_FULL";
+    })(deflex.SizeLimitSource || (deflex.SizeLimitSource = {}));
+    var SizeLimitSource = deflex.SizeLimitSource;
 })(deflex || (deflex = {}));
 var deflex;
 (function (deflex) {
@@ -1384,10 +1384,10 @@ var deflex;
             }
         };
 
-        StyleUtil.readBoxSizeSource = function (value) {
+        StyleUtil.readSizeLimitSource = function (value) {
             switch (value.toLowerCase()) {
-                case 'parent-box':
-                    return 0 /* PARENT_BOX */;
+                case 'self':
+                    return 0 /* SELF */;
                 case 'child-boxes':
                     return 1 /* CHILD_BOXES */;
                 case 'jquery-auto':
@@ -1395,7 +1395,7 @@ var deflex;
                 case 'jquery-full':
                     return 3 /* JQUERY_FULL */;
                 default:
-                    throw 'Invalid value. Expected box size source, got: ' + value;
+                    throw 'Invalid value. Expected size limit source, got: ' + value;
             }
         };
         return StyleUtil;
@@ -1410,8 +1410,8 @@ var deflex;
             _super.call(this, jq || jQuery('<div>'));
             this.sizeCacheX = 0;
             this.sizeCacheY = 0;
-            this.sizeSourceX = 1 /* CHILD_BOXES */;
-            this.sizeSourceY = 1 /* CHILD_BOXES */;
+            this.sizeLimitSourceX = 1 /* CHILD_BOXES */;
+            this.sizeLimitSourceY = 1 /* CHILD_BOXES */;
             this.offsetCacheX = 0;
             this.offsetCacheY = 0;
             this.children = [];
@@ -1488,7 +1488,7 @@ var deflex;
 
             var neededLayoutUpdate = this.getNeedsLayoutUpdate();
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
-                var sizeSource = this.getSizeSource(axis);
+                var sizeSource = this.getSizeLimitSource(axis);
                 if (sizeSource == 2 /* JQUERY_AUTO */ || sizeSource == 3 /* JQUERY_FULL */) {
                     var size = this.getSize(axis);
                     this.model.sizeLimit.set(axis, 0 /* MIN */, size);
@@ -1538,8 +1538,8 @@ var deflex;
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 this.setOffset(model.outOffset.get(axis), axis);
                 this.setShowScrollbar(model.outShowScrollbar.get(axis), axis);
-                var sizeSource = this.getSizeSource(axis);
-                if (sizeSource == 0 /* PARENT_BOX */ || sizeSource == 1 /* CHILD_BOXES */) {
+                var sizeSource = this.getSizeLimitSource(axis);
+                if (sizeSource == 0 /* SELF */ || sizeSource == 1 /* CHILD_BOXES */) {
                     this.setSize(model.outSize.get(axis), axis);
                 }
             }
@@ -1632,36 +1632,36 @@ var deflex;
             }
         };
 
-        Box.prototype.getSizeSource = function (axis) {
-            var result = 0 /* PARENT_BOX */;
+        Box.prototype.getSizeLimitSource = function (axis) {
+            var result = 0 /* SELF */;
             switch (axis) {
                 case 0 /* X */:
-                    result = this.sizeSourceX;
+                    result = this.sizeLimitSourceX;
                     break;
                 case 1 /* Y */:
-                    result = this.sizeSourceY;
+                    result = this.sizeLimitSourceY;
                     break;
             }
             return result;
         };
 
-        Box.prototype.setSizeSource = function (value, a) {
+        Box.prototype.setSizeLimitSource = function (value, a) {
             switch (value) {
                 case 2 /* JQUERY_AUTO */:
                 case 3 /* JQUERY_FULL */:
                     this.clearSizeCache(axis);
             }
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
-                var prevSizeSource = this.getSizeSource(axis);
+                var prevSizeSource = this.getSizeLimitSource(axis);
                 if (prevSizeSource === value)
                     continue;
 
                 switch (axis) {
                     case 0 /* X */:
-                        this.sizeSourceX = value;
+                        this.sizeLimitSourceX = value;
                         break;
                     case 1 /* Y */:
-                        this.sizeSourceY = value;
+                        this.sizeLimitSourceY = value;
                         break;
                 }
 
@@ -2293,14 +2293,14 @@ var deflex;
         Box.prototype.applySingleStyle = function (key, value) {
             var success = true;
             switch (key) {
-                case 'size-source':
-                    this.setSizeSource(deflex.StyleUtil.readBoxSizeSource(value));
+                case 'size-limit-source':
+                    this.setSizeLimitSource(deflex.StyleUtil.readSizeLimitSource(value));
                     break;
-                case 'size-source-x':
-                    this.setSizeSource(deflex.StyleUtil.readBoxSizeSource(value), 0 /* X */);
+                case 'size-limit-source-x':
+                    this.setSizeLimitSource(deflex.StyleUtil.readSizeLimitSource(value), 0 /* X */);
                     break;
-                case 'size-source-y':
-                    this.setSizeSource(deflex.StyleUtil.readBoxSizeSource(value), 1 /* Y */);
+                case 'size-limit-source-y':
+                    this.setSizeLimitSource(deflex.StyleUtil.readSizeLimitSource(value), 1 /* Y */);
                     break;
 
                 case 'inset':
@@ -2660,7 +2660,7 @@ var test1;
             this.u.assertEquals(this.root1.getApplySizeToSelf(), true, 'Test1 48');
             this.u.assertEquals(this.root1.getIsSolvingLayout(), false, 'Test1 49');
 
-            this.root1.setSizeSource(3 /* JQUERY_FULL */);
+            this.root1.setSizeLimitSource(3 /* JQUERY_FULL */);
 
             deflex.Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);
             deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest2, this);

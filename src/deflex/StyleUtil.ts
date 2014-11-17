@@ -37,13 +37,13 @@ module deflex {
 			}
 		}
 		
-		static readBoxSizeSource(value: string): BoxSizeSource {
+		static readSizeLimitSource(value: string): SizeLimitSource {
 			switch (value.toLowerCase()) {
-				case 'parent-box': return BoxSizeSource.PARENT_BOX;
-				case 'child-boxes': return BoxSizeSource.CHILD_BOXES;
-				case 'jquery-auto': return BoxSizeSource.JQUERY_AUTO;
-				case 'jquery-full': return BoxSizeSource.JQUERY_FULL;
-				default: throw 'Invalid value. Expected box size source, got: ' + value;
+				case 'self': return SizeLimitSource.SELF;
+				case 'child-boxes': return SizeLimitSource.CHILD_BOXES;
+				case 'jquery-auto': return SizeLimitSource.JQUERY_AUTO;
+				case 'jquery-full': return SizeLimitSource.JQUERY_FULL;
+				default: throw 'Invalid value. Expected size limit source, got: ' + value;
 			}
 		}
 	}

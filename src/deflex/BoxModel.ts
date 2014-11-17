@@ -50,7 +50,7 @@ module deflex {
 		new illa.Prop(false, this.onSettingChanged, this);
 
 		direction =
-		new illa.Prop(illa.Axis2D.X, this.onSettingChanged, this);
+		new illa.Prop(illa.Axis2D.Y, this.onSettingChanged, this);
 
 		applySizeToSelf =
 		new illa.Prop(false, this.onSettingChanged, this);

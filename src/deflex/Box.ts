@@ -15,8 +15,8 @@
 /// <reference path='../../lib/berek/Widget.ts'/>
 
 /// <reference path='BoxModel.ts'/>
-/// <reference path='BoxSizeSource.ts'/>
 /// <reference path='IBoxImp.ts'/>
+/// <reference path='SizeLimitSource.ts'/>
 /// <reference path='StyleUtil.ts'/>
 
 module deflex {
@@ -40,8 +40,8 @@ module deflex {
 
 		private sizeCacheX = 0;
 		private sizeCacheY = 0;
-		private sizeSourceX = BoxSizeSource.CHILD_BOXES;
-		private sizeSourceY = BoxSizeSource.CHILD_BOXES;
+		private sizeLimitSourceX = SizeLimitSource.CHILD_BOXES;
+		private sizeLimitSourceY = SizeLimitSource.CHILD_BOXES;
 		private offsetCacheX = 0;
 		private offsetCacheY = 0;
 		private parentBox: Box;
@@ -129,8 +129,8 @@ module deflex {
 			
 			var neededLayoutUpdate = this.getNeedsLayoutUpdate();
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
-				var sizeSource = this.getSizeSource(axis);
-				if (sizeSource == BoxSizeSource.JQUERY_AUTO || sizeSource == BoxSizeSource.JQUERY_FULL) {
+				var sizeSource = this.getSizeLimitSource(axis);
+				if (sizeSource == SizeLimitSource.JQUERY_AUTO || sizeSource == SizeLimitSource.JQUERY_FULL) {
 					var size = this.getSize(axis);
 					this.model.sizeLimit.set(axis, illa.End.MIN, size);
 					this.model.sizeLimit.set(axis, illa.End.MAX, size);
@@ -177,8 +177,8 @@ module deflex {
 			for (var axis = illa.Axis2D.X; axis <= illa.Axis2D.Y; axis++) {
 				this.setOffset(model.outOffset.get(axis), axis);
 				this.setShowScrollbar(model.outShowScrollbar.get(axis), axis);
-				var sizeSource = this.getSizeSource(axis);
-				if (sizeSource == BoxSizeSource.PARENT_BOX || sizeSource == BoxSizeSource.CHILD_BOXES) {
+				var sizeSource = this.getSizeLimitSource(axis);
+				if (sizeSource == SizeLimitSource.SELF || sizeSource == SizeLimitSource.CHILD_BOXES) {
 					this.setSize(model.outSize.get(axis), axis);
 				}
 			}
@@ -267,59 +267,59 @@ module deflex {
 			}
 		}
 		
-		getSizeSource(axis: illa.Axis2D): BoxSizeSource {
-			var result = BoxSizeSource.PARENT_BOX;
+		getSizeLimitSource(axis: illa.Axis2D): SizeLimitSource {
+			var result = SizeLimitSource.SELF;
 			switch (axis) {
 				case illa.Axis2D.X:
-					result = this.sizeSourceX;
+					result = this.sizeLimitSourceX;
 					break;
 				case illa.Axis2D.Y:
-					result = this.sizeSourceY;
+					result = this.sizeLimitSourceY;
 					break;
 			}
 			return result;
 		}
 		
-		setSizeSource(value: BoxSizeSource, a?: illa.Axis2D): void {
+		setSizeLimitSource(value: SizeLimitSource, a?: illa.Axis2D): void {
 			switch (value) {
-				case BoxSizeSource.JQUERY_AUTO:
-				case BoxSizeSource.JQUERY_FULL:
+				case SizeLimitSource.JQUERY_AUTO:
+				case SizeLimitSource.JQUERY_FULL:
 					this.clearSizeCache(axis);
 			}
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
-				var prevSizeSource = this.getSizeSource(axis);
+				var prevSizeSource = this.getSizeLimitSource(axis);
 				if (prevSizeSource === value) continue;
 					
 				switch (axis) {
 					case illa.Axis2D.X:
-						this.sizeSourceX = value;
+						this.sizeLimitSourceX = value;
 						break;
 					case illa.Axis2D.Y:
-						this.sizeSourceY = value;
+						this.sizeLimitSourceY = value;
 						break;
 				}
 
 				this.setNeedsLayoutUpdate(true);
 
 				switch (prevSizeSource) {
-					case BoxSizeSource.JQUERY_AUTO:
+					case SizeLimitSource.JQUERY_AUTO:
 						this.getJQuery().removeClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
 						break;
-					case BoxSizeSource.JQUERY_FULL:
+					case SizeLimitSource.JQUERY_FULL:
 						this.getJQuery().removeClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_FULL_X : Box.CSS_CLASS_SIZE_FULL_Y);
 						break;
-					case BoxSizeSource.CHILD_BOXES:
+					case SizeLimitSource.CHILD_BOXES:
 						this.model.shrinkWrap.set(axis, false);
 						break;
 				}
 				switch (value) {
-					case BoxSizeSource.JQUERY_AUTO:
+					case SizeLimitSource.JQUERY_AUTO:
 						this.getJQuery().addClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
 						break;
-					case BoxSizeSource.JQUERY_FULL:
+					case SizeLimitSource.JQUERY_FULL:
 						this.getJQuery().addClass(axis == illa.Axis2D.X ? Box.CSS_CLASS_SIZE_FULL_X : Box.CSS_CLASS_SIZE_FULL_Y);
 						break;
-					case BoxSizeSource.CHILD_BOXES:
+					case SizeLimitSource.CHILD_BOXES:
 						this.model.shrinkWrap.set(axis, true);
 						break;
 				}
@@ -910,14 +910,14 @@ module deflex {
 		applySingleStyle(key: string, value: string): boolean {
 			var success = true;
 			switch (key) {
-				case 'size-source':
-					this.setSizeSource(StyleUtil.readBoxSizeSource(value));
+				case 'size-limit-source':
+					this.setSizeLimitSource(StyleUtil.readSizeLimitSource(value));
 					break;
-				case 'size-source-x':
-					this.setSizeSource(StyleUtil.readBoxSizeSource(value), illa.Axis2D.X);
+				case 'size-limit-source-x':
+					this.setSizeLimitSource(StyleUtil.readSizeLimitSource(value), illa.Axis2D.X);
 					break;
-				case 'size-source-y':
-					this.setSizeSource(StyleUtil.readBoxSizeSource(value), illa.Axis2D.Y);
+				case 'size-limit-source-y':
+					this.setSizeLimitSource(StyleUtil.readSizeLimitSource(value), illa.Axis2D.Y);
 					break;
 
 				case 'inset':
