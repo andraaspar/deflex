@@ -48,7 +48,6 @@ module deflex {
 		private parentJQuery: jQuery.IInstance;
 		private children: Array<Box> = [];
 		private zIndex = 0;
-		private isDestroyed = false;
 		private isRoot = false;
 		private allowsVisibility = true;
 		private allowsLayoutActive = true;
@@ -70,8 +69,7 @@ module deflex {
 				this.setParent(jq.parent(), relatedBoxJQ ? illa.End.MAX : illa.End.MIN, relatedBoxJQ, true);
 			}
 
-			this.getJQuery().addClass(Box.CSS_CLASS)
-				.on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
+			this.getJQuery().addClass(Box.CSS_CLASS);
 			
 			if (!Box.scrollbarUtil) {
 				Box.scrollbarUtil = new berek.ScrollbarUtil();
@@ -619,9 +617,9 @@ module deflex {
 			this.getJQuery().remove();
 		}
 
-		onDestroyed(event: jQuery.IEvent): void {
+		onDestroyed(e: jQuery.IEvent): void {
+			super.onDestroyed(e);
 			illa.Log.infoIf(this.name, 'is being destroyed.');
-			this.isDestroyed = true;
 			var hasNotDestroyedParentBox = this.parentBox && !this.parentBox.getIsDestroyed();
 			var hasParentJQ = this.parentJQuery != null;
 			if (hasNotDestroyedParentBox || hasParentJQ) {
@@ -639,10 +637,6 @@ module deflex {
 			illa.Log.infoIf(this.name, 'has a new z-index: ' + value);
 			this.zIndex = value;
 			(<HTMLElement>this.getJQuery()[0]).style.zIndex = <any>value;
-		}
-
-		getIsDestroyed(): boolean {
-			return this.isDestroyed;
 		}
 
 		updateChildZIndexes(startIndex = 0): void {

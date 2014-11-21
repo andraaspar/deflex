@@ -1,9 +1,89 @@
+/// <reference path='IAJAXSettingsBeforeSendFunction.ts'/>
+/// <reference path='IAJAXSettingsCompleteFunction.ts'/>
+/// <reference path='IAJAXSettingsContentsObject.ts'/>
+/// <reference path='IAJAXSettingsDataFilterFunction.ts'/>
+/// <reference path='IAJAXSettingsXHRFunction.ts'/>
+/// <reference path='IXHRDoneFunction.ts'/>
+/// <reference path='IXHRFailFunction.ts'/>
+/// <reference path='IAJAXTransportCompleteFunction.ts'/>
+/// <reference path='IAJAXTransportObject.ts'/>
+/// <reference path='ICSSHookObject.ts'/>
+/// <reference path='IEvent.ts'/>
+/// <reference path='IPromise.ts'/>
+/// <reference path='IPromise.ts'/>
+/// <reference path='IPromise.ts'/>
+/// <reference path='IAnimationOptions.ts'/>
+/// <reference path='ITween.ts'/>
+/// <reference path='IAnimationDoneFunction.ts'/>
+/// <reference path='IAnimationProgressFunction.ts'/>
+/// <reference path='IAnimationStartFunction.ts'/>
+/// <reference path='IAnimationStepFunction.ts'/>
+/// <reference path='ISpecialEasingObject.ts'/>
+/// <reference path='IPositionObject.ts'/>
+/// <reference path='IEvent.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IAddClassFunction.ts'/>
+/// <reference path='IAJAXCompleteFunction.ts'/>
+/// <reference path='IAJAXErrorFunction.ts'/>
+/// <reference path='IAJAXSuccessFunction.ts'/>
+/// <reference path='IAnimationOptions.ts'/>
+/// <reference path='IAppendFunction.ts'/>
+/// <reference path='IAttrFunction.ts'/>
+/// <reference path='IClassToggleFunction.ts'/>
+/// <reference path='ICSSFunction.ts'/>
+/// <reference path='ICSSObject.ts'/>
+/// <reference path='IEachFunction.ts'/>
+/// <reference path='IHTMLFunction.ts'/>
+/// <reference path='IIsFunction.ts'/>
+/// <reference path='ILoadCompleteFunction.ts'/>
+/// <reference path='IOffsetFunction.ts'/>
+/// <reference path='IOnEventsObject.ts'/>
+/// <reference path='IQueueCallbackFunction.ts'/>
+/// <reference path='IReplaceWithFunction.ts'/>
+/// <reference path='ISizeFunction.ts'/>
+/// <reference path='ITextFunction.ts'/>
+/// <reference path='IValFunction.ts'/>
+/// <reference path='IWidthFunction.ts'/>
+/// <reference path='IWrapFunction.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IStaticEventSpecialHandleObject.ts'/>
+/// <reference path='IStaticEventSpecialSetupFunction.ts'/>
+/// <reference path='IStaticEventSpecialTeardownFunction.ts'/>
+/// <reference path='IStaticEventSpecialAddFunction.ts'/>
+/// <reference path='IStaticEventSpecialAddFunction.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IStaticEventSpecialObject.ts'/>
+/// <reference path='IStaticEventSpecial.ts'/>
+/// <reference path='IXHRAlwaysFunction.ts'/>
+/// <reference path='IXHRDoneFunction.ts'/>
+/// <reference path='IXHRFailFunction.ts'/>
+/// <reference path='IAJAXSettings.ts'/>
+/// <reference path='IAJAXPrefilterFunction.ts'/>
+/// <reference path='IAJAXTransportHandler.ts'/>
+/// <reference path='ICallbacks.ts'/>
+/// <reference path='ICSSHooksObject.ts'/>
+/// <reference path='IDeferred.ts'/>
+/// <reference path='IDeferredBeforeStartFunction.ts'/>
+/// <reference path='IEachFunction.ts'/>
+/// <reference path='IEachPropertyFunction.ts'/>
+/// <reference path='IEventConstructor.ts'/>
+/// <reference path='IFXObject.ts'/>
+/// <reference path='IGetSuccessFunction.ts'/>
+/// <reference path='IGrepFunction.ts'/>
+/// <reference path='IInstance.ts'/>
+/// <reference path='IMapFunction.ts'/>
+/// <reference path='IStaticEvent.ts'/>
+/// <reference path='IXHR.ts'/>
 var illa;
 (function (illa) {
+    /**
+     * A reference to the global object.
+     * This is the window in a browser, and the global in node.
+     */
     illa.GLOBAL = (function () {
         return this;
     })();
-
     illa.classByType = (function () {
         var classes = 'Boolean Number String Function Array Date RegExp Object Error'.split(' ');
         var result = {};
@@ -12,61 +92,82 @@ var illa;
         }
         return result;
     })();
-
+    /**
+     * Returns true if the value is a string primitive.
+     */
     function isString(v) {
         return typeof v == 'string';
     }
     illa.isString = isString;
-
+    /**
+     * Returns true if the value is a boolean primitive.
+     */
     function isBoolean(v) {
         return typeof v == 'boolean';
     }
     illa.isBoolean = isBoolean;
-
+    /**
+     * Returns true if the value is a number primitive.
+     */
     function isNumber(v) {
         return typeof v == 'number';
     }
     illa.isNumber = isNumber;
-
+    /**
+     * Returns true if the value is a function.
+     */
     function isFunction(v) {
         return typeof v == 'function';
     }
     illa.isFunction = isFunction;
-
+    /**
+     * Returns true if the value is an array.
+     * Array subclasses are not recognized as arrays.
+     */
     function isArray(v) {
         return illa.getType(v) == 'array';
     }
     illa.isArray = isArray;
-
     if (Array.isArray)
         illa.isArray = Array.isArray;
-
+    /**
+     * Returns true if the value is undefined.
+     */
     function isUndefined(v) {
         return typeof v == 'undefined';
     }
     illa.isUndefined = isUndefined;
-
+    /**
+     * Returns true if the value is null.
+     */
     function isNull(v) {
         return v === null;
     }
     illa.isNull = isNull;
-
+    /**
+     * Returns true if the value is undefined or null.
+     */
     function isUndefinedOrNull(v) {
         return typeof v == 'undefined' || v === null;
     }
     illa.isUndefinedOrNull = isUndefinedOrNull;
-
+    /**
+     * Returns true if the value is an object and not null. Includes functions.
+     */
     function isObjectNotNull(v) {
         var t = typeof v;
         return t == 'object' && v !== null || t == 'function';
     }
     illa.isObjectNotNull = isObjectNotNull;
-
+    /**
+     * Returns the type of value.
+     */
     function getType(v) {
         var result = '';
         if (v == null) {
             result = v + '';
-        } else {
+        }
+        else {
             result = typeof v;
             if (result == 'object' || result == 'function') {
                 result = illa.classByType[illa.classByType.toString.call(v)] || 'object';
@@ -75,12 +176,17 @@ var illa;
         return result;
     }
     illa.getType = getType;
-
+    /**
+     * Returns the value if ‘instanceof’ is true for the given constructor.
+     */
     function as(c, v) {
         return v instanceof c ? v : null;
     }
     illa.as = as;
-
+    /**
+     * Binds a function to a ‘this’ context.
+     * No argument binding allows us to keep function type safety.
+     */
     function bind(fn, obj) {
         if (!fn)
             throw 'No function.';
@@ -89,11 +195,14 @@ var illa;
         };
     }
     illa.bind = bind;
-
+    /**
+     * Binds a function to a ‘this’ context, and also prepends the specified arguments
+     * This is not type safe because of argument binding.
+     */
     function partial(fn, obj) {
         var args = [];
-        for (var _i = 0; _i < (arguments.length - 2); _i++) {
-            args[_i] = arguments[_i + 2];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
         }
         if (!fn)
             throw 'No function.';
@@ -102,7 +211,6 @@ var illa;
         };
     }
     illa.partial = partial;
-
     if (Function.prototype.bind) {
         illa.bind = illa.partial = function (fn, obj) {
             return fn.call.apply(fn.bind, arguments);
@@ -111,75 +219,270 @@ var illa;
 })(illa || (illa = {}));
 var illa;
 (function (illa) {
+    var NumberUtil = (function () {
+        function NumberUtil() {
+        }
+        NumberUtil.toStringNoLetters = function (num) {
+            var result = '';
+            if (!isNaN(num) && isFinite(num)) {
+                if (Math.abs(num) < 1.0) {
+                    var e = parseInt(num.toString().split('e-')[1]);
+                    if (e) {
+                        num *= Math.pow(10, e - 1);
+                        result = '0.' + (new Array(e)).join('0') + num.toString().substring(2);
+                    }
+                    else {
+                        result = num + '';
+                    }
+                }
+                else {
+                    var e = parseInt(num.toString().split('+')[1]);
+                    if (e > 20) {
+                        e -= 20;
+                        num /= Math.pow(10, e);
+                        result = num + (new Array(e + 1)).join('0');
+                    }
+                    else {
+                        result = num + '';
+                    }
+                }
+            }
+            return result;
+        };
+        return NumberUtil;
+    })();
+    illa.NumberUtil = NumberUtil;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
+    var StringUtil = (function () {
+        function StringUtil() {
+        }
+        StringUtil.escapeHTML = function (str) {
+            return str.replace(/[&<>"']/g, function (s) {
+                return StringUtil.CHAR_TO_HTML[s];
+            });
+        };
+        StringUtil.castNicely = function (str) {
+            return str == null ? '' : String(str);
+        };
+        StringUtil.trim = function (str) {
+            return str.replace(/^\s+|\s+$/g, '');
+        };
+        StringUtil.escapeRegExp = function (str) {
+            return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        };
+        StringUtil.CHAR_TO_HTML = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;' // IE8 does not support &apos;
+        };
+        return StringUtil;
+    })();
+    illa.StringUtil = StringUtil;
+})(illa || (illa = {}));
+/// <reference path='_module.ts'/>
+/// <reference path='NumberUtil.ts'/>
+/// <reference path='StringUtil.ts'/>
+var illa;
+(function (illa) {
+    var Arrkup = (function () {
+        function Arrkup(source, allowRaw) {
+            if (allowRaw === void 0) { allowRaw = true; }
+            this.source = source;
+            this.allowRaw = allowRaw;
+        }
+        Arrkup.prototype.createString = function () {
+            return this.processArrkup(this.getSource());
+        };
+        Arrkup.prototype.processArrkup = function (source) {
+            var result = '';
+            if (illa.isArray(source)) {
+                var sourceArr = source;
+                if (illa.isString(sourceArr[0])) {
+                    result = this.processTag(sourceArr);
+                }
+                else if (illa.isArray(sourceArr[0])) {
+                    result = this.processGroup(sourceArr);
+                }
+                else if (illa.isNull(sourceArr[0])) {
+                    if (this.getAllowRaw()) {
+                        result = this.processRaw(sourceArr);
+                    }
+                }
+            }
+            else {
+                result = this.processNonArrkup(source);
+            }
+            return result;
+        };
+        Arrkup.prototype.processTag = function (source) {
+            var tagName = source[0];
+            var isSelfClosing = tagName.charAt(tagName.length - 1) == '/';
+            if (isSelfClosing)
+                tagName = tagName.slice(0, -1);
+            var result = '<' + tagName;
+            var hasAttributes = illa.isObjectNotNull(source[1]) && !illa.isArray(source[1]);
+            if (hasAttributes)
+                result += this.processAttributes(source[1]);
+            var contentIndex = hasAttributes ? 2 : 1;
+            if (isSelfClosing) {
+                result += '/>';
+            }
+            else {
+                result += '>';
+                result += this.processChildren(source, contentIndex);
+                result += '</' + tagName + '>';
+            }
+            return result;
+        };
+        Arrkup.prototype.processGroup = function (source) {
+            return this.processChildren(source, 0);
+        };
+        Arrkup.prototype.processRaw = function (source) {
+            var result = '';
+            for (var i = 1, n = source.length; i < n; i++) {
+                result += source[i] + '';
+            }
+            return result;
+        };
+        Arrkup.prototype.processNonArrkup = function (source) {
+            return illa.StringUtil.escapeHTML(source + '');
+        };
+        Arrkup.prototype.processAttributes = function (rawProps) {
+            var result = '';
+            for (var prop in rawProps) {
+                if (rawProps.hasOwnProperty(prop)) {
+                    result += this.processAttribute(prop, rawProps[prop]);
+                }
+            }
+            return result;
+        };
+        Arrkup.prototype.processAttribute = function (key, value) {
+            var result = '';
+            if (key) {
+                if (illa.isNumber(value)) {
+                    value = illa.NumberUtil.toStringNoLetters(value);
+                }
+                if (illa.isString(value)) {
+                    result = ' ' + key + '="' + illa.StringUtil.escapeHTML(value) + '"';
+                }
+                else if (illa.isBoolean(value)) {
+                    if (value) {
+                        result += ' ' + key;
+                    }
+                }
+            }
+            return result;
+        };
+        Arrkup.prototype.processChildren = function (rawChildren, startIndex) {
+            var result = '';
+            for (var i = startIndex, n = rawChildren.length; i < n; i++) {
+                result += this.processArrkup(rawChildren[i]);
+            }
+            return result;
+        };
+        Arrkup.prototype.getSource = function () {
+            return this.source;
+        };
+        Arrkup.prototype.setSource = function (value) {
+            this.source = value;
+        };
+        Arrkup.prototype.getAllowRaw = function () {
+            return this.allowRaw;
+        };
+        Arrkup.prototype.setAllowRaw = function (flag) {
+            this.allowRaw = flag;
+        };
+        Arrkup.createString = function (source, allowRaw) {
+            if (allowRaw === void 0) { allowRaw = true; }
+            return new Arrkup(source, allowRaw).createString();
+        };
+        return Arrkup;
+    })();
+    illa.Arrkup = Arrkup;
+})(illa || (illa = {}));
+/// <reference path='_module.ts'/>
+var illa;
+(function (illa) {
     var Log = (function () {
         function Log() {
         }
         Log.log = function () {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                args[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
             }
             var console = illa.GLOBAL.console;
             if (console && console.log) {
                 if (console.log.apply) {
                     console.log.apply(console, args);
-                } else {
+                }
+                else {
                     console.log(args.join(' '));
                 }
             }
         };
         Log.info = function () {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                args[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
             }
             var console = illa.GLOBAL.console;
             if (console && console.info) {
                 if (console.info.apply) {
                     console.info.apply(console, args);
-                } else {
+                }
+                else {
                     console.info(args.join(' '));
                 }
-            } else {
+            }
+            else {
                 Log.log.apply(this, args);
             }
         };
         Log.warn = function () {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                args[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
             }
             var console = illa.GLOBAL.console;
             if (console && console.warn) {
                 if (console.warn.apply) {
                     console.warn.apply(console, args);
-                } else {
+                }
+                else {
                     console.warn(args.join(' '));
                 }
-            } else {
+            }
+            else {
                 Log.log.apply(this, args);
             }
         };
         Log.error = function () {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                args[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
             }
             var console = illa.GLOBAL.console;
             if (console && console.error) {
                 if (console.error.apply) {
                     console.error.apply(console, args);
-                } else {
+                }
+                else {
                     console.error(args.join(' '));
                 }
-            } else {
+            }
+            else {
                 Log.log.apply(this, args);
             }
         };
         Log.logIf = function (test) {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                args[_i] = arguments[_i + 1];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
             }
             if (test) {
                 Log.log.apply(this, [test].concat(args));
@@ -187,8 +490,8 @@ var illa;
         };
         Log.infoIf = function (test) {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                args[_i] = arguments[_i + 1];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
             }
             if (test) {
                 Log.info.apply(this, [test].concat(args));
@@ -196,8 +499,8 @@ var illa;
         };
         Log.warnIf = function (test) {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                args[_i] = arguments[_i + 1];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
             }
             if (test) {
                 Log.warn.apply(this, [test].concat(args));
@@ -205,8 +508,8 @@ var illa;
         };
         Log.errorIf = function (test) {
             var args = [];
-            for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                args[_i] = arguments[_i + 1];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
             }
             if (test) {
                 Log.error.apply(this, [test].concat(args));
@@ -216,6 +519,8 @@ var illa;
     })();
     illa.Log = Log;
 })(illa || (illa = {}));
+/// <reference path='_module.ts'/>
+/// <reference path='Log.ts'/>
 var illa;
 (function (illa) {
     var UnitTest = (function () {
@@ -225,34 +530,35 @@ var illa;
             this.failCount = 0;
         }
         UnitTest.prototype.assert = function (test, desc) {
-            if (typeof desc === "undefined") { desc = ''; }
+            if (desc === void 0) { desc = ''; }
             this.testCount++;
             if (test === true) {
                 this.successCount++;
-            } else {
+            }
+            else {
                 this.failCount++;
                 if (desc) {
                     this.warn('Test failed: ' + desc);
-                } else {
+                }
+                else {
                     throw 'Test failed.';
                 }
             }
             return test;
         };
-
         UnitTest.prototype.assertThrowsError = function (fn, desc) {
-            if (typeof desc === "undefined") { desc = ''; }
+            if (desc === void 0) { desc = ''; }
             var errorThrown = false;
-            try  {
+            try {
                 fn();
-            } catch (e) {
+            }
+            catch (e) {
                 errorThrown = true;
             }
             return this.assert(errorThrown, desc);
         };
-
         UnitTest.prototype.assertEquals = function (received, expected, desc) {
-            if (typeof desc === "undefined") { desc = ''; }
+            if (desc === void 0) { desc = ''; }
             var result = this.assert(received === expected, desc);
             if (!result) {
                 this.info('Received:', received);
@@ -260,23 +566,20 @@ var illa;
             }
             return result;
         };
-
         UnitTest.prototype.printStats = function () {
             this.info(this.testCount + ' tests completed: ' + this.successCount + ' succeeded, ' + this.failCount + ' failed.');
         };
-
         UnitTest.prototype.info = function () {
             var r = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                r[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                r[_i - 0] = arguments[_i];
             }
             illa.Log.info.apply(illa.Log, r);
         };
-
         UnitTest.prototype.warn = function () {
             var r = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                r[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                r[_i - 0] = arguments[_i];
             }
             illa.Log.warn.apply(illa.Log, r);
         };
@@ -284,12 +587,14 @@ var illa;
     })();
     illa.UnitTest = UnitTest;
 })(illa || (illa = {}));
+/// <reference path='../../lib/illa/UnitTest.ts'/>
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+/// <reference path='../../lib/jQuery.d.ts'/>
 var berek;
 (function (berek) {
     var UnitTest = (function (_super) {
@@ -300,26 +605,27 @@ var berek;
         }
         UnitTest.prototype.info = function () {
             var r = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                r[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                r[_i - 0] = arguments[_i];
             }
             if (this.printTarget) {
                 var out = jQuery('<p>').text(r.join(' '));
                 this.printTarget.append(out);
-            } else {
+            }
+            else {
                 _super.prototype.info.apply(this, r);
             }
         };
-
         UnitTest.prototype.warn = function () {
             var r = [];
-            for (var _i = 0; _i < (arguments.length - 0); _i++) {
-                r[_i] = arguments[_i + 0];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                r[_i - 0] = arguments[_i];
             }
             if (this.printTarget) {
                 var out = jQuery('<p>').text(r.join(' ')).prepend('<b>WARNING: </b>');
                 this.printTarget.append(out);
-            } else {
+            }
+            else {
                 _super.prototype.warn.apply(this, r);
             }
         };
@@ -344,11 +650,13 @@ var illa;
         ArrayUtil.indexOf = function (a, v, fromIndex) {
             if (Array.prototype.indexOf) {
                 return Array.prototype.indexOf.call(a, v, fromIndex);
-            } else {
+            }
+            else {
                 var length = a.length;
                 if (fromIndex == null) {
                     fromIndex = 0;
-                } else if (fromIndex < 0) {
+                }
+                else if (fromIndex < 0) {
                     fromIndex = Math.max(0, length + fromIndex);
                 }
                 for (var i = fromIndex; i < length; i++) {
@@ -359,7 +667,6 @@ var illa;
             }
             return -1;
         };
-
         ArrayUtil.removeFirst = function (a, v) {
             var i = this.indexOf(a, v);
             var removed = i >= 0;
@@ -368,7 +675,6 @@ var illa;
             }
             return removed;
         };
-
         ArrayUtil.removeAll = function (a, v) {
             var removed = false;
             for (var i = a.length - 1; i >= 0; i--) {
@@ -399,6 +705,7 @@ var illa;
     })(illa.End || (illa.End = {}));
     var End = illa.End;
 })(illa || (illa = {}));
+/// <reference path='IEventCallback.ts'/>
 var illa;
 (function (illa) {
     var EventCallbackReg = (function () {
@@ -410,6 +717,9 @@ var illa;
     })();
     illa.EventCallbackReg = EventCallbackReg;
 })(illa || (illa = {}));
+/// <reference path='IEventCallback.ts'/>
+/// <reference path='EventCallbackReg.ts'/>
+/// <reference path='IEventHandler.ts'/>
 var illa;
 (function (illa) {
     var EventHandler = (function () {
@@ -422,21 +732,19 @@ var illa;
                 result = [];
             return result;
         };
-
         EventHandler.prototype.getEventParent = function () {
             return null;
         };
-
         EventHandler.prototype.addEventCallback = function (type, cb, thisObj) {
             var reg = new illa.EventCallbackReg(cb, thisObj);
             if (illa.isArray(this.callbacksByType[type])) {
                 this.removeEventCallback(type, cb, thisObj);
                 this.callbacksByType[type].push(reg);
-            } else {
+            }
+            else {
                 this.callbacksByType[type] = [reg];
             }
         };
-
         EventHandler.prototype.removeEventCallback = function (type, cb, thisObj) {
             var callbacks = this.callbacksByType[type];
             if (illa.isArray(callbacks)) {
@@ -449,7 +757,6 @@ var illa;
                 }
             }
         };
-
         EventHandler.prototype.removeAllEventCallbacks = function () {
             this.callbacksByType = {};
         };
@@ -457,39 +764,7 @@ var illa;
     })();
     illa.EventHandler = EventHandler;
 })(illa || (illa = {}));
-var illa;
-(function (illa) {
-    var StringUtil = (function () {
-        function StringUtil() {
-        }
-        StringUtil.escapeHTML = function (str) {
-            return str.replace(/[&<>"']/g, function (s) {
-                return StringUtil.CHAR_TO_HTML[s];
-            });
-        };
-
-        StringUtil.castNicely = function (str) {
-            return str == null ? '' : String(str);
-        };
-
-        StringUtil.trim = function (str) {
-            return str.replace(/^\s+|\s+$/g, '');
-        };
-
-        StringUtil.escapeRegExp = function (str) {
-            return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        };
-        StringUtil.CHAR_TO_HTML = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        };
-        return StringUtil;
-    })();
-    illa.StringUtil = StringUtil;
-})(illa || (illa = {}));
+/// <reference path='IEventHandler.ts'/>
 var illa;
 (function (illa) {
     var Event = (function () {
@@ -502,7 +777,6 @@ var illa;
         Event.prototype.dispatch = function () {
             this.processHandler(this.target);
         };
-
         Event.prototype.processHandler = function (handler) {
             this.currentTarget = handler;
             var callbackRegs = handler.getCallbackRegsByType(this.type).slice(0);
@@ -518,31 +792,24 @@ var illa;
                     this.processHandler(parentHandler);
             }
         };
-
         Event.prototype.getType = function () {
             return this.type;
         };
-
         Event.prototype.getTarget = function () {
             return this.target;
         };
-
         Event.prototype.getCurrentTarget = function () {
             return this.currentTarget;
         };
-
         Event.prototype.setIsPropagationStopped = function (flag) {
             this.isPropagationStopped = flag;
         };
-
         Event.prototype.getIsPropagationStopped = function () {
             return this.isPropagationStopped;
         };
-
         Event.prototype.setStopImmediatePropagation = function (flag) {
             this.isImmediatePropagationStopped = flag;
         };
-
         Event.prototype.getIsImmediatePropagationStopped = function () {
             return this.isImmediatePropagationStopped;
         };
@@ -550,6 +817,9 @@ var illa;
     })();
     illa.Event = Event;
 })(illa || (illa = {}));
+/// <reference path='_module.ts'/>
+/// <reference path='Event.ts'/>
+/// <reference path='EventHandler.ts'/>
 var illa;
 (function (illa) {
     var Ticker = (function (_super) {
@@ -564,31 +834,30 @@ var illa;
         Ticker.prototype.getIsStarted = function () {
             return !illa.isUndefined(this.intervalID);
         };
-
         Ticker.prototype.setIsStarted = function (flag) {
             if (this.getIsStarted() == flag)
                 return;
-
             if (flag) {
                 if (this.supportsAnimationFrame) {
                     this.intervalID = requestAnimationFrame(this.onTickBound);
-                } else {
+                }
+                else {
                     this.intervalID = setInterval(this.onTickBound, 1000 / 60);
                 }
-            } else {
+            }
+            else {
                 if (this.supportsAnimationFrame) {
                     cancelAnimationFrame(this.intervalID);
-                } else {
+                }
+                else {
                     clearInterval(this.intervalID);
                 }
                 this.intervalID = undefined;
             }
         };
-
         Ticker.prototype.getSupportsAnimationFrame = function () {
             return this.supportsAnimationFrame;
         };
-
         Ticker.prototype.onTick = function () {
             new illa.Event(Ticker.EVENT_BEFORE_TICK, this).dispatch();
             this.tickCount++;
@@ -598,7 +867,6 @@ var illa;
             new illa.Event(Ticker.EVENT_TICK, this).dispatch();
             new illa.Event(Ticker.EVENT_AFTER_TICK, this).dispatch();
         };
-
         Ticker.prototype.getTickCount = function () {
             return this.tickCount;
         };
@@ -618,6 +886,8 @@ var berek;
     })(berek.Context || (berek.Context = {}));
     var Context = berek.Context;
 })(berek || (berek = {}));
+/// <reference path='../../lib/illa/Axis2D.ts'/>
+/// <reference path='../../lib/jQuery.d.ts'/>
 var berek;
 (function (berek) {
     var ScrollbarUtil = (function () {
@@ -626,7 +896,8 @@ var berek;
             this.defaultHeight = NaN;
             if (box) {
                 this.box = box;
-            } else {
+            }
+            else {
                 this.box = jQuery('<div>');
             }
             this.box.addClass(ScrollbarUtil.CSS_CLASS);
@@ -634,13 +905,11 @@ var berek;
         }
         ScrollbarUtil.prototype.getDefaultSize = function (axis) {
             var result = NaN;
-
             if (isNaN(this.defaultWidth)) {
                 var boxElement = this.box[0];
                 this.defaultWidth = Math.ceil(boxElement.offsetWidth - boxElement.clientWidth);
                 this.defaultHeight = Math.ceil(boxElement.offsetHeight - boxElement.clientHeight);
             }
-
             switch (axis) {
                 case 0 /* X */:
                     result = this.defaultWidth;
@@ -649,14 +918,12 @@ var berek;
                     result = this.defaultHeight;
                     break;
             }
-
             return result;
         };
-
         ScrollbarUtil.prototype.clearDefaultSizeCache = function () {
+            // Only the width is checked
             this.defaultWidth = NaN;
         };
-
         ScrollbarUtil.isVisibleOn = function (jq, axis) {
             var elem = jq[0];
             if (!elem)
@@ -684,7 +951,6 @@ var berek;
             }
             return false;
         };
-
         ScrollbarUtil.getScroll = function (jq, axis) {
             var result = NaN;
             switch (axis) {
@@ -697,7 +963,6 @@ var berek;
             }
             return result;
         };
-
         ScrollbarUtil.setScroll = function (jq, value, axis) {
             switch (axis) {
                 default:
@@ -714,15 +979,16 @@ var berek;
     })();
     berek.ScrollbarUtil = ScrollbarUtil;
 })(berek || (berek = {}));
+/// <reference path='../../lib/illa/EventHandler.ts'/>
+/// <reference path='../../lib/jQuery.d.ts'/>
 var berek;
 (function (berek) {
     var Widget = (function (_super) {
         __extends(Widget, _super);
         function Widget(jq) {
             _super.call(this);
-
+            this.isDestroyed = false;
             this.jQuery = jq;
-
             this.jQuery.data(Widget.JQUERY_DATA_KEY, this);
             if (!(Widget.EVENT_DESTROYED in jQuery.event.special)) {
                 jQuery.event.special[Widget.EVENT_DESTROYED] = {
@@ -733,11 +999,18 @@ var berek;
                     }
                 };
             }
+            this.jQuery.on(Widget.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
         }
         Widget.prototype.getJQuery = function () {
             return this.jQuery;
         };
-
+        Widget.prototype.getIsDestroyed = function () {
+            return this.isDestroyed;
+        };
+        Widget.prototype.onDestroyed = function (e) {
+            this.isDestroyed = true;
+            this.removeAllEventCallbacks();
+        };
         Widget.getFrom = function (source) {
             var result = null;
             if (source) {
@@ -765,7 +1038,6 @@ var illa;
         Prop.prototype.get = function () {
             return this.value;
         };
-
         Prop.prototype.set = function (value) {
             if (this.get() === value)
                 return;
@@ -774,7 +1046,6 @@ var illa;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, oldValue, value);
         };
-
         Prop.prototype.toString = function () {
             return '[Prop ' + this.value + ']';
         };
@@ -793,7 +1064,6 @@ var illa;
         Prop2.prototype.get = function (index) {
             return this.values[index];
         };
-
         Prop2.prototype.set = function (index, value) {
             if (this.get(index) === value)
                 return;
@@ -802,7 +1072,6 @@ var illa;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, index, oldValue, value);
         };
-
         Prop2.prototype.toString = function () {
             return '[Prop2 ' + this.values.join(', ') + ']';
         };
@@ -821,7 +1090,6 @@ var illa;
         Prop4.prototype.get = function (index, index2) {
             return this.values[index * 2 + index2];
         };
-
         Prop4.prototype.set = function (index, index2, value) {
             if (this.get(index, index2) === value)
                 return;
@@ -831,7 +1099,6 @@ var illa;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, index, index2, oldValue, value);
         };
-
         Prop4.prototype.toString = function () {
             return '[Prop4 ' + this.values.join(', ') + ']';
         };
@@ -850,7 +1117,6 @@ var illa;
         Prop8.prototype.get = function (index, index2, index3) {
             return this.values[index * 4 + index2 * 2 + index3];
         };
-
         Prop8.prototype.set = function (index, index2, index3, value) {
             if (this.get(index, index2, index3) === value)
                 return;
@@ -860,7 +1126,6 @@ var illa;
             if (this.onChangedCallback)
                 this.onChangedCallback.call(this.callbackThis, index, index2, index3, oldValue, value);
         };
-
         Prop8.prototype.toString = function () {
             return '[Prop8 ' + this.values.join(', ') + ']';
         };
@@ -868,6 +1133,15 @@ var illa;
     })();
     illa.Prop8 = Prop8;
 })(illa || (illa = {}));
+/// <reference path='../../lib/illa/Alignment.ts'/>
+/// <reference path='../../lib/illa/Axis2D.ts'/>
+/// <reference path='../../lib/illa/End.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='../../lib/illa/Prop.ts'/>
+/// <reference path='../../lib/illa/Prop2.ts'/>
+/// <reference path='../../lib/illa/Prop4.ts'/>
+/// <reference path='../../lib/illa/Prop8.ts'/>
+/// <reference path='IBoxImp.ts'/>
 var deflex;
 (function (deflex) {
     var BoxModel = (function () {
@@ -896,7 +1170,6 @@ var deflex;
         BoxModel.prototype.onSettingChanged = function () {
             this.needsLayoutUpdate = true;
         };
-
         BoxModel.prototype.solveLayout = function () {
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 this.outShowScrollbar.set(axis, false);
@@ -905,24 +1178,22 @@ var deflex;
                 this.solveLayoutStep();
             }
         };
-
         BoxModel.prototype.solveLayoutStep = function () {
             this.needsLayoutUpdate = false;
-
             this.applyShrinkWrap();
             if (this.needsLayoutUpdate) {
+                // Shrink wrap changed size limits - new size must be applied
                 return;
             }
-
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 if (this.applySizeToSelf.get()) {
                     this.outSize.set(axis, this.sizeLimit.get(axis, 0 /* MIN */));
                 }
-
                 if (this.direction.get() == axis) {
                     var remainingSpace = this.shareSpaceAmongChildren(axis);
                     this.stackChildren(axis, remainingSpace);
-                } else {
+                }
+                else {
                     var contentSpace = this.getContentSpace(axis);
                     var largestMinSize = this.getLargestChildSizeLimit(axis, 0 /* MIN */);
                     var sizeToSet = Math.max(contentSpace, largestMinSize);
@@ -930,52 +1201,43 @@ var deflex;
                     this.alignChildren(axis, sizeToSet);
                     var remainingSpace = contentSpace - largestMinSize;
                 }
-
                 if (this.mayShowScrollbar.get(1 - axis)) {
                     this.outShowScrollbar.set(1 - axis, remainingSpace + this.inset.get(axis, 1 /* MAX */) < 0);
                 }
             }
-
             if (this.needsLayoutUpdate) {
+                // Scrollbar visibility changed - own or content size will change
                 return;
             }
-
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var child = this.children[i];
                 child.solveLayoutStep();
                 this.needsLayoutUpdate = this.needsLayoutUpdate || child.needsLayoutUpdate;
             }
         };
-
         BoxModel.prototype.shareSpaceAmongChildren = function (axis) {
             var allWeight = 0;
-
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var item = this.children[i];
                 item.outSize.set(axis, item.sizeLimit.get(axis, 0 /* MIN */));
                 allWeight += item.weight.get(axis);
             }
-
             var growables = this.children.slice(0);
             growables.sort(function (a, b) {
+                // Largest maxSize comes first
                 var result = b.sizeLimit.get(axis, 1 /* MAX */) - a.sizeLimit.get(axis, 1 /* MAX */);
-                return result || 0;
+                return result || 0; // Avoid NaN
             });
-
             var remainingSpace = this.getContentSpace(axis) - this.getChildSizeLimits(axis, 0 /* MIN */);
-
             while (remainingSpace > 0) {
                 while (growables.length && growables.length > remainingSpace) {
                     var maxedOut = growables.pop();
                     allWeight -= maxedOut.weight.get(axis);
                 }
-
                 if (growables.length == 0 || allWeight == 0) {
                     break;
                 }
-
                 var spaceUnit = Math.floor(remainingSpace / allWeight) || 1;
-
                 for (var i = 0, n = growables.length; i < n; i++) {
                     var growable = growables[i];
                     var prevSize = growable.outSize.get(axis);
@@ -985,33 +1247,34 @@ var deflex;
                         allWeight -= growable.weight.get(axis);
                         i--;
                         n--;
-                    } else {
+                    }
+                    else {
                         growable.outSize.set(axis, newSize);
                         remainingSpace -= newSize - prevSize;
                     }
                 }
             }
-
             return remainingSpace;
         };
-
         BoxModel.prototype.stackChildren = function (axis, remainingSpace) {
             if (this.alignment.get(axis) == 1 /* CENTER */) {
                 var offset = Math.floor(remainingSpace / 2);
-            } else if (this.alignment.get(axis) == 2 /* END */) {
+            }
+            else if (this.alignment.get(axis) == 2 /* END */) {
                 var offset = remainingSpace;
-            } else {
+            }
+            else {
                 var offset = 0;
             }
             offset = Math.max(0, offset);
             offset += this.inset.get(axis, 0 /* MIN */);
-
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var item = this.children[i];
                 if (i > 0) {
                     if (isNaN(item.spaceBefore.get(axis))) {
                         offset += this.defaultSpaceBefore.get(axis);
-                    } else {
+                    }
+                    else {
                         offset += item.spaceBefore.get(axis);
                     }
                 }
@@ -1019,7 +1282,6 @@ var deflex;
                 offset += item.outSize.get(axis);
             }
         };
-
         BoxModel.prototype.alignChildren = function (axis, contentSpace) {
             var insetStart = this.inset.get(axis, 0 /* MIN */);
             for (var i = 0, n = this.children.length; i < n; i++) {
@@ -1036,7 +1298,6 @@ var deflex;
                 item.outOffset.set(axis, offset);
             }
         };
-
         BoxModel.prototype.setChildSizes = function (axis, size) {
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var item = this.children[i];
@@ -1044,7 +1305,6 @@ var deflex;
                 item.outSize.set(axis, sizeToSet);
             }
         };
-
         BoxModel.prototype.applyContentWeight = function () {
             for (var i = 0, n = this.children.length; i < n; i++) {
                 this.children[i].applyContentWeight();
@@ -1059,16 +1319,14 @@ var deflex;
                 }
             }
         };
-
         BoxModel.prototype.getShrinkWrappedSizeLimit = function (axis, end) {
             if (axis == this.direction.get()) {
                 var result = this.getChildSizeLimits(axis, end);
-            } else {
+            }
+            else {
                 var result = this.getLargestChildSizeLimit(axis, end);
             }
-
             result = Math.max(this.shrinkWrapSizeLimit.get(axis, end, 0 /* MIN */), Math.min(this.shrinkWrapSizeLimit.get(axis, end, 1 /* MAX */), result));
-
             result += this.inset.get(axis, 0 /* MIN */);
             result += this.inset.get(axis, 1 /* MAX */);
             if (this.outShowScrollbar.get(axis)) {
@@ -1076,7 +1334,6 @@ var deflex;
             }
             return result;
         };
-
         BoxModel.prototype.applyShrinkWrap = function () {
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 if (this.shrinkWrap.get(axis)) {
@@ -1088,7 +1345,6 @@ var deflex;
                 }
             }
         };
-
         BoxModel.prototype.getContentSpace = function (axis) {
             var result = this.outSize.get(axis) - this.inset.get(axis, 0 /* MIN */) - this.inset.get(axis, 1 /* MAX */);
             if (this.outShowScrollbar.get(axis)) {
@@ -1096,20 +1352,19 @@ var deflex;
             }
             return result;
         };
-
         BoxModel.prototype.getChildSizeLimits = function (axis, end) {
             var result = 0;
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var child = this.children[i];
-
+                // Spacers must not expand maximum size of shrinkwrapped container
                 var endToGet = child.isSpacer.get() ? 0 /* MIN */ : end;
-
                 result += child.sizeLimit.get(axis, endToGet);
                 if (i > 0) {
                     var childSpaceBefore = child.spaceBefore.get(axis);
                     if (isNaN(childSpaceBefore)) {
                         result += this.defaultSpaceBefore.get(axis);
-                    } else {
+                    }
+                    else {
                         result += childSpaceBefore;
                     }
                 }
@@ -1119,14 +1374,12 @@ var deflex;
             }
             return result;
         };
-
         BoxModel.prototype.getLargestChildSizeLimit = function (axis, end) {
             var result = 0;
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var child = this.children[i];
-
+                // Spacers must not expand maximum size of shrinkwrapped container
                 var endToGet = child.isSpacer.get() ? 0 /* MIN */ : end;
-
                 result = Math.max(result, child.sizeLimit.get(axis, endToGet));
                 if (!isFinite(result)) {
                     break;
@@ -1134,7 +1387,6 @@ var deflex;
             }
             return result;
         };
-
         BoxModel.prototype.getImp = function () {
             return this.imp;
         };
@@ -1167,7 +1419,6 @@ var deflex;
                     throw 'Invalid value. Expected boolean, got: ' + value;
             }
         };
-
         StyleUtil.readNumber = function (value) {
             switch (value.toLowerCase()) {
                 case 'nan':
@@ -1183,7 +1434,6 @@ var deflex;
                     return result;
             }
         };
-
         StyleUtil.readAxis2D = function (value) {
             switch (value.toLowerCase()) {
                 case 'x':
@@ -1194,7 +1444,6 @@ var deflex;
                     throw 'Invalid value. Expected axis, got: ' + value;
             }
         };
-
         StyleUtil.readAlignment = function (value) {
             switch (value.toLowerCase()) {
                 case 'start':
@@ -1207,7 +1456,6 @@ var deflex;
                     throw 'Invalid value. Expected alignment, got: ' + value;
             }
         };
-
         StyleUtil.readSizeLimitSource = function (value) {
             switch (value.toLowerCase()) {
                 case 'self':
@@ -1226,6 +1474,23 @@ var deflex;
     })();
     deflex.StyleUtil = StyleUtil;
 })(deflex || (deflex = {}));
+/// <reference path='../../lib/illa/_module.ts'/>
+/// <reference path='../../lib/illa/Alignment.ts'/>
+/// <reference path='../../lib/illa/ArrayUtil.ts'/>
+/// <reference path='../../lib/illa/Axis2D.ts'/>
+/// <reference path='../../lib/illa/End.ts'/>
+/// <reference path='../../lib/illa/EventHandler.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='../../lib/illa/StringUtil.ts'/>
+/// <reference path='../../lib/illa/Ticker.ts'/>
+/// <reference path='../../lib/jQuery.d.ts'/>
+/// <reference path='../../lib/berek/Context.ts'/>
+/// <reference path='../../lib/berek/ScrollbarUtil.ts'/>
+/// <reference path='../../lib/berek/Widget.ts'/>
+/// <reference path='BoxModel.ts'/>
+/// <reference path='IBoxImp.ts'/>
+/// <reference path='SizeLimitSource.ts'/>
+/// <reference path='StyleUtil.ts'/>
 var deflex;
 (function (deflex) {
     var Box = (function (_super) {
@@ -1240,7 +1505,6 @@ var deflex;
             this.offsetCacheY = 0;
             this.children = [];
             this.zIndex = 0;
-            this.isDestroyed = false;
             this.isRoot = false;
             this.allowsVisibility = true;
             this.allowsLayoutActive = true;
@@ -1248,16 +1512,14 @@ var deflex;
             this.doubleCheckLayout = true;
             this.isSolvingLayout = false;
             this.model = new deflex.BoxModel(this);
-
+            //			this.name = 'Box-' + Box.nextId++;
             if (jq) {
                 var relatedBoxJQ = jq.prev('.' + Box.CSS_CLASS);
                 if (!relatedBoxJQ.length)
                     relatedBoxJQ = undefined;
                 this.setParent(jq.parent(), relatedBoxJQ ? 1 /* MAX */ : 0 /* MIN */, relatedBoxJQ, true);
             }
-
-            this.getJQuery().addClass(Box.CSS_CLASS).on(Box.EVENT_DESTROYED, illa.bind(this.onDestroyed, this));
-
+            this.getJQuery().addClass(Box.CSS_CLASS);
             if (!Box.scrollbarUtil) {
                 Box.scrollbarUtil = new berek.ScrollbarUtil();
             }
@@ -1267,16 +1529,13 @@ var deflex;
             this.isSolvingLayout = true;
             var solutionCount = 0;
             this.checkNeedsLayoutUpdate();
-
             while (this.getNeedsLayoutUpdate()) {
                 solutionCount++;
                 this.getScrollbarUtil().clearDefaultSizeCache();
                 this.updateModel();
                 this.solveLayout();
-
                 if (this.doubleCheckLayout) {
                     this.checkNeedsLayoutUpdate();
-
                     if (this.getNeedsLayoutUpdate() && solutionCount + 1 > Box.solutionCountLimit) {
                         illa.Log.warn(this.name || '', 'Solution count limit reached - disabling layout double checks.');
                         this.setDoubleCheckLayout(false);
@@ -1284,32 +1543,26 @@ var deflex;
                     }
                 }
             }
-
             if (solutionCount) {
                 illa.Log.infoIf(this.name, 'layout solved:', new Date().getTime() - startTime, 'ms, solution count:', solutionCount);
             }
-
             this.isSolvingLayout = false;
         };
-
         Box.prototype.onSolveLayoutNowRequested = function (e) {
             if (!this.isSolvingLayout) {
                 this.onRootTick(null);
             }
         };
-
         Box.prototype.checkNeedsLayoutUpdate = function () {
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var child = this.children[i];
                 if (child.getIsLayoutActive()) {
                     child.checkNeedsLayoutUpdate();
-
                     if (child.getNeedsLayoutUpdate()) {
                         this.setNeedsLayoutUpdate(true);
                     }
                 }
             }
-
             var neededLayoutUpdate = this.getNeedsLayoutUpdate();
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
                 var sizeSource = this.getSizeLimitSource(axis);
@@ -1323,7 +1576,6 @@ var deflex;
                 illa.Log.infoIf(this.name, 'initiates layout update. Size limit set to:', this.model.sizeLimit.toString());
             }
         };
-
         Box.prototype.updateModel = function () {
             var childModels = [];
             for (var i = 0, n = this.children.length; i < n; i++) {
@@ -1334,29 +1586,23 @@ var deflex;
                 }
             }
             this.model.children = childModels;
-
             if (this.name)
                 this.model.name = this.name + 'Model';
             else
                 this.model.name = '';
         };
-
         Box.prototype.solveLayout = function () {
             this.model.applyContentWeight();
-
             var startTime = new Date().getTime();
-
             while (this.getNeedsLayoutUpdate()) {
                 this.model.solveLayout();
                 this.applyModel();
-
                 if (new Date().getTime() > startTime + 3000) {
                     illa.Log.warn(this.name || '', 'Layout solving takes too long - breaking.');
                     break;
                 }
             }
         };
-
         Box.prototype.applyModel = function () {
             var model = this.model;
             for (var axis = 0 /* X */; axis <= 1 /* Y */; axis++) {
@@ -1367,7 +1613,6 @@ var deflex;
                     this.setSize(model.outSize.get(axis), axis);
                 }
             }
-
             for (var i = 0, n = this.children.length; i < n; i++) {
                 var child = this.children[i];
                 if (child.getIsLayoutActive()) {
@@ -1376,7 +1621,6 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.clearSizeCache = function (axis) {
             switch (axis) {
                 default:
@@ -1388,7 +1632,6 @@ var deflex;
                     this.sizeCacheY = NaN;
             }
         };
-
         Box.prototype.clearOffsetCache = function (axis) {
             switch (axis) {
                 default:
@@ -1400,22 +1643,23 @@ var deflex;
                     this.offsetCacheY = NaN;
             }
         };
-
         Box.prototype.getSize = function (axis, context) {
-            if (typeof context === "undefined") { context = 1 /* PARENT */; }
+            if (context === void 0) { context = 1 /* PARENT */; }
             var result = NaN;
             switch (axis) {
                 case 0 /* X */:
                     if (isNaN(this.sizeCacheX)) {
                         result = this.getJQuery()[0].offsetWidth;
-                    } else {
+                    }
+                    else {
                         result = this.sizeCacheX;
                     }
                     break;
                 case 1 /* Y */:
                     if (isNaN(this.sizeCacheY)) {
                         result = this.getJQuery()[0].offsetHeight;
-                    } else {
+                    }
+                    else {
                         result = this.sizeCacheY;
                     }
                     break;
@@ -1426,9 +1670,8 @@ var deflex;
             }
             return result;
         };
-
         Box.prototype.setSize = function (v, a, context) {
-            if (typeof context === "undefined") { context = 1 /* PARENT */; }
+            if (context === void 0) { context = 1 /* PARENT */; }
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 var value = v;
                 if (context == 0 /* INNER */) {
@@ -1436,7 +1679,8 @@ var deflex;
                 }
                 if (isNaN(value) || !isFinite(value)) {
                     value = 0;
-                } else {
+                }
+                else {
                     value = Math.max(0, Math.round(value));
                 }
                 switch (axis) {
@@ -1455,7 +1699,6 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.getSizeLimitSource = function (axis) {
             var result = 0 /* SELF */;
             switch (axis) {
@@ -1468,7 +1711,6 @@ var deflex;
             }
             return result;
         };
-
         Box.prototype.setSizeLimitSource = function (value, a) {
             switch (value) {
                 case 2 /* JQUERY_AUTO */:
@@ -1479,7 +1721,6 @@ var deflex;
                 var prevSizeSource = this.getSizeLimitSource(axis);
                 if (prevSizeSource === value)
                     continue;
-
                 switch (axis) {
                     case 0 /* X */:
                         this.sizeLimitSourceX = value;
@@ -1488,9 +1729,7 @@ var deflex;
                         this.sizeLimitSourceY = value;
                         break;
                 }
-
                 this.setNeedsLayoutUpdate(true);
-
                 switch (prevSizeSource) {
                     case 2 /* JQUERY_AUTO */:
                         this.getJQuery().removeClass(axis == 0 /* X */ ? Box.CSS_CLASS_SIZE_AUTO_X : Box.CSS_CLASS_SIZE_AUTO_Y);
@@ -1515,10 +1754,9 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.getOffset = function (axis, alignment, context) {
-            if (typeof alignment === "undefined") { alignment = 0 /* START */; }
-            if (typeof context === "undefined") { context = 1 /* PARENT */; }
+            if (alignment === void 0) { alignment = 0 /* START */; }
+            if (context === void 0) { context = 1 /* PARENT */; }
             var result = NaN;
             var offset;
             switch (context) {
@@ -1528,7 +1766,8 @@ var deflex;
                 case 1 /* PARENT */:
                     if (isNaN(this.offsetCacheX) || isNaN(this.offsetCacheY)) {
                         offset = this.getJQuery().position();
-                    } else {
+                    }
+                    else {
                         offset = { left: this.offsetCacheX, top: this.offsetCacheY };
                     }
                     break;
@@ -1553,19 +1792,19 @@ var deflex;
             }
             return result;
         };
-
         Box.prototype.setOffset = function (v, a, alignment, context, preventNegative) {
-            if (typeof alignment === "undefined") { alignment = 0 /* START */; }
-            if (typeof context === "undefined") { context = 1 /* PARENT */; }
-            if (typeof preventNegative === "undefined") { preventNegative = false; }
+            if (alignment === void 0) { alignment = 0 /* START */; }
+            if (context === void 0) { context = 1 /* PARENT */; }
+            if (preventNegative === void 0) { preventNegative = false; }
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 var value = v;
                 if (context == 2 /* PAGE */) {
                     var pageOffset = this.getOffset(axis, 0 /* START */, 2 /* PAGE */);
                     var currentOffset = this.getOffset(axis);
-                    value -= pageOffset - currentOffset;
-                } else if (context == 0 /* INNER */) {
-                    value += this.getOffset(axis);
+                    value -= pageOffset - currentOffset; // Page offset of parent
+                }
+                else if (context == 0 /* INNER */) {
+                    value += this.getOffset(axis); // Parent offset
                 }
                 if (alignment != 0 /* START */) {
                     var size = this.getSize(axis, context);
@@ -1576,7 +1815,8 @@ var deflex;
                 }
                 if (isNaN(value) || !isFinite(value)) {
                     value = 0;
-                } else {
+                }
+                else {
                     value = Math.round(value);
                     if (preventNegative)
                         value = Math.max(0, value);
@@ -1597,7 +1837,6 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.getShowScrollbar = function (axis) {
             var overflow = '';
             switch (axis) {
@@ -1610,7 +1849,6 @@ var deflex;
             }
             return overflow == 'scroll';
         };
-
         Box.prototype.setShowScrollbar = function (flag, axis) {
             var overflow = flag ? 'scroll' : '';
             switch (axis) {
@@ -1627,7 +1865,6 @@ var deflex;
                     }
             }
         };
-
         Box.prototype.getVisibleScrollbarSize = function (axis) {
             var result = 0;
             if (this.getShowScrollbar(axis)) {
@@ -1635,15 +1872,12 @@ var deflex;
             }
             return result;
         };
-
         Box.prototype.getScrollbarSize = function (axis) {
             return this.getScrollbarUtil().getDefaultSize(axis);
         };
-
         Box.prototype.getScrollbarUtil = function () {
             return Box.scrollbarUtil;
         };
-
         Box.getFrom = function (source) {
             var result = berek.Widget.getFrom(source);
             if (!(result instanceof Box)) {
@@ -1651,42 +1885,42 @@ var deflex;
             }
             return result;
         };
-
         Box.prototype.setParent = function (parent, end, related, dontModifyDOM) {
-            if (typeof end === "undefined") { end = 1 /* MAX */; }
-            if (typeof related === "undefined") { related = null; }
-            if (typeof dontModifyDOM === "undefined") { dontModifyDOM = false; }
+            if (end === void 0) { end = 1 /* MAX */; }
+            if (related === void 0) { related = null; }
+            if (dontModifyDOM === void 0) { dontModifyDOM = false; }
             var parentBox = null;
             var parentJQuery = null;
             var relatedBox = null;
             var relatedJQuery = null;
-
             if (parent instanceof Box) {
                 parentBox = parent;
-            } else if (parent instanceof jQuery) {
+            }
+            else if (parent instanceof jQuery) {
                 parentJQuery = parent;
                 parentBox = Box.getFrom(parentJQuery);
-            } else if (typeof parent == 'string') {
+            }
+            else if (typeof parent == 'string') {
                 parentJQuery = jQuery(parent);
             }
-
             if (related instanceof Box) {
                 relatedBox = related;
-
+                // If a parent jQuery and a related Box were specified, get the related jQuery
+                // because the related Box is only used when the parent is a Box.
                 if (!parentBox)
                     relatedJQuery = relatedBox.getJQuery();
-            } else if (related instanceof jQuery) {
+            }
+            else if (related instanceof jQuery) {
                 relatedJQuery = related;
                 relatedBox = Box.getFrom(relatedJQuery);
-
+                // If a parent Box and a related jQuery were specified, ignore the parent Box and
+                // insert next to the related jQuery.
                 if (!relatedBox)
                     parentBox = null;
             }
-
             if (this.parentBox) {
                 this.parentBox.removeChild(this);
             }
-
             if (parentBox) {
                 if (this.parentBox != parentBox) {
                     if (!dontModifyDOM) {
@@ -1697,10 +1931,10 @@ var deflex;
                 }
                 this.parentBox.insertChild(this, end, relatedBox);
                 this.setIsRoot(false);
-            } else if (relatedJQuery) {
+            }
+            else if (relatedJQuery) {
                 this.parentBox = null;
                 this.parentJQuery = relatedJQuery.parent();
-
                 if (!dontModifyDOM) {
                     switch (end) {
                         case 0 /* MIN */:
@@ -1712,10 +1946,10 @@ var deflex;
                     }
                 }
                 this.setIsRoot(true);
-            } else if (parentJQuery) {
+            }
+            else if (parentJQuery) {
                 this.parentBox = null;
                 this.parentJQuery = parentJQuery;
-
                 if (!dontModifyDOM) {
                     switch (end) {
                         case 0 /* MIN */:
@@ -1727,39 +1961,37 @@ var deflex;
                     }
                 }
                 this.setIsRoot(true);
-            } else {
+            }
+            else {
                 if (!dontModifyDOM) {
                     this.getJQuery().detach();
                 }
-
                 this.parentBox = null;
                 this.parentJQuery = null;
                 this.setIsRoot(false);
             }
             this.setNeedsLayoutUpdate(true);
         };
-
         Box.prototype.getParentBox = function () {
             return this.parentBox;
         };
-
         Box.prototype.getParentJQuery = function () {
             return this.parentJQuery;
         };
-
         Box.prototype.getEventParent = function () {
             if (this.parentBox) {
                 return this.parentBox;
-            } else if (this.parentJQuery) {
+            }
+            else if (this.parentJQuery) {
                 return Box.getFrom(this.parentJQuery.closest('.' + Box.CSS_CLASS));
-            } else {
+            }
+            else {
                 return null;
             }
         };
-
         Box.prototype.insertChild = function (child, end, related) {
-            if (typeof end === "undefined") { end = 1 /* MAX */; }
-            if (typeof related === "undefined") { related = null; }
+            if (end === void 0) { end = 1 /* MAX */; }
+            if (related === void 0) { related = null; }
             var newIndex = 0;
             if (related) {
                 var relatedIndex = this.getChildIndex(related);
@@ -1774,7 +2006,8 @@ var deflex;
                         break;
                 }
                 this.children.splice(newIndex, 0, child);
-            } else {
+            }
+            else {
                 switch (end) {
                     case 0 /* MIN */:
                         this.children.unshift(child);
@@ -1789,21 +2022,20 @@ var deflex;
             this.updateChildZIndexes(newIndex);
             this.setNeedsLayoutUpdate(true);
         };
-
         Box.prototype.moveChild = function (child, end, related) {
-            if (typeof end === "undefined") { end = 1 /* MAX */; }
-            if (typeof related === "undefined") { related = null; }
+            if (end === void 0) { end = 1 /* MAX */; }
+            if (related === void 0) { related = null; }
             this.removeChild(child, true);
             this.insertChild(child, end, related);
         };
-
         Box.prototype.removeChild = function (child, throwError) {
-            if (typeof throwError === "undefined") { throwError = false; }
+            if (throwError === void 0) { throwError = false; }
             var index = this.getChildIndex(child);
             if (index == -1) {
                 if (throwError)
                     throw 'Not a child.';
-            } else {
+            }
+            else {
                 this.children.splice(index, 1);
                 if (child.name)
                     illa.Log.infoIf(this.name, 'removed child:', child.name);
@@ -1811,18 +2043,15 @@ var deflex;
             }
             this.setNeedsLayoutUpdate(true);
         };
-
         Box.prototype.getChildIndex = function (child) {
             return illa.ArrayUtil.indexOf(this.children, child);
         };
-
         Box.prototype.destroy = function () {
             this.getJQuery().remove();
         };
-
-        Box.prototype.onDestroyed = function (event) {
+        Box.prototype.onDestroyed = function (e) {
+            _super.prototype.onDestroyed.call(this, e);
             illa.Log.infoIf(this.name, 'is being destroyed.');
-            this.isDestroyed = true;
             var hasNotDestroyedParentBox = this.parentBox && !this.parentBox.getIsDestroyed();
             var hasParentJQ = this.parentJQuery != null;
             if (hasNotDestroyedParentBox || hasParentJQ) {
@@ -1830,11 +2059,9 @@ var deflex;
                 this.setParent(null, undefined, undefined, true);
             }
         };
-
         Box.prototype.getZIndex = function () {
             return this.zIndex;
         };
-
         Box.prototype.setZIndex = function (value) {
             if (this.zIndex == value)
                 return;
@@ -1842,22 +2069,15 @@ var deflex;
             this.zIndex = value;
             this.getJQuery()[0].style.zIndex = value;
         };
-
-        Box.prototype.getIsDestroyed = function () {
-            return this.isDestroyed;
-        };
-
         Box.prototype.updateChildZIndexes = function (startIndex) {
-            if (typeof startIndex === "undefined") { startIndex = 0; }
+            if (startIndex === void 0) { startIndex = 0; }
             for (var i = startIndex, n = this.children.length; i < n; i++) {
                 this.children[i].setZIndex(i);
             }
         };
-
         Box.prototype.getIsRoot = function () {
             return this.isRoot;
         };
-
         Box.prototype.setIsRoot = function (value) {
             if (this.isRoot == value)
                 return;
@@ -1867,32 +2087,28 @@ var deflex;
             if (value) {
                 Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
                 this.addEventCallback(Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED, this.onSolveLayoutNowRequested, this);
-            } else {
+            }
+            else {
                 Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_TICK, this.onRootTick, this);
                 this.removeEventCallback(Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED, this.onSolveLayoutNowRequested, this);
             }
             illa.Log.infoIf(this.name, 'is now ' + (value ? '' : 'NOT ') + 'root.');
         };
-
         Box.prototype.getAllowsLayoutActive = function () {
             return this.allowsLayoutActive;
         };
-
         Box.prototype.setAllowsLayoutActive = function (flag) {
             if (this.getAllowsLayoutActive() == flag)
                 return;
             this.allowsLayoutActive = flag;
             this.setNeedsLayoutUpdate(true);
         };
-
         Box.prototype.getIsLayoutActive = function () {
             return this.getAllowsLayoutActive() && this.getAllowsVisibility();
         };
-
         Box.prototype.getAllowsVisibility = function () {
             return this.allowsVisibility;
         };
-
         Box.prototype.setAllowsVisibility = function (flag) {
             if (this.allowsVisibility == flag)
                 return;
@@ -1902,46 +2118,36 @@ var deflex;
             if (this.getParentBox())
                 this.getParentBox().getModel().needsLayoutUpdate = true;
         };
-
         Box.prototype.getIsVisible = function () {
             return this.getJQuery().is(':visible');
         };
-
         Box.prototype.getScroll = function (axis) {
             return berek.ScrollbarUtil.getScroll(this.getJQuery(), axis);
         };
-
         Box.prototype.setScroll = function (value, axis) {
             berek.ScrollbarUtil.setScroll(this.getJQuery(), value, axis);
         };
-
         Box.prototype.getModel = function () {
             return this.model;
         };
-
         Box.prototype.setModel = function (value) {
             this.model = value;
         };
-
         Box.prototype.getNeedsLayoutUpdate = function () {
             return this.model.needsLayoutUpdate;
         };
-
         Box.prototype.setNeedsLayoutUpdate = function (value) {
             this.model.needsLayoutUpdate = value;
         };
-
         Box.prototype.getAlignment = function (axis) {
             return this.model.alignment.get(axis);
         };
-
         Box.prototype.setAlignment = function (value, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 this.model.alignment.set(axis, value);
             }
             this.setNeedsLayoutUpdate(true);
         };
-
         Box.prototype.getInset = function (axis, e) {
             var result = 0;
             for (var end = e || 0 /* MIN */, lastEnd = (e != null ? e : 1 /* MAX */); end <= lastEnd; end++) {
@@ -1949,7 +2155,6 @@ var deflex;
             }
             return result;
         };
-
         Box.prototype.setInset = function (value, a, e) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 for (var end = e || 0 /* MIN */, lastEnd = (e != null ? e : 1 /* MAX */); end <= lastEnd; end++) {
@@ -1957,19 +2162,15 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.getDirection = function () {
             return this.model.direction.get();
         };
-
         Box.prototype.setDirection = function (value) {
             this.model.direction.set(value);
         };
-
         Box.prototype.getSizeLimit = function (axis, end) {
             return this.model.sizeLimit.get(axis, end);
         };
-
         Box.prototype.setSizeLimit = function (min, max, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 if (!isNaN(min)) {
@@ -1981,11 +2182,9 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.getShrinkWrapSizeLimit = function (axis, end, end2) {
             return this.model.shrinkWrapSizeLimit.get(axis, end, end2);
         };
-
         Box.prototype.setShrinkWrapSizeLimit = function (value, a, e, e2) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 for (var end = e || 0 /* MIN */, lastEnd = (e != null ? e : 1 /* MAX */); end <= lastEnd; end++) {
@@ -1995,125 +2194,101 @@ var deflex;
                 }
             }
         };
-
         Box.prototype.getSpaceBefore = function (axis) {
             return this.model.spaceBefore.get(axis);
         };
-
         Box.prototype.setSpaceBefore = function (value, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 this.model.spaceBefore.set(axis, value);
             }
         };
-
         Box.prototype.getDefaultSpaceBefore = function (axis) {
             return this.model.defaultSpaceBefore.get(axis);
         };
-
         Box.prototype.setDefaultSpaceBefore = function (value, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 this.model.defaultSpaceBefore.set(axis, value);
             }
         };
-
         Box.prototype.getWeight = function (axis) {
             return this.model.weight.get(axis);
         };
-
         Box.prototype.setWeight = function (value, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 this.model.weight.set(axis, value);
             }
         };
-
         Box.prototype.getUseContentWeight = function (axis) {
             return this.model.useContentWeight.get(axis);
         };
-
         Box.prototype.setUseContentWeight = function (value, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 this.model.useContentWeight.set(axis, value);
             }
         };
-
         Box.prototype.getIsSpacer = function () {
             return this.model.isSpacer.get();
         };
-
         Box.prototype.setIsSpacer = function (value) {
             this.model.isSpacer.set(value);
         };
-
         Box.prototype.getApplySizeToSelf = function () {
             return this.model.applySizeToSelf.get();
         };
-
         Box.prototype.setApplySizeToSelf = function (value) {
             this.model.applySizeToSelf.set(value);
         };
-
         Box.prototype.getMayShowScrollbar = function (axis) {
             return this.model.mayShowScrollbar.get(axis);
         };
-
         Box.prototype.setMayShowScrollbar = function (value, a) {
             for (var axis = a || 0 /* X */, lastAxis = (a != null ? a : 1 /* Y */); axis <= lastAxis; axis++) {
                 this.model.mayShowScrollbar.set(axis, value);
             }
         };
-
         Box.prototype.getChildren = function () {
             return this.children;
         };
-
         Box.prototype.getOverflowIsVisible = function () {
             return this.overflowIsVisible;
         };
-
         Box.prototype.setOverflowIsVisible = function (flag) {
             if (this.overflowIsVisible != flag) {
                 this.overflowIsVisible = flag;
                 this.getJQuery().toggleClass(Box.CSS_CLASS_OVERFLOW_VISIBLE, flag);
             }
         };
-
         Box.prototype.getDoubleCheckLayout = function () {
             return this.doubleCheckLayout;
         };
-
         Box.prototype.setDoubleCheckLayout = function (flag) {
             this.doubleCheckLayout = flag;
         };
-
         Box.prototype.getIsSolvingLayout = function () {
             return this.isSolvingLayout;
         };
-
         Box.prototype.setIsSolvingLayout = function (flag) {
             this.isSolvingLayout = flag;
         };
-
         Box.prototype.applyStyle = function (styles) {
             styles = illa.StringUtil.trim(styles);
-
             var style = styles.split(/\s*;\s*/g);
             for (var i = 0, n = style.length; i < n; i++) {
                 var styleSplit = style[i].split(/\s*:\s*/g);
                 var key = styleSplit[0];
                 var value = styleSplit[1];
-
                 if (key) {
-                    try  {
+                    try {
                         if (!this.applySingleStyle(key, value)) {
                             illa.Log.warn(this.name || '', 'Style key not recognized: ' + key);
                         }
-                    } catch (e) {
+                    }
+                    catch (e) {
                         illa.Log.warn(key + ': ' + e);
                     }
                 }
             }
         };
-
         Box.prototype.applySingleStyle = function (key, value) {
             var success = true;
             switch (key) {
@@ -2126,7 +2301,6 @@ var deflex;
                 case 'size-limit-source-y':
                     this.setSizeLimitSource(deflex.StyleUtil.readSizeLimitSource(value), 1 /* Y */);
                     break;
-
                 case 'inset':
                     this.setInset(deflex.StyleUtil.readNumber(value));
                     break;
@@ -2148,7 +2322,6 @@ var deflex;
                 case 'inset-bottom':
                     this.setInset(deflex.StyleUtil.readNumber(value), 1 /* Y */, 1 /* MAX */);
                     break;
-
                 case 'size-limit':
                     this.setSizeLimit(deflex.StyleUtil.readNumber(value), deflex.StyleUtil.readNumber(value));
                     break;
@@ -2176,7 +2349,6 @@ var deflex;
                 case 'size-limit-y-max':
                     this.setSizeLimit(undefined, deflex.StyleUtil.readNumber(value), 1 /* Y */);
                     break;
-
                 case 'shrink-wrap-size-limit':
                     this.setShrinkWrapSizeLimit(deflex.StyleUtil.readNumber(value));
                     break;
@@ -2240,7 +2412,6 @@ var deflex;
                 case 'shrink-wrap-size-limit-y-max-max':
                     this.setShrinkWrapSizeLimit(deflex.StyleUtil.readNumber(value), 1 /* Y */, 1 /* MAX */, 1 /* MAX */);
                     break;
-
                 case 'space-before':
                     this.setSpaceBefore(deflex.StyleUtil.readNumber(value));
                     break;
@@ -2250,7 +2421,6 @@ var deflex;
                 case 'space-before-y':
                     this.setSpaceBefore(deflex.StyleUtil.readNumber(value), 1 /* Y */);
                     break;
-
                 case 'default-space-before':
                     this.setDefaultSpaceBefore(deflex.StyleUtil.readNumber(value));
                     break;
@@ -2260,7 +2430,6 @@ var deflex;
                 case 'default-space-before-y':
                     this.setDefaultSpaceBefore(deflex.StyleUtil.readNumber(value), 1 /* Y */);
                     break;
-
                 case 'weight':
                     this.setWeight(deflex.StyleUtil.readNumber(value));
                     break;
@@ -2270,7 +2439,6 @@ var deflex;
                 case 'weight-y':
                     this.setWeight(deflex.StyleUtil.readNumber(value), 1 /* Y */);
                     break;
-
                 case 'use-content-weight':
                     this.setUseContentWeight(deflex.StyleUtil.readBoolean(value));
                     break;
@@ -2280,7 +2448,6 @@ var deflex;
                 case 'use-content-weight-y':
                     this.setUseContentWeight(deflex.StyleUtil.readBoolean(value), 1 /* Y */);
                     break;
-
                 case 'alignment':
                     this.setAlignment(deflex.StyleUtil.readAlignment(value));
                     break;
@@ -2290,15 +2457,12 @@ var deflex;
                 case 'alignment-y':
                     this.setAlignment(deflex.StyleUtil.readAlignment(value), 1 /* Y */);
                     break;
-
                 case 'is-spacer':
                     this.setIsSpacer(deflex.StyleUtil.readBoolean(value));
                     break;
-
                 case 'direction':
                     this.setDirection(deflex.StyleUtil.readAxis2D(value));
                     break;
-
                 case 'may-show-scrollbar':
                     this.setMayShowScrollbar(deflex.StyleUtil.readBoolean(value));
                     break;
@@ -2308,54 +2472,41 @@ var deflex;
                 case 'may-show-scrollbar-y':
                     this.setMayShowScrollbar(deflex.StyleUtil.readBoolean(value), 1 /* Y */);
                     break;
-
                 case 'overflow-is-visible':
                     this.setOverflowIsVisible(deflex.StyleUtil.readBoolean(value));
                     break;
-
                 case 'double-check-layout':
                     this.setDoubleCheckLayout(deflex.StyleUtil.readBoolean(value));
                     break;
-
                 case 'name':
                     this.name = value;
                     break;
-
                 default:
                     success = false;
             }
-
             return success;
         };
-
         Box.getBoxesFromRootsJQueryByName = function (name, rootsJq) {
-            if (typeof rootsJq === "undefined") { rootsJq = jQuery('.' + Box.CSS_CLASS_IS_ROOT); }
+            if (rootsJq === void 0) { rootsJq = jQuery('.' + Box.CSS_CLASS_IS_ROOT); }
             var result = [];
-
             for (var i = 0, n = rootsJq.length; i < n; i++) {
                 var root = Box.getFrom(rootsJq.eq(i));
                 result = result.concat(this.getBoxesFromRootByName(name, root));
             }
-
             return result;
         };
-
         Box.getBoxesFromRootByName = function (name, root) {
             var result = [];
-
             if (root.name === name) {
                 result.push(root);
             }
-
             var children = root.getChildren();
             for (var i = 0, n = children.length; i < n; i++) {
                 result = result.concat(this.getBoxesFromRootByName(name, children[i]));
             }
-
             return result;
         };
         Box.ROOT_TICKER = new illa.Ticker();
-
         Box.CSS_CLASS = 'deflex-Box';
         Box.CSS_CLASS_SIZE_AUTO_X = 'deflex-Box-size-auto-x';
         Box.CSS_CLASS_SIZE_AUTO_Y = 'deflex-Box-size-auto-y';
@@ -2364,60 +2515,186 @@ var deflex;
         Box.CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
         Box.CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
         Box.EVENT_SOLVE_LAYOUT_NOW_REQUESTED = 'deflex_Box_EVENT_SOLVE_LAYOUT_NOW_REQUESTED';
-
         Box.solutionCountLimit = 100;
         return Box;
     })(berek.Widget);
     deflex.Box = Box;
 })(deflex || (deflex = {}));
-var test2;
-(function (test2) {
+/// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='Box.ts'/>
+/// <reference path='IBoxConstructor.ts'/>
+var deflex;
+(function (deflex) {
+    var Factory = (function () {
+        function Factory() {
+        }
+        Factory.checkDOM = function () {
+            var jqs = jQuery('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
+            for (var i = 0, n = jqs.length; i < n; i++) {
+                var jq = jqs.eq(i);
+                this.create(jq);
+            }
+        };
+        Factory.create = function (jq) {
+            var className = jq.attr(this.CLASS_ATTRIBUTE_NAME);
+            jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
+            if (!illa.isString(className) || className == '') {
+                className = 'default';
+            }
+            var boxConstructor = this.boxConstructors[className];
+            var box = new boxConstructor(jq);
+            var styleClassString = this.styleClasses[className];
+            if (illa.isString(styleClassString)) {
+                box.applyStyle(styleClassString);
+            }
+            var styleString = jq.attr(this.STYLE_ATTRIBUTE_NAME);
+            jq.removeAttr(this.STYLE_ATTRIBUTE_NAME);
+            if (styleString) {
+                box.applyStyle(styleString);
+            }
+            return box;
+        };
+        Factory.CLASS_ATTRIBUTE_NAME = 'data-deflex-class';
+        Factory.STYLE_ATTRIBUTE_NAME = 'data-deflex-style';
+        Factory.boxConstructors = { 'default': deflex.Box };
+        Factory.styleClasses = {};
+        return Factory;
+    })();
+    deflex.Factory = Factory;
+})(deflex || (deflex = {}));
+/// <reference path='../../lib/jQuery.d.ts'/>
+/// <reference path='../../lib/illa/Arrkup.ts'/>
+/// <reference path='../../lib/illa/Log.ts'/>
+/// <reference path='../../lib/berek/UnitTest.ts'/>
+/// <reference path='../../src/deflex/Factory.ts'/>
+var test1;
+(function (test1) {
     var Main = (function () {
         function Main() {
             jQuery(illa.bind(this.onDOMLoaded, this));
         }
         Main.prototype.onDOMLoaded = function () {
-            var u = new berek.UnitTest(jQuery('body'));
-            u.info('Testing...');
-
-            var box = new deflex.Box();
-            box.setInset(10, 0 /* X */, 0 /* MIN */);
-            box.setInset(20, 0 /* X */, 1 /* MAX */);
-            box.setInset(30, 1 /* Y */, 0 /* MIN */);
-            box.setInset(40, 1 /* Y */, 1 /* MAX */);
-            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 10, 'getInset 1');
-            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 20, 'getInset 2');
-            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 30, 'getInset 3');
-            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 40, 'getInset 4');
-            u.assert(box.getInset(0 /* X */) === 30, 'getInset 5');
-            u.assert(box.getInset(1 /* Y */) === 70, 'getInset 6');
-            box.setInset(5);
-            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 5, 'getInset 7');
-            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 5, 'getInset 8');
-            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 5, 'getInset 9');
-            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 5, 'getInset 10');
-            u.assert(box.getInset(0 /* X */) === 10, 'getInset 11');
-            u.assert(box.getInset(1 /* Y */) === 10, 'getInset 12');
-            box.setInset(25, 0 /* X */);
-            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 25, 'getInset 13');
-            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 25, 'getInset 14');
-            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 5, 'getInset 15');
-            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 5, 'getInset 16');
-            u.assert(box.getInset(0 /* X */) === 50, 'getInset 17');
-            u.assert(box.getInset(1 /* Y */) === 10, 'getInset 18');
-            box.setInset(15, 1 /* Y */);
-            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 25, 'getInset 19');
-            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 25, 'getInset 20');
-            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 15, 'getInset 21');
-            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 15, 'getInset 22');
-            u.assert(box.getInset(0 /* X */) === 50, 'getInset 23');
-            u.assert(box.getInset(1 /* Y */) === 30, 'getInset 24');
-
-            u.printStats();
+            this.uOut = jQuery('<div>');
+            this.u = new berek.UnitTest(this.uOut);
+            this.div1 = jQuery(illa.Arrkup.createString(['div', { style: 'position: relative; top: 20px; left: 10px; width: 100px; height: 200px; padding: 2px 0 0 1px' }]));
+            this.div1.appendTo('body');
+            this.root1 = new deflex.Box();
+            this.root1.setParent(this.div1);
+            deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);
         };
+        Main.prototype.doTest1 = function (e) {
+            this.u.assert(illa.isNull(this.root1.getParentBox()), 'Test1 01');
+            this.u.assertEquals(this.root1.getParentJQuery(), this.div1, 'Test1 02');
+            this.u.assert(illa.isNull(this.root1.getEventParent()), 'Test1 03');
+            this.u.assertEquals(this.root1.getSize(0 /* X */), 0, 'Test1 04');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */), 0, 'Test1 05');
+            this.u.assertEquals(this.root1.getSize(0 /* X */, 0 /* INNER */), 0, 'Test1 06');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */, 0 /* INNER */), 0, 'Test1 07');
+            this.u.assertEquals(this.root1.getSize(0 /* X */, 1 /* PARENT */), 0, 'Test1 08');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */, 1 /* PARENT */), 0, 'Test1 09');
+            this.u.assertEquals(this.root1.getSize(0 /* X */, 2 /* PAGE */), 0, 'Test1 10');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */, 2 /* PAGE */), 0, 'Test1 11');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */), 0, 'Test1 12');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */), 0, 'Test1 13');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */), 0, 'Test1 14');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */), 0, 'Test1 15');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */), 0, 'Test1 16');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */), 0, 'Test1 17');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */), 0, 'Test1 18');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */), 0, 'Test1 19');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 0 /* INNER */), 0, 'Test1 20');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 0 /* INNER */), 0, 'Test1 21');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 0 /* INNER */), 0, 'Test1 22');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 0 /* INNER */), 0, 'Test1 23');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 0 /* INNER */), 0, 'Test1 24');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 0 /* INNER */), 0, 'Test1 25');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 1 /* PARENT */), 0, 'Test1 26');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 1 /* PARENT */), 0, 'Test1 27');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 1 /* PARENT */), 0, 'Test1 28');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 1 /* PARENT */), 0, 'Test1 29');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 1 /* PARENT */), 0, 'Test1 30');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 1 /* PARENT */), 0, 'Test1 31');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 2 /* PAGE */), 11, 'Test1 32');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 2 /* PAGE */), 22, 'Test1 33');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 2 /* PAGE */), 11, 'Test1 34');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 2 /* PAGE */), 22, 'Test1 35');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 2 /* PAGE */), 11, 'Test1 36');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 2 /* PAGE */), 22, 'Test1 37');
+            this.u.assertEquals(this.root1.getShowScrollbar(0 /* X */), false, 'Test1 38');
+            this.u.assertEquals(this.root1.getShowScrollbar(1 /* Y */), false, 'Test1 39');
+            this.u.assertEquals(this.root1.getZIndex(), 0, 'Test1 40');
+            this.u.assertEquals(this.root1.getIsDestroyed(), false, 'Test1 41');
+            this.u.assertEquals(this.root1.getIsRoot(), true, 'Test1 42');
+            this.u.assertEquals(this.root1.getIsLayoutActive(), true, 'Test1 43');
+            this.u.assertEquals(this.root1.getIsVisible(), false, 'Test1 44');
+            this.u.assertEquals(this.root1.getScroll(0 /* X */), 0, 'Test1 45');
+            this.u.assertEquals(this.root1.getScroll(1 /* Y */), 0, 'Test1 46');
+            this.u.assertEquals(this.root1.getNeedsLayoutUpdate(), false, 'Test1 47');
+            this.u.assertEquals(this.root1.getApplySizeToSelf(), true, 'Test1 48');
+            this.u.assertEquals(this.root1.getIsSolvingLayout(), false, 'Test1 49');
+            this.root1.setSizeLimitSource(3 /* JQUERY_FULL */);
+            deflex.Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);
+            deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest2, this);
+        };
+        Main.prototype.doTest2 = function (e) {
+            this.u.assertEquals(this.root1.getSize(0 /* X */), 100, 'Test2 01');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */), 200, 'Test2 02');
+            this.u.assertEquals(this.root1.getSize(0 /* X */, 0 /* INNER */), 100, 'Test2 03');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */, 0 /* INNER */), 200, 'Test2 04');
+            this.u.assertEquals(this.root1.getSize(0 /* X */, 1 /* PARENT */), 100, 'Test2 05');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */, 1 /* PARENT */), 200, 'Test2 06');
+            this.u.assertEquals(this.root1.getSize(0 /* X */, 2 /* PAGE */), 100, 'Test2 07');
+            this.u.assertEquals(this.root1.getSize(1 /* Y */, 2 /* PAGE */), 200, 'Test2 08');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */), 0, 'Test2 09');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */), 0, 'Test2 10');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */), 0, 'Test2 11');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */), 0, 'Test2 12');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */), 50, 'Test2 13');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */), 100, 'Test2 14');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */), 100, 'Test2 15');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */), 200, 'Test2 16');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 0 /* INNER */), 0, 'Test2 17');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 0 /* INNER */), 0, 'Test2 18');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 0 /* INNER */), 50, 'Test2 19');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 0 /* INNER */), 100, 'Test2 20');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 0 /* INNER */), 100, 'Test2 21');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 0 /* INNER */), 200, 'Test2 22');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 1 /* PARENT */), 0, 'Test2 23');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 1 /* PARENT */), 0, 'Test2 24');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 1 /* PARENT */), 50, 'Test2 25');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 1 /* PARENT */), 100, 'Test2 26');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 1 /* PARENT */), 100, 'Test2 27');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 1 /* PARENT */), 200, 'Test2 28');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 2 /* PAGE */), 11, 'Test2 29');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 2 /* PAGE */), 22, 'Test2 30');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 2 /* PAGE */), 61, 'Test2 31');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 2 /* PAGE */), 122, 'Test2 32');
+            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 2 /* PAGE */), 111, 'Test2 33');
+            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 2 /* PAGE */), 222, 'Test2 34');
+            this.u.assertEquals(this.root1.getShowScrollbar(0 /* X */), false, 'Test2 35');
+            this.u.assertEquals(this.root1.getShowScrollbar(1 /* Y */), false, 'Test2 36');
+            this.u.assertEquals(this.root1.getZIndex(), 0, 'Test2 37');
+            this.u.assertEquals(this.root1.getIsDestroyed(), false, 'Test2 38');
+            this.u.assertEquals(this.root1.getIsRoot(), true, 'Test2 39');
+            this.u.assertEquals(this.root1.getIsLayoutActive(), true, 'Test2 40');
+            this.u.assertEquals(this.root1.getIsVisible(), true, 'Test2 41');
+            this.u.assertEquals(this.root1.getScroll(0 /* X */), 0, 'Test2 42');
+            this.u.assertEquals(this.root1.getScroll(1 /* Y */), 0, 'Test2 43');
+            this.u.assertEquals(this.root1.getNeedsLayoutUpdate(), false, 'Test2 44');
+            this.u.assertEquals(this.root1.getApplySizeToSelf(), true, 'Test2 45');
+            this.u.assertEquals(this.root1.getIsSolvingLayout(), false, 'Test2 46');
+            this.onTestsDone();
+        };
+        Main.prototype.onTestsDone = function () {
+            deflex.Box.ROOT_TICKER.setIsStarted(false);
+            this.u.printStats();
+            jQuery('body').empty().append(this.uOut);
+        };
+        Main.getInstance = function () {
+            return this.instance;
+        };
+        Main.instance = new Main();
         return Main;
     })();
-    test2.Main = Main;
-})(test2 || (test2 = {}));
-
-var test2Main = new test2.Main();
+    test1.Main = Main;
+})(test1 || (test1 = {}));
