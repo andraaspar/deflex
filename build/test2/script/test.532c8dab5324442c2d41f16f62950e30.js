@@ -1,80 +1,3 @@
-/// <reference path='IAJAXSettingsBeforeSendFunction.ts'/>
-/// <reference path='IAJAXSettingsCompleteFunction.ts'/>
-/// <reference path='IAJAXSettingsContentsObject.ts'/>
-/// <reference path='IAJAXSettingsDataFilterFunction.ts'/>
-/// <reference path='IAJAXSettingsXHRFunction.ts'/>
-/// <reference path='IXHRDoneFunction.ts'/>
-/// <reference path='IXHRFailFunction.ts'/>
-/// <reference path='IAJAXTransportCompleteFunction.ts'/>
-/// <reference path='IAJAXTransportObject.ts'/>
-/// <reference path='ICSSHookObject.ts'/>
-/// <reference path='IEvent.ts'/>
-/// <reference path='IPromise.ts'/>
-/// <reference path='IPromise.ts'/>
-/// <reference path='IPromise.ts'/>
-/// <reference path='IAnimationOptions.ts'/>
-/// <reference path='ITween.ts'/>
-/// <reference path='IAnimationDoneFunction.ts'/>
-/// <reference path='IAnimationProgressFunction.ts'/>
-/// <reference path='IAnimationStartFunction.ts'/>
-/// <reference path='IAnimationStepFunction.ts'/>
-/// <reference path='ISpecialEasingObject.ts'/>
-/// <reference path='IPositionObject.ts'/>
-/// <reference path='IEvent.ts'/>
-/// <reference path='IEventHandler.ts'/>
-/// <reference path='IAddClassFunction.ts'/>
-/// <reference path='IAJAXCompleteFunction.ts'/>
-/// <reference path='IAJAXErrorFunction.ts'/>
-/// <reference path='IAJAXSuccessFunction.ts'/>
-/// <reference path='IAnimationOptions.ts'/>
-/// <reference path='IAppendFunction.ts'/>
-/// <reference path='IAttrFunction.ts'/>
-/// <reference path='IClassToggleFunction.ts'/>
-/// <reference path='ICSSFunction.ts'/>
-/// <reference path='ICSSObject.ts'/>
-/// <reference path='IEachFunction.ts'/>
-/// <reference path='IHTMLFunction.ts'/>
-/// <reference path='IIsFunction.ts'/>
-/// <reference path='ILoadCompleteFunction.ts'/>
-/// <reference path='IOffsetFunction.ts'/>
-/// <reference path='IOnEventsObject.ts'/>
-/// <reference path='IQueueCallbackFunction.ts'/>
-/// <reference path='IReplaceWithFunction.ts'/>
-/// <reference path='ISizeFunction.ts'/>
-/// <reference path='ITextFunction.ts'/>
-/// <reference path='IValFunction.ts'/>
-/// <reference path='IWidthFunction.ts'/>
-/// <reference path='IWrapFunction.ts'/>
-/// <reference path='IEventHandler.ts'/>
-/// <reference path='IEventHandler.ts'/>
-/// <reference path='IStaticEventSpecialHandleObject.ts'/>
-/// <reference path='IStaticEventSpecialSetupFunction.ts'/>
-/// <reference path='IStaticEventSpecialTeardownFunction.ts'/>
-/// <reference path='IStaticEventSpecialAddFunction.ts'/>
-/// <reference path='IStaticEventSpecialAddFunction.ts'/>
-/// <reference path='IEventHandler.ts'/>
-/// <reference path='IStaticEventSpecialObject.ts'/>
-/// <reference path='IStaticEventSpecial.ts'/>
-/// <reference path='IXHRAlwaysFunction.ts'/>
-/// <reference path='IXHRDoneFunction.ts'/>
-/// <reference path='IXHRFailFunction.ts'/>
-/// <reference path='IAJAXSettings.ts'/>
-/// <reference path='IAJAXPrefilterFunction.ts'/>
-/// <reference path='IAJAXTransportHandler.ts'/>
-/// <reference path='ICallbacks.ts'/>
-/// <reference path='ICSSHooksObject.ts'/>
-/// <reference path='IDeferred.ts'/>
-/// <reference path='IDeferredBeforeStartFunction.ts'/>
-/// <reference path='IEachFunction.ts'/>
-/// <reference path='IEachPropertyFunction.ts'/>
-/// <reference path='IEventConstructor.ts'/>
-/// <reference path='IFXObject.ts'/>
-/// <reference path='IGetSuccessFunction.ts'/>
-/// <reference path='IGrepFunction.ts'/>
-/// <reference path='IInstance.ts'/>
-/// <reference path='IMapFunction.ts'/>
-/// <reference path='IStaticEvent.ts'/>
-/// <reference path='IXHR.ts'/>
 var illa;
 (function (illa) {
     /**
@@ -183,23 +106,7 @@ var illa;
         return v instanceof c ? v : null;
     }
     illa.as = as;
-    /**
-     * Binds a function to a ‘this’ context.
-     * No argument binding allows us to keep function type safety.
-     */
     function bind(fn, obj) {
-        if (!fn)
-            throw 'No function.';
-        return function () {
-            return fn.apply(obj, arguments);
-        };
-    }
-    illa.bind = bind;
-    /**
-     * Binds a function to a ‘this’ context, and also prepends the specified arguments
-     * This is not type safe because of argument binding.
-     */
-    function partial(fn, obj) {
         var args = [];
         for (var _i = 2; _i < arguments.length; _i++) {
             args[_i - 2] = arguments[_i];
@@ -210,199 +117,24 @@ var illa;
             return fn.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
         };
     }
-    illa.partial = partial;
+    illa.bind = bind;
+    /**
+     * Binds a function to a ‘this’ context, and also prepends the specified arguments.
+     * This is not type safe.
+     */
+    function bindUnsafe(fn, obj) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        return illa.bind.call(this, arguments);
+    }
+    illa.bindUnsafe = bindUnsafe;
     if (Function.prototype.bind) {
-        illa.bind = illa.partial = function (fn, obj) {
+        illa.bind = illa.bindUnsafe = function (fn) {
             return fn.call.apply(fn.bind, arguments);
         };
     }
-})(illa || (illa = {}));
-var illa;
-(function (illa) {
-    var NumberUtil = (function () {
-        function NumberUtil() {
-        }
-        NumberUtil.toStringNoLetters = function (num) {
-            var result = '';
-            if (!isNaN(num) && isFinite(num)) {
-                if (Math.abs(num) < 1.0) {
-                    var e = parseInt(num.toString().split('e-')[1]);
-                    if (e) {
-                        num *= Math.pow(10, e - 1);
-                        result = '0.' + (new Array(e)).join('0') + num.toString().substring(2);
-                    }
-                    else {
-                        result = num + '';
-                    }
-                }
-                else {
-                    var e = parseInt(num.toString().split('+')[1]);
-                    if (e > 20) {
-                        e -= 20;
-                        num /= Math.pow(10, e);
-                        result = num + (new Array(e + 1)).join('0');
-                    }
-                    else {
-                        result = num + '';
-                    }
-                }
-            }
-            return result;
-        };
-        return NumberUtil;
-    })();
-    illa.NumberUtil = NumberUtil;
-})(illa || (illa = {}));
-var illa;
-(function (illa) {
-    var StringUtil = (function () {
-        function StringUtil() {
-        }
-        StringUtil.escapeHTML = function (str) {
-            return str.replace(/[&<>"']/g, function (s) {
-                return StringUtil.CHAR_TO_HTML[s];
-            });
-        };
-        StringUtil.castNicely = function (str) {
-            return str == null ? '' : String(str);
-        };
-        StringUtil.trim = function (str) {
-            return str.replace(/^\s+|\s+$/g, '');
-        };
-        StringUtil.escapeRegExp = function (str) {
-            return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        };
-        StringUtil.CHAR_TO_HTML = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;' // IE8 does not support &apos;
-        };
-        return StringUtil;
-    })();
-    illa.StringUtil = StringUtil;
-})(illa || (illa = {}));
-/// <reference path='_module.ts'/>
-/// <reference path='NumberUtil.ts'/>
-/// <reference path='StringUtil.ts'/>
-var illa;
-(function (illa) {
-    var Arrkup = (function () {
-        function Arrkup(source, allowRaw) {
-            if (allowRaw === void 0) { allowRaw = true; }
-            this.source = source;
-            this.allowRaw = allowRaw;
-        }
-        Arrkup.prototype.createString = function () {
-            return this.processArrkup(this.getSource());
-        };
-        Arrkup.prototype.processArrkup = function (source) {
-            var result = '';
-            if (illa.isArray(source)) {
-                var sourceArr = source;
-                if (illa.isString(sourceArr[0])) {
-                    result = this.processTag(sourceArr);
-                }
-                else if (illa.isArray(sourceArr[0])) {
-                    result = this.processGroup(sourceArr);
-                }
-                else if (illa.isNull(sourceArr[0])) {
-                    if (this.getAllowRaw()) {
-                        result = this.processRaw(sourceArr);
-                    }
-                }
-            }
-            else {
-                result = this.processNonArrkup(source);
-            }
-            return result;
-        };
-        Arrkup.prototype.processTag = function (source) {
-            var tagName = source[0];
-            var isSelfClosing = tagName.charAt(tagName.length - 1) == '/';
-            if (isSelfClosing)
-                tagName = tagName.slice(0, -1);
-            var result = '<' + tagName;
-            var hasAttributes = illa.isObjectNotNull(source[1]) && !illa.isArray(source[1]);
-            if (hasAttributes)
-                result += this.processAttributes(source[1]);
-            var contentIndex = hasAttributes ? 2 : 1;
-            if (isSelfClosing) {
-                result += '/>';
-            }
-            else {
-                result += '>';
-                result += this.processChildren(source, contentIndex);
-                result += '</' + tagName + '>';
-            }
-            return result;
-        };
-        Arrkup.prototype.processGroup = function (source) {
-            return this.processChildren(source, 0);
-        };
-        Arrkup.prototype.processRaw = function (source) {
-            var result = '';
-            for (var i = 1, n = source.length; i < n; i++) {
-                result += source[i] + '';
-            }
-            return result;
-        };
-        Arrkup.prototype.processNonArrkup = function (source) {
-            return illa.StringUtil.escapeHTML(source + '');
-        };
-        Arrkup.prototype.processAttributes = function (rawProps) {
-            var result = '';
-            for (var prop in rawProps) {
-                if (rawProps.hasOwnProperty(prop)) {
-                    result += this.processAttribute(prop, rawProps[prop]);
-                }
-            }
-            return result;
-        };
-        Arrkup.prototype.processAttribute = function (key, value) {
-            var result = '';
-            if (key) {
-                if (illa.isNumber(value)) {
-                    value = illa.NumberUtil.toStringNoLetters(value);
-                }
-                if (illa.isString(value)) {
-                    result = ' ' + key + '="' + illa.StringUtil.escapeHTML(value) + '"';
-                }
-                else if (illa.isBoolean(value)) {
-                    if (value) {
-                        result += ' ' + key;
-                    }
-                }
-            }
-            return result;
-        };
-        Arrkup.prototype.processChildren = function (rawChildren, startIndex) {
-            var result = '';
-            for (var i = startIndex, n = rawChildren.length; i < n; i++) {
-                result += this.processArrkup(rawChildren[i]);
-            }
-            return result;
-        };
-        Arrkup.prototype.getSource = function () {
-            return this.source;
-        };
-        Arrkup.prototype.setSource = function (value) {
-            this.source = value;
-        };
-        Arrkup.prototype.getAllowRaw = function () {
-            return this.allowRaw;
-        };
-        Arrkup.prototype.setAllowRaw = function (flag) {
-            this.allowRaw = flag;
-        };
-        Arrkup.createString = function (source, allowRaw) {
-            if (allowRaw === void 0) { allowRaw = true; }
-            return new Arrkup(source, allowRaw).createString();
-        };
-        return Arrkup;
-    })();
-    illa.Arrkup = Arrkup;
 })(illa || (illa = {}));
 /// <reference path='_module.ts'/>
 var illa;
@@ -519,6 +251,83 @@ var illa;
     })();
     illa.Log = Log;
 })(illa || (illa = {}));
+/// <reference path='IAJAXSettingsBeforeSendFunction.ts'/>
+/// <reference path='IAJAXSettingsCompleteFunction.ts'/>
+/// <reference path='IAJAXSettingsContentsObject.ts'/>
+/// <reference path='IAJAXSettingsDataFilterFunction.ts'/>
+/// <reference path='IAJAXSettingsXHRFunction.ts'/>
+/// <reference path='IXHRDoneFunction.ts'/>
+/// <reference path='IXHRFailFunction.ts'/>
+/// <reference path='IAJAXTransportCompleteFunction.ts'/>
+/// <reference path='IAJAXTransportObject.ts'/>
+/// <reference path='ICSSHookObject.ts'/>
+/// <reference path='IEvent.ts'/>
+/// <reference path='IPromise.ts'/>
+/// <reference path='IPromise.ts'/>
+/// <reference path='IPromise.ts'/>
+/// <reference path='IAnimationOptions.ts'/>
+/// <reference path='ITween.ts'/>
+/// <reference path='IAnimationDoneFunction.ts'/>
+/// <reference path='IAnimationProgressFunction.ts'/>
+/// <reference path='IAnimationStartFunction.ts'/>
+/// <reference path='IAnimationStepFunction.ts'/>
+/// <reference path='ISpecialEasingObject.ts'/>
+/// <reference path='IPositionObject.ts'/>
+/// <reference path='IEvent.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IAddClassFunction.ts'/>
+/// <reference path='IAJAXCompleteFunction.ts'/>
+/// <reference path='IAJAXErrorFunction.ts'/>
+/// <reference path='IAJAXSuccessFunction.ts'/>
+/// <reference path='IAnimationOptions.ts'/>
+/// <reference path='IAppendFunction.ts'/>
+/// <reference path='IAttrFunction.ts'/>
+/// <reference path='IClassToggleFunction.ts'/>
+/// <reference path='ICSSFunction.ts'/>
+/// <reference path='ICSSObject.ts'/>
+/// <reference path='IEachFunction.ts'/>
+/// <reference path='IHTMLFunction.ts'/>
+/// <reference path='IIsFunction.ts'/>
+/// <reference path='ILoadCompleteFunction.ts'/>
+/// <reference path='IOffsetFunction.ts'/>
+/// <reference path='IOnEventsObject.ts'/>
+/// <reference path='IQueueCallbackFunction.ts'/>
+/// <reference path='IReplaceWithFunction.ts'/>
+/// <reference path='ISizeFunction.ts'/>
+/// <reference path='ITextFunction.ts'/>
+/// <reference path='IValFunction.ts'/>
+/// <reference path='IWidthFunction.ts'/>
+/// <reference path='IWrapFunction.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IStaticEventSpecialHandleObject.ts'/>
+/// <reference path='IStaticEventSpecialSetupFunction.ts'/>
+/// <reference path='IStaticEventSpecialTeardownFunction.ts'/>
+/// <reference path='IStaticEventSpecialAddFunction.ts'/>
+/// <reference path='IStaticEventSpecialAddFunction.ts'/>
+/// <reference path='IEventHandler.ts'/>
+/// <reference path='IStaticEventSpecialObject.ts'/>
+/// <reference path='IStaticEventSpecial.ts'/>
+/// <reference path='IXHRAlwaysFunction.ts'/>
+/// <reference path='IXHRDoneFunction.ts'/>
+/// <reference path='IXHRFailFunction.ts'/>
+/// <reference path='IAJAXSettings.ts'/>
+/// <reference path='IAJAXPrefilterFunction.ts'/>
+/// <reference path='IAJAXTransportHandler.ts'/>
+/// <reference path='ICallbacks.ts'/>
+/// <reference path='ICSSHooksObject.ts'/>
+/// <reference path='IDeferred.ts'/>
+/// <reference path='IDeferredBeforeStartFunction.ts'/>
+/// <reference path='IEachFunction.ts'/>
+/// <reference path='IEachPropertyFunction.ts'/>
+/// <reference path='IEventConstructor.ts'/>
+/// <reference path='IFXObject.ts'/>
+/// <reference path='IGetSuccessFunction.ts'/>
+/// <reference path='IGrepFunction.ts'/>
+/// <reference path='IInstance.ts'/>
+/// <reference path='IMapFunction.ts'/>
+/// <reference path='IStaticEvent.ts'/>
+/// <reference path='IXHR.ts'/>
 /// <reference path='_module.ts'/>
 /// <reference path='Log.ts'/>
 var illa;
@@ -763,6 +572,36 @@ var illa;
         return EventHandler;
     })();
     illa.EventHandler = EventHandler;
+})(illa || (illa = {}));
+var illa;
+(function (illa) {
+    var StringUtil = (function () {
+        function StringUtil() {
+        }
+        StringUtil.escapeHTML = function (str) {
+            return str.replace(/[&<>"']/g, function (s) {
+                return StringUtil.CHAR_TO_HTML[s];
+            });
+        };
+        StringUtil.castNicely = function (str) {
+            return str == null ? '' : String(str);
+        };
+        StringUtil.trim = function (str) {
+            return str.replace(/^\s+|\s+$/g, '');
+        };
+        StringUtil.escapeRegExp = function (str) {
+            return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+        };
+        StringUtil.CHAR_TO_HTML = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;' // IE8 does not support &apos;
+        };
+        return StringUtil;
+    })();
+    illa.StringUtil = StringUtil;
 })(illa || (illa = {}));
 /// <reference path='IEventHandler.ts'/>
 var illa;
@@ -2521,180 +2360,54 @@ var deflex;
     deflex.Box = Box;
 })(deflex || (deflex = {}));
 /// <reference path='../../lib/illa/Log.ts'/>
-/// <reference path='Box.ts'/>
-/// <reference path='IBoxConstructor.ts'/>
-var deflex;
-(function (deflex) {
-    var Factory = (function () {
-        function Factory() {
-        }
-        Factory.checkDOM = function () {
-            var jqs = jQuery('[' + this.CLASS_ATTRIBUTE_NAME + '],[' + this.STYLE_ATTRIBUTE_NAME + ']');
-            for (var i = 0, n = jqs.length; i < n; i++) {
-                var jq = jqs.eq(i);
-                this.create(jq);
-            }
-        };
-        Factory.create = function (jq) {
-            var className = jq.attr(this.CLASS_ATTRIBUTE_NAME);
-            jq.removeAttr(this.CLASS_ATTRIBUTE_NAME);
-            if (!illa.isString(className) || className == '') {
-                className = 'default';
-            }
-            var boxConstructor = this.boxConstructors[className];
-            var box = new boxConstructor(jq);
-            var styleClassString = this.styleClasses[className];
-            if (illa.isString(styleClassString)) {
-                box.applyStyle(styleClassString);
-            }
-            var styleString = jq.attr(this.STYLE_ATTRIBUTE_NAME);
-            jq.removeAttr(this.STYLE_ATTRIBUTE_NAME);
-            if (styleString) {
-                box.applyStyle(styleString);
-            }
-            return box;
-        };
-        Factory.CLASS_ATTRIBUTE_NAME = 'data-deflex-class';
-        Factory.STYLE_ATTRIBUTE_NAME = 'data-deflex-style';
-        Factory.boxConstructors = { 'default': deflex.Box };
-        Factory.styleClasses = {};
-        return Factory;
-    })();
-    deflex.Factory = Factory;
-})(deflex || (deflex = {}));
 /// <reference path='../../lib/jQuery.d.ts'/>
-/// <reference path='../../lib/illa/Arrkup.ts'/>
-/// <reference path='../../lib/illa/Log.ts'/>
 /// <reference path='../../lib/berek/UnitTest.ts'/>
-/// <reference path='../../src/deflex/Factory.ts'/>
-var test1;
-(function (test1) {
+/// <reference path='../../src/deflex/Box.ts'/>
+var test2;
+(function (test2) {
     var Main = (function () {
         function Main() {
             jQuery(illa.bind(this.onDOMLoaded, this));
         }
         Main.prototype.onDOMLoaded = function () {
-            this.uOut = jQuery('<div>');
-            this.u = new berek.UnitTest(this.uOut);
-            this.div1 = jQuery(illa.Arrkup.createString(['div', { style: 'position: relative; top: 20px; left: 10px; width: 100px; height: 200px; padding: 2px 0 0 1px' }]));
-            this.div1.appendTo('body');
-            this.root1 = new deflex.Box();
-            this.root1.setParent(this.div1);
-            deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);
+            var u = new berek.UnitTest(jQuery('body'));
+            u.info('Testing...');
+            var box = new deflex.Box();
+            box.setInset(10, 0 /* X */, 0 /* MIN */);
+            box.setInset(20, 0 /* X */, 1 /* MAX */);
+            box.setInset(30, 1 /* Y */, 0 /* MIN */);
+            box.setInset(40, 1 /* Y */, 1 /* MAX */);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 10, 'getInset 1');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 20, 'getInset 2');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 30, 'getInset 3');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 40, 'getInset 4');
+            u.assert(box.getInset(0 /* X */) === 30, 'getInset 5');
+            u.assert(box.getInset(1 /* Y */) === 70, 'getInset 6');
+            box.setInset(5);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 5, 'getInset 7');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 5, 'getInset 8');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 5, 'getInset 9');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 5, 'getInset 10');
+            u.assert(box.getInset(0 /* X */) === 10, 'getInset 11');
+            u.assert(box.getInset(1 /* Y */) === 10, 'getInset 12');
+            box.setInset(25, 0 /* X */);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 25, 'getInset 13');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 25, 'getInset 14');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 5, 'getInset 15');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 5, 'getInset 16');
+            u.assert(box.getInset(0 /* X */) === 50, 'getInset 17');
+            u.assert(box.getInset(1 /* Y */) === 10, 'getInset 18');
+            box.setInset(15, 1 /* Y */);
+            u.assert(box.getInset(0 /* X */, 0 /* MIN */) === 25, 'getInset 19');
+            u.assert(box.getInset(0 /* X */, 1 /* MAX */) === 25, 'getInset 20');
+            u.assert(box.getInset(1 /* Y */, 0 /* MIN */) === 15, 'getInset 21');
+            u.assert(box.getInset(1 /* Y */, 1 /* MAX */) === 15, 'getInset 22');
+            u.assert(box.getInset(0 /* X */) === 50, 'getInset 23');
+            u.assert(box.getInset(1 /* Y */) === 30, 'getInset 24');
+            u.printStats();
         };
-        Main.prototype.doTest1 = function (e) {
-            this.u.assert(illa.isNull(this.root1.getParentBox()), 'Test1 01');
-            this.u.assertEquals(this.root1.getParentJQuery(), this.div1, 'Test1 02');
-            this.u.assert(illa.isNull(this.root1.getEventParent()), 'Test1 03');
-            this.u.assertEquals(this.root1.getSize(0 /* X */), 0, 'Test1 04');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */), 0, 'Test1 05');
-            this.u.assertEquals(this.root1.getSize(0 /* X */, 0 /* INNER */), 0, 'Test1 06');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */, 0 /* INNER */), 0, 'Test1 07');
-            this.u.assertEquals(this.root1.getSize(0 /* X */, 1 /* PARENT */), 0, 'Test1 08');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */, 1 /* PARENT */), 0, 'Test1 09');
-            this.u.assertEquals(this.root1.getSize(0 /* X */, 2 /* PAGE */), 0, 'Test1 10');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */, 2 /* PAGE */), 0, 'Test1 11');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */), 0, 'Test1 12');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */), 0, 'Test1 13');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */), 0, 'Test1 14');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */), 0, 'Test1 15');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */), 0, 'Test1 16');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */), 0, 'Test1 17');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */), 0, 'Test1 18');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */), 0, 'Test1 19');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 0 /* INNER */), 0, 'Test1 20');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 0 /* INNER */), 0, 'Test1 21');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 0 /* INNER */), 0, 'Test1 22');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 0 /* INNER */), 0, 'Test1 23');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 0 /* INNER */), 0, 'Test1 24');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 0 /* INNER */), 0, 'Test1 25');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 1 /* PARENT */), 0, 'Test1 26');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 1 /* PARENT */), 0, 'Test1 27');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 1 /* PARENT */), 0, 'Test1 28');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 1 /* PARENT */), 0, 'Test1 29');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 1 /* PARENT */), 0, 'Test1 30');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 1 /* PARENT */), 0, 'Test1 31');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 2 /* PAGE */), 11, 'Test1 32');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 2 /* PAGE */), 22, 'Test1 33');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 2 /* PAGE */), 11, 'Test1 34');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 2 /* PAGE */), 22, 'Test1 35');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 2 /* PAGE */), 11, 'Test1 36');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 2 /* PAGE */), 22, 'Test1 37');
-            this.u.assertEquals(this.root1.getShowScrollbar(0 /* X */), false, 'Test1 38');
-            this.u.assertEquals(this.root1.getShowScrollbar(1 /* Y */), false, 'Test1 39');
-            this.u.assertEquals(this.root1.getZIndex(), 0, 'Test1 40');
-            this.u.assertEquals(this.root1.getIsDestroyed(), false, 'Test1 41');
-            this.u.assertEquals(this.root1.getIsRoot(), true, 'Test1 42');
-            this.u.assertEquals(this.root1.getIsLayoutActive(), true, 'Test1 43');
-            this.u.assertEquals(this.root1.getIsVisible(), false, 'Test1 44');
-            this.u.assertEquals(this.root1.getScroll(0 /* X */), 0, 'Test1 45');
-            this.u.assertEquals(this.root1.getScroll(1 /* Y */), 0, 'Test1 46');
-            this.u.assertEquals(this.root1.getNeedsLayoutUpdate(), false, 'Test1 47');
-            this.u.assertEquals(this.root1.getApplySizeToSelf(), true, 'Test1 48');
-            this.u.assertEquals(this.root1.getIsSolvingLayout(), false, 'Test1 49');
-            this.root1.setSizeLimitSource(3 /* JQUERY_FULL */);
-            deflex.Box.ROOT_TICKER.removeEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);
-            deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest2, this);
-        };
-        Main.prototype.doTest2 = function (e) {
-            this.u.assertEquals(this.root1.getSize(0 /* X */), 100, 'Test2 01');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */), 200, 'Test2 02');
-            this.u.assertEquals(this.root1.getSize(0 /* X */, 0 /* INNER */), 100, 'Test2 03');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */, 0 /* INNER */), 200, 'Test2 04');
-            this.u.assertEquals(this.root1.getSize(0 /* X */, 1 /* PARENT */), 100, 'Test2 05');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */, 1 /* PARENT */), 200, 'Test2 06');
-            this.u.assertEquals(this.root1.getSize(0 /* X */, 2 /* PAGE */), 100, 'Test2 07');
-            this.u.assertEquals(this.root1.getSize(1 /* Y */, 2 /* PAGE */), 200, 'Test2 08');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */), 0, 'Test2 09');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */), 0, 'Test2 10');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */), 0, 'Test2 11');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */), 0, 'Test2 12');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */), 50, 'Test2 13');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */), 100, 'Test2 14');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */), 100, 'Test2 15');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */), 200, 'Test2 16');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 0 /* INNER */), 0, 'Test2 17');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 0 /* INNER */), 0, 'Test2 18');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 0 /* INNER */), 50, 'Test2 19');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 0 /* INNER */), 100, 'Test2 20');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 0 /* INNER */), 100, 'Test2 21');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 0 /* INNER */), 200, 'Test2 22');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 1 /* PARENT */), 0, 'Test2 23');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 1 /* PARENT */), 0, 'Test2 24');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 1 /* PARENT */), 50, 'Test2 25');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 1 /* PARENT */), 100, 'Test2 26');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 1 /* PARENT */), 100, 'Test2 27');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 1 /* PARENT */), 200, 'Test2 28');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 0 /* START */, 2 /* PAGE */), 11, 'Test2 29');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 0 /* START */, 2 /* PAGE */), 22, 'Test2 30');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 1 /* CENTER */, 2 /* PAGE */), 61, 'Test2 31');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 1 /* CENTER */, 2 /* PAGE */), 122, 'Test2 32');
-            this.u.assertEquals(this.root1.getOffset(0 /* X */, 2 /* END */, 2 /* PAGE */), 111, 'Test2 33');
-            this.u.assertEquals(this.root1.getOffset(1 /* Y */, 2 /* END */, 2 /* PAGE */), 222, 'Test2 34');
-            this.u.assertEquals(this.root1.getShowScrollbar(0 /* X */), false, 'Test2 35');
-            this.u.assertEquals(this.root1.getShowScrollbar(1 /* Y */), false, 'Test2 36');
-            this.u.assertEquals(this.root1.getZIndex(), 0, 'Test2 37');
-            this.u.assertEquals(this.root1.getIsDestroyed(), false, 'Test2 38');
-            this.u.assertEquals(this.root1.getIsRoot(), true, 'Test2 39');
-            this.u.assertEquals(this.root1.getIsLayoutActive(), true, 'Test2 40');
-            this.u.assertEquals(this.root1.getIsVisible(), true, 'Test2 41');
-            this.u.assertEquals(this.root1.getScroll(0 /* X */), 0, 'Test2 42');
-            this.u.assertEquals(this.root1.getScroll(1 /* Y */), 0, 'Test2 43');
-            this.u.assertEquals(this.root1.getNeedsLayoutUpdate(), false, 'Test2 44');
-            this.u.assertEquals(this.root1.getApplySizeToSelf(), true, 'Test2 45');
-            this.u.assertEquals(this.root1.getIsSolvingLayout(), false, 'Test2 46');
-            this.onTestsDone();
-        };
-        Main.prototype.onTestsDone = function () {
-            deflex.Box.ROOT_TICKER.setIsStarted(false);
-            this.u.printStats();
-            jQuery('body').empty().append(this.uOut);
-        };
-        Main.getInstance = function () {
-            return this.instance;
-        };
-        Main.instance = new Main();
         return Main;
     })();
-    test1.Main = Main;
-})(test1 || (test1 = {}));
+    test2.Main = Main;
+})(test2 || (test2 = {}));
+var test2Main = new test2.Main();
