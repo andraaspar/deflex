@@ -1,6 +1,6 @@
 .deflex-Box
 {
-	box-sizing: content-box; // border-box causes scrollbar problems in IE9
+	box-sizing: content-box; /* border-box causes scrollbar problems in IE9 */
 	position: absolute !important;
 	top: 0;
 	left: 0;
@@ -43,14 +43,13 @@
 .deflex-Box-overflow-visible
 {
 	overflow: visible;
-	
-	&:before,
-	&:after
-	{
-		// Uncollapse margins
-		content: '\a0'; // No-break space
-		display: block;
-		overflow: hidden;
-		height: 0;
-	}
+}
+.deflex-Box-overflow-visible:before,
+.deflex-Box-overflow-visible:after
+{
+	/* Uncollapse margins */
+	content: '\a0';
+	display: block;
+	overflow: hidden;
+	height: 0;
 }
