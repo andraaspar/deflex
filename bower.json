@@ -26,6 +26,6 @@
 		"package.json"
 	],
 	"dependencies": {
-		"berek": "andraaspar/berek#v1.5"
+		"berek": "andraaspar/berek#v1.12"
 	}
 }

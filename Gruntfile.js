@@ -6,7 +6,33 @@ grunt.initConfig((function() {
 		
 		var config = {
 			clean: {
-				tests: ['tmp', 'build']
+				tests: ['tmp', 'build'],
+				update: [
+					'lib'
+				]
+			},
+			copy: {
+				update: {
+					files: [{
+						expand: true,
+						cwd: 'bower_components/illa/src',
+						dot: true,
+						src: '**',
+						dest: 'lib'
+					}, {
+						expand: true,
+						cwd: 'bower_components/berek/src',
+						dot: true,
+						src: '**',
+						dest: 'lib'
+					}, {
+						expand: true,
+						cwd: 'bower_components/jquery-d-ts/src',
+						dot: true,
+						src: '**',
+						dest: 'lib'
+					}]
+				}
 			},
 			kapocs: {
 				tests: {
@@ -31,15 +57,10 @@ grunt.initConfig((function() {
 					files: {}
 				}
 			},
-			typescript: {
-				tests: {
-					files: {}
-				}
-			},
-			sas: {
-				update: {}
-			},
 			shell: {
+				typescriptTests: {
+					command: ''
+				},
 				update: {
 					command: [
 						'bower prune',
@@ -57,20 +78,31 @@ grunt.initConfig((function() {
 			
 			config.less.tests.files[cssPath] = 'test/test' + i + '/_style.less';
 			
-			config.typescript.tests.files[jsPath] = 'test/test' + i + '/Main.ts';
+			config.shell.typescriptTests.command ? config.shell.typescriptTests.command += ' && ' : 0;
+			config.shell.typescriptTests.command += '"./node_modules/.bin/tsc" "test/test' + i + '/Main.ts" --outFile "' + jsPath + '"';
 		}
 		
 		return config;
 	})());
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-kapocs');
-	grunt.loadNpmTasks('grunt-sas');
 	grunt.loadNpmTasks('grunt-shell');
-	grunt.loadNpmTasks('grunt-typescript');
 
-	grunt.registerTask('update', ['shell:update','sas:update']);
-	grunt.registerTask('compile', ['clean:tests','typescript:tests','less:tests', 'kapocs:tests']);
-	grunt.registerTask('default', ['compile']);
+	grunt.registerTask('update', [
+		'shell:update',
+		'clean:update',
+		'copy:update'
+	]);
+	grunt.registerTask('compile', [
+		'clean:tests',
+		'shell:typescriptTests',
+		'less:tests',
+		'kapocs:tests'
+	]);
+	grunt.registerTask('default', [
+		'compile'
+	]);
 };
