@@ -617,7 +617,7 @@ module deflex {
 			this.getJQuery().remove();
 		}
 
-		onDestroyed(e: jQuery.IEvent): void {
+		protected onDestroyed(e: jQuery.IEvent): void {
 			super.onDestroyed(e);
 			illa.Log.infoIf(this.name, 'is being destroyed.');
 			var hasNotDestroyedParentBox = this.parentBox && !this.parentBox.getIsDestroyed();
