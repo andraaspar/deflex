@@ -40,6 +40,14 @@
 	position: relative !important;
 }
 
+.deflex-Box-overflow-scroll-x
+{
+	overflow-x: scroll;
+}
+.deflex-Box-overflow-scroll-y
+{
+	overflow-y: scroll;
+}
 .deflex-Box-overflow-visible
 {
 	overflow: visible;

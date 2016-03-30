@@ -31,6 +31,8 @@ module deflex {
 		static CSS_CLASS_SIZE_FULL_Y = 'deflex-Box-size-full-y';
 		static CSS_CLASS_IS_ROOT = 'deflex-Box-is-root';
 		static CSS_CLASS_OVERFLOW_VISIBLE = 'deflex-Box-overflow-visible';
+		static CSS_CLASS_OVERFLOW_SCROLL_X = 'deflex-Box-overflow-scroll-x';
+		static CSS_CLASS_OVERFLOW_SCROLL_Y = 'deflex-Box-overflow-scroll-y';
 		static EVENT_SOLVE_LAYOUT_NOW_REQUESTED = 'deflex_Box_EVENT_SOLVE_LAYOUT_NOW_REQUESTED';
 		
 		static solutionCountLimit = 100;
@@ -51,6 +53,8 @@ module deflex {
 		private isRoot = false;
 		private allowsVisibility = true;
 		private allowsLayoutActive = true;
+		private scrollbarIsVisibleX = false;
+		private scrollbarIsVisibleY = false;
 		private overflowIsVisible = false;
 		private doubleCheckLayout = true;
 		private isSolvingLayout = false;
@@ -401,30 +405,27 @@ module deflex {
 		}
 
 		getShowScrollbar(axis: illa.Axis2D): boolean {
-			var overflow = '';
 			switch (axis) {
 				case illa.Axis2D.X:
-					overflow = (<HTMLElement>this.getJQuery()[0]).style.overflowY;
-					break;
+					return this.scrollbarIsVisibleX;
 				case illa.Axis2D.Y:
-					overflow = (<HTMLElement>this.getJQuery()[0]).style.overflowX;
-					break;
+					return this.scrollbarIsVisibleY;
 			}
-			return overflow == 'scroll';
 		}
 
 		setShowScrollbar(flag: boolean, axis?: illa.Axis2D): void {
-			var overflow = flag ? 'scroll' : '';
 			switch (axis) {
 				default:
 				case illa.Axis2D.X:
-					if (this.getShowScrollbar(illa.Axis2D.X) != flag) {
-						(<HTMLElement>this.getJQuery()[0]).style.overflowY = overflow;
+					if (this.scrollbarIsVisibleX != flag) {
+						this.scrollbarIsVisibleX = flag;
+						this.getJQuery().toggleClass(Box.CSS_CLASS_OVERFLOW_SCROLL_Y, flag);
 					}
 					if (axis != null) break;
 				case illa.Axis2D.Y:
-					if (this.getShowScrollbar(illa.Axis2D.Y) != flag) {
-						(<HTMLElement>this.getJQuery()[0]).style.overflowX = overflow;
+					if (this.scrollbarIsVisibleY != flag) {
+						this.scrollbarIsVisibleY = flag;
+						this.getJQuery().toggleClass(Box.CSS_CLASS_OVERFLOW_SCROLL_X, flag);
 					}
 			}
 		}
