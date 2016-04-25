@@ -19,7 +19,7 @@ module test2 {
 			
 			
 			
-			var box = new deflex.Box();
+			var box = deflex.Box.create();
 			box.setInset(10, illa.Axis2D.X, illa.End.MIN);
 			box.setInset(20, illa.Axis2D.X, illa.End.MAX);
 			box.setInset(30, illa.Axis2D.Y, illa.End.MIN);

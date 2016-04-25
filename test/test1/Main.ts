@@ -30,7 +30,7 @@ module test1 {
 			this.div1 = jQuery(illa.Arrkup.createString(['div', {style: 'position: relative; top: 20px; left: 10px; width: 100px; height: 200px; padding: 2px 0 0 1px'}]));
 			this.div1.appendTo('body');
 			
-			this.root1 = new deflex.Box();
+			this.root1 = deflex.Box.create();
 			this.root1.setParent(this.div1);
 			
 			deflex.Box.ROOT_TICKER.addEventCallback(illa.Ticker.EVENT_AFTER_TICK, this.doTest1, this);

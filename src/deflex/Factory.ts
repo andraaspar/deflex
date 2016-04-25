@@ -26,7 +26,8 @@ module deflex {
 			}
 
 			var boxConstructor = this.boxConstructors[className];
-			var box = new boxConstructor(jq);
+			var box = new boxConstructor();
+			box.initBox(jq);
 			
 			var styleClassString = this.styleClasses[className];
 			if (illa.isString(styleClassString)) {

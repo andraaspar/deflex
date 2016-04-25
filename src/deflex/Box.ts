@@ -61,9 +61,13 @@ module deflex {
 		private model = new BoxModel(this);
 		
 		public name: string;
+		
+		static create(jq?: jQuery.IInstance): Box {
+			return new Box().initBox(jq);
+		}
 
-		constructor(jq?: jQuery.IInstance) {
-			super(jq || jQuery('<div>'));
+		initBox(jq?: jQuery.IInstance) {
+			super.initWidget(jq || jQuery('<div>'));
 			
 //			this.name = 'Box-' + Box.nextId++;
 			
@@ -78,6 +82,8 @@ module deflex {
 			if (!Box.scrollbarUtil) {
 				Box.scrollbarUtil = new berek.ScrollbarUtil();
 			}
+			
+			return this;
 		}
 
 		onRootTick(e: illa.Event): void {
