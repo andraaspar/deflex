@@ -7,6 +7,7 @@
 /// <reference path='../../lib/illa/Prop4.ts'/>
 /// <reference path='../../lib/illa/Prop8.ts'/>
 /// <reference path='IBoxImp.ts'/>
+/// <reference path='ScrollbarVisibility.ts'/>
 
 module deflex {
 	export class BoxModel {
@@ -55,8 +56,8 @@ module deflex {
 		applySizeToSelf =
 		new illa.Prop(false, this.onSettingChanged, this);
 
-		mayShowScrollbar =
-		new illa.Prop2<illa.Axis2D, boolean>([true, true], this.onSettingChanged, this);
+		scrollbarVisibility =
+		new illa.Prop2<illa.Axis2D, ScrollbarVisibility>([ScrollbarVisibility.AUTO, ScrollbarVisibility.AUTO], this.onSettingChanged, this);
 
 		children: BoxModel[] = [];
 
@@ -107,8 +108,11 @@ module deflex {
 					var remainingSpace = contentSpace - largestMinSize;
 				}
 
-				if (this.mayShowScrollbar.get(1 - axis)) {
+				var scrollbarVisibility = this.scrollbarVisibility.get(1 - axis);
+				if (scrollbarVisibility == ScrollbarVisibility.AUTO) {
 					this.outShowScrollbar.set(1 - axis, remainingSpace + this.inset.get(axis, illa.End.MAX) < 0);
+				} else if (scrollbarVisibility == ScrollbarVisibility.ALWAYS) {
+					this.outShowScrollbar.set(1 - axis, true);
 				}
 			}
 

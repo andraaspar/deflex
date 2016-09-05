@@ -846,13 +846,13 @@ module deflex {
 			this.model.applySizeToSelf.set(value);
 		}
 
-		getMayShowScrollbar(axis: illa.Axis2D): boolean {
-			return this.model.mayShowScrollbar.get(axis);
+		getScrollbarVisibility(axis: illa.Axis2D): ScrollbarVisibility {
+			return this.model.scrollbarVisibility.get(axis);
 		}
 
-		setMayShowScrollbar(value: boolean, a?: illa.Axis2D): void {
+		setScrollbarVisibility(value: ScrollbarVisibility, a?: illa.Axis2D): void {
 			for (var axis = a || illa.Axis2D.X, lastAxis = (a != null ? a : illa.Axis2D.Y); axis <= lastAxis; axis++) {
-				this.model.mayShowScrollbar.set(axis, value);
+				this.model.scrollbarVisibility.set(axis, value);
 			}
 		}
 
@@ -1093,14 +1093,14 @@ module deflex {
 					this.setDirection(StyleUtil.readAxis2D(value));
 					break;
 
-				case 'may-show-scrollbar':
-					this.setMayShowScrollbar(StyleUtil.readBoolean(value));
+				case 'scrollbar-visibility':
+					this.setScrollbarVisibility(StyleUtil.readScrollbarVisibility(value));
 					break;
-				case 'may-show-scrollbar-x':
-					this.setMayShowScrollbar(StyleUtil.readBoolean(value), illa.Axis2D.X);
+				case 'scrollbar-visibility':
+					this.setScrollbarVisibility(StyleUtil.readScrollbarVisibility(value), illa.Axis2D.X);
 					break;
-				case 'may-show-scrollbar-y':
-					this.setMayShowScrollbar(StyleUtil.readBoolean(value), illa.Axis2D.Y);
+				case 'scrollbar-visibility':
+					this.setScrollbarVisibility(StyleUtil.readScrollbarVisibility(value), illa.Axis2D.Y);
 					break;
 				
 				case 'overflow-is-visible':

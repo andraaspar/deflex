@@ -46,5 +46,14 @@ module deflex {
 				default: throw 'Invalid value. Expected size limit source, got: ' + value;
 			}
 		}
+		
+		static readScrollbarVisibility(value: string): ScrollbarVisibility {
+			switch (value.toLowerCase()) {
+				case 'auto': return ScrollbarVisibility.AUTO;
+				case 'always': return ScrollbarVisibility.ALWAYS;
+				case 'never': return ScrollbarVisibility.NEVER;
+				default: throw 'Invalid value. Expected scrollbar visibility, got: ' + value;
+			}
+		}
 	}
 }
